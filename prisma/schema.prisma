@@ -1,0 +1,428 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+model letters {
+  id                                                                       Int                      @id(map: "PK_letters") @default(autoincrement())
+  title                                                                    String?                  @db.NVarChar(Max)
+  create_date                                                              DateTime?                @db.DateTime
+  issue_date                                                               DateTime?                @db.DateTime
+  creator_id                                                               Int?
+  sender_id                                                                Int?
+  contents                                                                 String?                  @db.NVarChar(Max)
+  internal_number                                                          String?                  @db.NVarChar(Max)
+  external_number                                                          String?                  @db.NVarChar(Max)
+  source_type                                                              Int?
+  classification                                                           Int?
+  letter_archive_items                                                     letter_archive_items[]
+  letter_attachments                                                       letter_attachments[]
+  letter_recipients                                                        letter_recipients[]
+  letter_referrals                                                         letter_referrals[]
+  letter_related_letters_letter_related_letters_main_letter_idToletters    letter_related_letters[] @relation("letter_related_letters_main_letter_idToletters")
+  letter_related_letters_letter_related_letters_related_letter_idToletters letter_related_letters[] @relation("letter_related_letters_related_letter_idToletters")
+  users_letters_creator_idTousers                                          users?                   @relation("letters_creator_idTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letters_users")
+  users_letters_sender_idTousers                                           users?                   @relation("letters_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letters_users1")
+}
+
+model persons {
+  id                              Int       @id(map: "PK_persons") @default(autoincrement())
+  first_name                      String?   @db.NVarChar(Max)
+  last_name                       String?   @db.NVarChar(Max)
+  job                             String?   @db.NVarChar(Max)
+  create_date                     DateTime? @db.DateTime
+  creator_id                      Int?
+  user_id                         Int?
+  users_persons_user_idTousers    users?    @relation("persons_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_persons_users")
+  users_persons_creator_idTousers users?    @relation("persons_creator_idTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_persons_users1")
+}
+
+model users {
+  id                                                   Int                 @id(map: "PK_users") @default(autoincrement())
+  user_id                                              String?             @db.NVarChar(Max)
+  create_date                                          DateTime?           @db.DateTime
+  creator_id                                           Int?
+  role_id                                              Int?
+  password                                             String?             @db.NVarChar(Max)
+  photo                                                String?             @db.NVarChar(Max)
+  files                                                files[]
+  form_instance_steps                                  form_instance_steps[]
+  form_archive_items                                   form_archive_items[]
+  meeting_archive_items                                meeting_archive_items[]
+  form_instances_form_instances_creator_idTousers      form_instances[]    @relation("form_instances_creator_idTousers")
+  form_process_steps                                   form_process_steps[]
+  form_referrals_form_referrals_receiver_idTousers     form_referrals[]     @relation("form_referrals_receiver_idTousers")
+  form_referrals_form_referrals_sender_idTousers       form_referrals[]     @relation("form_referrals_sender_idTousers")
+  form_templates_form_templates_creator_idTousers      form_templates[]     @relation("form_templates_creator_idTousers")
+  letter_archive_folders                               letter_archive_folders[]
+  letter_archive_items                                 letter_archive_items[]
+  letter_recipients                                    letter_recipients[]
+  letter_referrals_letter_referrals_sender_idTousers   letter_referrals[]  @relation("letter_referrals_sender_idTousers")
+  letter_referrals_letter_referrals_receiver_idTousers letter_referrals[]  @relation("letter_referrals_receiver_idTousers")
+  letters_letters_creator_idTousers                    letters[]           @relation("letters_creator_idTousers")
+  letters_letters_sender_idTousers                     letters[]           @relation("letters_sender_idTousers")
+  messages_messages_sender_idTousers                   messages[]          @relation("messages_sender_idTousers")
+  message_recipients                                   message_recipients[]
+  meeting_attendees                                    meeting_attendees[]
+  meeting_referrals_meeting_referrals_sender_idTousers meeting_referrals[] @relation("meeting_referrals_sender_idTousers")
+  meeting_referrals_meeting_referrals_receiver_idTousers meeting_referrals[] @relation("meeting_referrals_receiver_idTousers")
+  meetings_meetings_creator_idTousers                  meetings[]          @relation("meetings_creator_idTousers")
+  meetings_meetings_chair_user_idTousers               meetings[]          @relation("meetings_chair_user_idTousers")
+  meetings_meetings_secretary_user_idTousers           meetings[]          @relation("meetings_secretary_user_idTousers")
+  persons_persons_user_idTousers                       persons[]           @relation("persons_user_idTousers")
+  persons_persons_creator_idTousers                    persons[]           @relation("persons_creator_idTousers")
+  roles                                                roles?              @relation(fields: [role_id], references: [id], onUpdate: NoAction, map: "FK_users_roles")
+  users                                                users?              @relation("usersTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_users_users")
+  other_users                                          users[]             @relation("usersTousers")
+  users_permissions                                    users_permissions[]
+  ai_inbox_briefs                                      ai_inbox_briefs[]
+}
+
+model messages {
+  id                          Int                  @id(map: "PK_messages") @default(autoincrement())
+  title                       String               @db.NVarChar(500)
+  contents                    String?              @db.NVarChar(Max)
+  importance                  Int                  @default(1)
+  sender_id                   Int?
+  create_date                 DateTime?            @db.DateTime
+  parent_message_id           Int?
+  forwarded_from_message_id   Int?
+  sender                      users?               @relation("messages_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_messages_sender_users")
+  parent_message              messages?            @relation("messages_parent", fields: [parent_message_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_messages_parent")
+  replies                     messages[]           @relation("messages_parent")
+  forwarded_from_message      messages?            @relation("messages_forwarded_from", fields: [forwarded_from_message_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_messages_forwarded_from")
+  forwarded_messages          messages[]           @relation("messages_forwarded_from")
+  message_recipients          message_recipients[]
+
+  @@index([sender_id], map: "IX_messages_sender")
+  @@index([create_date], map: "IX_messages_create_date")
+}
+
+model message_recipients {
+  id                         Int       @id(map: "PK_message_recipients") @default(autoincrement())
+  message_id                 Int
+  user_id                    Int
+  read_at                    DateTime? @db.DateTime
+  read_notification_seen_at  DateTime? @db.DateTime
+  message                    messages  @relation(fields: [message_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_message_recipients_messages")
+  user                       users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_message_recipients_users")
+
+  @@unique([message_id, user_id], map: "UX_message_recipients_message_user")
+  @@index([user_id, read_at], map: "IX_message_recipients_user_read")
+  @@index([message_id], map: "IX_message_recipients_message")
+}
+
+model meetings {
+  id                                      Int                 @id(map: "PK_meetings") @default(autoincrement())
+  title                                   String              @db.NVarChar(300)
+  description                             String?             @db.NVarChar(Max)
+  location_type                           Int                 @default(0)
+  location_title                          String?             @db.NVarChar(Max)
+  meeting_at                              DateTime            @db.DateTime
+  minutes                                 String              @db.NText
+  creator_id                              Int?
+  chair_user_id                           Int
+  secretary_user_id                       Int
+  approval_status                         Int                 @default(0)
+  approved_at                             DateTime?           @db.DateTime
+  create_date                             DateTime?           @db.DateTime
+  users_meetings_creator_idTousers        users?              @relation("meetings_creator_idTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meetings_creator_users")
+  users_meetings_chair_user_idTousers     users               @relation("meetings_chair_user_idTousers", fields: [chair_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meetings_chair_users")
+  users_meetings_secretary_user_idTousers users               @relation("meetings_secretary_user_idTousers", fields: [secretary_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meetings_secretary_users")
+  meeting_attendees                       meeting_attendees[]
+  meeting_archive_items                   meeting_archive_items[]
+  meeting_referrals                       meeting_referrals[]
+
+  @@index([meeting_at], map: "IX_meetings_meeting_at")
+  @@index([chair_user_id, approval_status], map: "IX_meetings_chair_approval")
+}
+
+model meeting_attendees {
+  id         Int      @id(map: "PK_meeting_attendees") @default(autoincrement())
+  meeting_id Int
+  user_id    Int
+  role       Int      @default(0)
+  meetings   meetings @relation(fields: [meeting_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_meeting_attendees_meetings")
+  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_attendees_users")
+
+  @@unique([meeting_id, user_id], map: "UX_meeting_attendees_meeting_user")
+  @@index([user_id], map: "IX_meeting_attendees_user")
+}
+
+model meeting_referrals {
+  id                                           Int       @id(map: "PK_meeting_referrals") @default(autoincrement())
+  meeting_id                                   Int
+  sender_id                                    Int?
+  receiver_id                                  Int?
+  date_time                                    DateTime? @db.DateTime
+  contents                                     String?   @db.NText
+  status                                       Int?
+  read_at                                      DateTime? @db.DateTime
+  meetings                                     meetings  @relation(fields: [meeting_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_meeting_referrals_meetings")
+  users_meeting_referrals_sender_idTousers     users?    @relation("meeting_referrals_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_referrals_sender_users")
+  users_meeting_referrals_receiver_idTousers   users?    @relation("meeting_referrals_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_referrals_receiver_users")
+
+  @@index([receiver_id, read_at], map: "IX_meeting_referrals_receiver_read")
+  @@index([sender_id, date_time], map: "IX_meeting_referrals_sender_date")
+}
+
+model meeting_archive_items {
+  id          Int                    @id(map: "PK_meeting_archive_items") @default(autoincrement())
+  user_id     Int
+  folder_id   Int
+  meeting_id  Int
+  create_date DateTime?              @db.DateTime
+  update_date DateTime?              @db.DateTime
+  users       users                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_archive_items_users")
+  folder      letter_archive_folders @relation(fields: [folder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_archive_items_folders")
+  meeting     meetings               @relation(fields: [meeting_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_meeting_archive_items_meetings")
+
+  @@unique([user_id, meeting_id], map: "UX_meeting_archive_items_user_meeting")
+  @@index([folder_id], map: "IX_meeting_archive_items_folder")
+  @@index([meeting_id], map: "IX_meeting_archive_items_meeting")
+}
+
+model roles {
+  id                Int                 @id(map: "PK_roles") @default(autoincrement())
+  title             String?             @db.NVarChar(Max)
+  roles_permissions roles_permissions[]
+  users             users[]
+}
+
+model files {
+  id                 Int                  @id(map: "PK_files") @default(autoincrement())
+  file_name          String?              @db.Text
+  file_title         String?              @db.Text
+  create_date        DateTime?            @db.DateTime
+  creator_id         Int?
+  form_instances     form_instances[]     @relation("form_instances_current_file_idTofiles")
+  form_templates     form_templates[]     @relation("form_templates_template_file_idTofiles")
+  users              users?               @relation(fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_files_users")
+  letter_attachments letter_attachments[]
+}
+
+model letter_attachments {
+  id        Int      @id(map: "PK_letter_attachments") @default(autoincrement())
+  letter_id Int?
+  file_id   Int?
+  files     files?   @relation(fields: [file_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_attachments_files")
+  letters   letters? @relation(fields: [letter_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_letter_attachments_letters")
+}
+
+model letter_archive_folders {
+  id          Int                      @id(map: "PK_letter_archive_folders") @default(autoincrement())
+  user_id     Int
+  parent_id   Int?
+  title       String                   @db.NVarChar(200)
+  sort_order  Int                      @default(0)
+  create_date DateTime?                @db.DateTime
+  update_date DateTime?                @db.DateTime
+  users       users                    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_archive_folders_users")
+  parent      letter_archive_folders?  @relation("letter_archive_folders_parent", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_archive_folders_parent")
+  children    letter_archive_folders[] @relation("letter_archive_folders_parent")
+  items       letter_archive_items[]
+  form_items  form_archive_items[]
+  meeting_items meeting_archive_items[]
+
+  @@index([user_id, parent_id], map: "IX_letter_archive_folders_user_parent")
+}
+
+model letter_archive_items {
+  id          Int                    @id(map: "PK_letter_archive_items") @default(autoincrement())
+  user_id     Int
+  folder_id   Int
+  letter_id   Int
+  create_date DateTime?              @db.DateTime
+  update_date DateTime?              @db.DateTime
+  users       users                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_archive_items_users")
+  folder      letter_archive_folders @relation(fields: [folder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_archive_items_folders")
+  letter      letters                @relation(fields: [letter_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_archive_items_letters")
+
+  @@unique([user_id, letter_id], map: "UX_letter_archive_items_user_letter")
+  @@index([folder_id], map: "IX_letter_archive_items_folder")
+  @@index([letter_id], map: "IX_letter_archive_items_letter")
+}
+
+model form_archive_items {
+  id               Int                    @id(map: "PK_form_archive_items") @default(autoincrement())
+  user_id          Int
+  folder_id        Int
+  form_instance_id Int
+  create_date      DateTime?              @db.DateTime
+  update_date      DateTime?              @db.DateTime
+  users            users                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_archive_items_users")
+  folder           letter_archive_folders @relation(fields: [folder_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_archive_items_folders")
+  form_instance    form_instances         @relation(fields: [form_instance_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_archive_items_instances")
+
+  @@unique([user_id, form_instance_id], map: "UX_form_archive_items_user_form")
+  @@index([folder_id], map: "IX_form_archive_items_folder")
+  @@index([form_instance_id], map: "IX_form_archive_items_form")
+}
+
+model letter_referrals {
+  id                                        Int       @id(map: "PK_letter_referrals") @default(autoincrement())
+  letter_id                                 Int?
+  sender_id                                 Int?
+  receiver_id                               Int?
+  date_time                                 DateTime? @db.DateTime
+  contents                                  String?   @db.NText
+  due_date                                  DateTime? @db.DateTime
+  status                                    Int?
+  read_at                                   DateTime? @db.DateTime
+  letters                                   letters?  @relation(fields: [letter_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_letter_referrals_letters")
+  users_letter_referrals_sender_idTousers   users?    @relation("letter_referrals_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_referrals_users")
+  users_letter_referrals_receiver_idTousers users?    @relation("letter_referrals_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_referrals_users1")
+
+  @@index([receiver_id, read_at], map: "IX_letter_referrals_receiver_read")
+}
+
+model letter_related_letters {
+  id                                                        Int      @id(map: "PK_related_letters") @default(autoincrement())
+  main_letter_id                                            Int?
+  related_letter_id                                         Int?
+  letters_letter_related_letters_main_letter_idToletters    letters? @relation("letter_related_letters_main_letter_idToletters", fields: [main_letter_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_related_letters_letters")
+  letters_letter_related_letters_related_letter_idToletters letters? @relation("letter_related_letters_related_letter_idToletters", fields: [related_letter_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_related_letters_letters1")
+}
+
+model letter_recipients {
+  id        Int      @id(map: "PK_letter_recipients") @default(autoincrement())
+  letter_id Int?
+  user_id   Int?
+  letters   letters? @relation(fields: [letter_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_letter_recipients_letters")
+  users     users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_letter_recipients_users")
+}
+
+model form_templates {
+  id                                                     Int                  @id(map: "PK_form_templates") @default(autoincrement())
+  title                                                  String               @db.NVarChar(200)
+  description                                            String?              @db.NVarChar(Max)
+  template_file_id                                       Int?
+  is_active                                              Boolean              @default(true)
+  is_deleted                                             Boolean              @default(false)
+  create_date                                            DateTime?            @db.DateTime
+  creator_id                                             Int?
+  files                                                  files?               @relation("form_templates_template_file_idTofiles", fields: [template_file_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_templates_files")
+  users_form_templates_creator_idTousers                 users?               @relation("form_templates_creator_idTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_templates_users")
+  form_process_steps                                     form_process_steps[]
+  form_instances                                         form_instances[]
+
+  @@index([is_active, is_deleted], map: "IX_form_templates_active")
+}
+
+model form_process_steps {
+  id                  Int            @id(map: "PK_form_process_steps") @default(autoincrement())
+  template_id         Int
+  step_order          Int
+  title               String?        @db.NVarChar(200)
+  approver_user_id    Int
+  form_templates      form_templates @relation(fields: [template_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_form_process_steps_templates")
+  users               users          @relation(fields: [approver_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_process_steps_users")
+
+  @@unique([template_id, step_order], map: "UX_form_process_steps_template_order")
+  @@index([approver_user_id], map: "IX_form_process_steps_approver")
+}
+
+model form_instances {
+  id                                             Int                   @id(map: "PK_form_instances") @default(autoincrement())
+  template_id                                    Int
+  title                                          String                @db.NVarChar(300)
+  creator_id                                     Int?
+  current_file_id                                Int?
+  status                                         Int                   @default(0)
+  current_step_order                             Int?
+  create_date                                    DateTime?             @db.DateTime
+  submit_date                                    DateTime?             @db.DateTime
+  complete_date                                  DateTime?             @db.DateTime
+  reject_date                                    DateTime?             @db.DateTime
+  form_templates                                 form_templates        @relation(fields: [template_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_instances_templates")
+  files                                          files?                @relation("form_instances_current_file_idTofiles", fields: [current_file_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_instances_files")
+  users_form_instances_creator_idTousers         users?                @relation("form_instances_creator_idTousers", fields: [creator_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_instances_users")
+  form_archive_items                             form_archive_items[]
+  form_instance_steps                            form_instance_steps[]
+  form_referrals                                 form_referrals[]
+
+  @@index([creator_id, create_date], map: "IX_form_instances_creator")
+  @@index([status, current_step_order], map: "IX_form_instances_status_step")
+}
+
+model form_instance_steps {
+  id                Int            @id(map: "PK_form_instance_steps") @default(autoincrement())
+  instance_id       Int
+  step_order        Int
+  title             String?        @db.NVarChar(200)
+  approver_user_id  Int
+  status            Int            @default(0)
+  action_date       DateTime?      @db.DateTime
+  comments          String?        @db.NText
+  form_instances    form_instances @relation(fields: [instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_form_instance_steps_instances")
+  users             users          @relation(fields: [approver_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_instance_steps_users")
+
+  @@unique([instance_id, step_order], map: "UX_form_instance_steps_instance_order")
+  @@index([approver_user_id, status], map: "IX_form_instance_steps_approver_status")
+}
+
+model form_referrals {
+  id                                            Int            @id(map: "PK_form_referrals") @default(autoincrement())
+  instance_id                                   Int
+  sender_id                                     Int?
+  receiver_id                                   Int?
+  date_time                                     DateTime?      @db.DateTime
+  contents                                      String?        @db.NText
+  status                                        Int?
+  read_at                                       DateTime?      @db.DateTime
+  form_instances                                form_instances @relation(fields: [instance_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_form_referrals_instances")
+  users_form_referrals_sender_idTousers         users?         @relation("form_referrals_sender_idTousers", fields: [sender_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_referrals_sender_users")
+  users_form_referrals_receiver_idTousers       users?         @relation("form_referrals_receiver_idTousers", fields: [receiver_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_form_referrals_receiver_users")
+
+  @@index([receiver_id, read_at], map: "IX_form_referrals_receiver_read")
+  @@index([sender_id, date_time], map: "IX_form_referrals_sender_date")
+}
+
+model general_settings {
+  id    Int     @id(map: "PK_general_settings") @default(autoincrement())
+  code  String? @db.NVarChar(Max)
+  title String? @db.NVarChar(Max)
+  value String? @db.NVarChar(Max)
+}
+
+model permissions_defination {
+  id                Int                 @id(map: "PK_permissions_defination") @default(autoincrement())
+  code              String?             @db.NVarChar(Max)
+  title             String?             @db.NVarChar(Max)
+  roles_permissions roles_permissions[]
+  users_permissions users_permissions[]
+}
+
+model roles_permissions {
+  id                     Int                     @id(map: "PK_roles_permissions") @default(autoincrement())
+  role_id                Int?
+  permission_id          Int?
+  permissions_defination permissions_defination? @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_roles_permissions_permissions_defination")
+  roles                  roles?                  @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_roles_permissions_roles")
+}
+
+model users_permissions {
+  id                     Int                     @id(map: "PK_users_permissions") @default(autoincrement())
+  user_id                Int?
+  permission_id          Int?
+  permissions_defination permissions_defination? @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_users_permissions_permissions_defination")
+  users                  users?                  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_users_permissions_users")
+}
+
+model ai_inbox_briefs {
+  id                Int       @id(map: "PK_ai_inbox_briefs") @default(autoincrement())
+  user_id           Int
+  brief_date        DateTime  @db.Date
+  create_date       DateTime? @db.DateTime
+  summary           String?   @db.NVarChar(Max)
+  tasks_json        String    @db.NVarChar(Max)
+  source_items_json String?   @db.NVarChar(Max)
+  ai_error          String?   @db.NVarChar(Max)
+  users             users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ai_inbox_briefs_users")
+
+  @@index([user_id, brief_date, create_date], map: "IX_ai_inbox_briefs_user_date")
+}
