@@ -447,20 +447,8 @@ export async function markHeaderNotificationClicked(
     const currentUserId = await requireUserId();
 
     if (notification.type === "letter") {
-      await prisma.letter_referrals.updateMany({
-        where: {
-          id: notification.sourceId,
-          receiver_id: currentUserId,
-          read_at: null,
-        },
-        data: {
-          read_at: new Date(),
-        },
-      });
-
-      revalidatePath("/");
-      revalidatePath("/incoming-letters");
-
+      // Letter view handles the read transition so archive suggestions can
+      // reliably start only when an unread letter is opened.
       return { success: true };
     }
 
@@ -551,7 +539,7 @@ export async function markLetterViewed(letterId: number) {
   try {
     const currentUserId = await requireUserId();
 
-    await prisma.letter_referrals.updateMany({
+    const updatedReferrals = await prisma.letter_referrals.updateMany({
       where: {
         letter_id: letterId,
         receiver_id: currentUserId,
@@ -565,12 +553,48 @@ export async function markLetterViewed(letterId: number) {
     revalidatePath("/");
     revalidatePath("/incoming-letters");
 
-    return { success: true };
+    return { success: true, wasUnread: updatedReferrals.count > 0 };
   } catch (error) {
     console.error("Error marking letter viewed:", error);
     return {
       success: false,
       error: "خطا در ثبت مشاهده نامه",
+    };
+  }
+}
+
+export async function markLetterUnread(referralId: number) {
+  try {
+    const currentUserId = await requireUserId();
+    const parsedReferralId = Number(referralId);
+
+    if (!Number.isInteger(parsedReferralId) || parsedReferralId <= 0) {
+      return { success: false, error: "ارجاع نامه معتبر نیست" };
+    }
+
+    const updatedReferrals = await prisma.letter_referrals.updateMany({
+      where: {
+        id: parsedReferralId,
+        receiver_id: currentUserId,
+        read_at: {
+          not: null,
+        },
+      },
+      data: {
+        read_at: null,
+      },
+    });
+
+    revalidatePath("/");
+    revalidatePath("/incoming-letters");
+    revalidatePath("/letter");
+
+    return { success: true, changed: updatedReferrals.count > 0 };
+  } catch (error) {
+    console.error("Error marking letter unread:", error);
+    return {
+      success: false,
+      error: "خطا در ثبت نامه به عنوان خوانده نشده",
     };
   }
 }

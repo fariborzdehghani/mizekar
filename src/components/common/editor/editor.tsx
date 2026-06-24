@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
@@ -16,6 +16,7 @@ interface EditorProps {
   height?: number | string; // accept px number or CSS size string
   readOnly?: boolean; // make editor read-only
   initialValue?: string; // initial value for controlled mode
+  onChange?: (content: string) => void;
 }
 
 const Editor = ({
@@ -24,8 +25,10 @@ const Editor = ({
   height,
   readOnly = false,
   initialValue,
+  onChange,
 }: EditorProps) => {
-  const [content, setContent] = useState(initialValue || defaultContent || "");
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  const initialContent = initialValue || defaultContent || "";
 
   const editor = useEditor({
     // CRITICAL for Next.js: prevents hydration mismatches
@@ -49,7 +52,11 @@ const Editor = ({
     content: initialValue || defaultContent || "<p></p>",
     editable: !readOnly,
     onUpdate: ({ editor }) => {
-      setContent(editor.getHTML());
+      const nextContent = editor.getHTML();
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = nextContent;
+      }
+      onChange?.(nextContent);
     },
     editorProps: {
       attributes: {
@@ -60,7 +67,12 @@ const Editor = ({
 
   useEffect(() => {
     if (editor && initialValue !== undefined) {
-      editor.commands.setContent(initialValue || "<p></p>");
+      const nextContent = initialValue || "<p></p>";
+      if (editor.getHTML() === nextContent) return;
+      editor.commands.setContent(nextContent);
+      if (hiddenInputRef.current) {
+        hiddenInputRef.current.value = nextContent;
+      }
     }
   }, [initialValue, editor]);
 
@@ -73,9 +85,16 @@ const Editor = ({
   const minHeight = typeof height === "number" ? `${height}px` : height;
 
   return (
-    <div className="border rounded-lg p-4">
+    <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
       {/* Hidden input so form submissions include the HTML content */}
-      {name && <input type="hidden" name={name} value={content} />}
+      {name && (
+        <input
+          ref={hiddenInputRef}
+          type="hidden"
+          name={name}
+          defaultValue={initialContent}
+        />
+      )}
       {!readOnly && <Toolbar editor={editor} />}
       <EditorContent
         editor={editor}

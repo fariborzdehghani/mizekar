@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/src/lib/prisma";
+import { Prisma } from "@/generated/prisma/client";
 import { requireUser, requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
@@ -12,9 +13,20 @@ import {
   type LetterRelationSummaryResult,
 } from "@/src/ai/features/letterRelationSummary";
 import {
+  generateLetterKeywordTagsWithAi,
+  type LetterKeywordTagsResult,
+} from "@/src/ai/features/letterKeywordTags";
+import {
   getPlainTextSnippet,
   hasRichTextContent,
 } from "@/src/lib/richText";
+import {
+  normalizeLetterTagKey,
+  normalizeLetterTagName,
+  parseLetterTagsJson,
+  uniqueLetterTagNames,
+  type LetterKeywordTag,
+} from "@/src/lib/letterTags";
 
 interface PersonRecipient {
   id: number;
@@ -35,6 +47,174 @@ interface ReferralReceiverInput {
 const REFERRAL_STATUS_IN_PROGRESS = 0;
 const REFERRAL_STATUS_DONE = 1;
 const DEFAULT_INTERNAL_LETTER_TEMPLATE = "{سال}/ص/{شماره}";
+
+type LetterTagRow = {
+  id: number;
+  name: string;
+};
+
+type LetterTagLinkRow = LetterTagRow & {
+  letter_id: number;
+};
+
+async function upsertLetterTagRaw(
+  name: string,
+  normalizedName: string,
+  createDate: Date
+) {
+  const rows = await prisma.$queryRaw<LetterTagRow[]>(Prisma.sql`
+    MERGE [dbo].[letter_tags] WITH (HOLDLOCK) AS target
+    USING (
+      SELECT
+        ${name} AS [name],
+        ${normalizedName} AS [normalized_name],
+        ${createDate} AS [create_date]
+    ) AS source
+    ON target.[normalized_name] = source.[normalized_name]
+    WHEN MATCHED THEN
+      UPDATE SET [name] = target.[name]
+    WHEN NOT MATCHED THEN
+      INSERT ([name], [normalized_name], [create_date])
+      VALUES (source.[name], source.[normalized_name], source.[create_date])
+    OUTPUT inserted.[id], inserted.[name];
+  `);
+
+  return rows[0] || null;
+}
+
+async function linkLetterTagRaw(
+  letterId: number,
+  tagId: number,
+  createDate: Date
+) {
+  await prisma.$executeRaw(Prisma.sql`
+    MERGE [dbo].[letter_tag_links] WITH (HOLDLOCK) AS target
+    USING (
+      SELECT
+        ${letterId} AS [letter_id],
+        ${tagId} AS [tag_id],
+        ${createDate} AS [create_date]
+    ) AS source
+    ON target.[letter_id] = source.[letter_id]
+      AND target.[tag_id] = source.[tag_id]
+    WHEN NOT MATCHED THEN
+      INSERT ([letter_id], [tag_id], [create_date])
+      VALUES (source.[letter_id], source.[tag_id], source.[create_date]);
+  `);
+}
+
+async function searchLetterTagsRaw(query = "") {
+  const trimmedQuery = normalizeLetterTagName(query);
+  const normalizedQuery = normalizeLetterTagKey(trimmedQuery);
+
+  if (!trimmedQuery) {
+    return prisma.$queryRaw<LetterTagRow[]>(Prisma.sql`
+      SELECT TOP (12) [id], [name]
+      FROM [dbo].[letter_tags]
+      ORDER BY [create_date] DESC, [name] ASC;
+    `);
+  }
+
+  const namePattern = `%${trimmedQuery}%`;
+  const normalizedPattern = `%${normalizedQuery}%`;
+
+  return prisma.$queryRaw<LetterTagRow[]>(Prisma.sql`
+    SELECT TOP (12) [id], [name]
+    FROM [dbo].[letter_tags]
+    WHERE [name] LIKE ${namePattern}
+      OR [normalized_name] LIKE ${normalizedPattern}
+    ORDER BY [name] ASC;
+  `);
+}
+
+async function findLetterIdsByTagSearch(query: string) {
+  const trimmedQuery = normalizeLetterTagName(query);
+  const normalizedQuery = normalizeLetterTagKey(trimmedQuery);
+  if (!trimmedQuery) return [];
+
+  const namePattern = `%${trimmedQuery}%`;
+  const normalizedPattern = `%${normalizedQuery}%`;
+  const rows = await prisma.$queryRaw<Array<{ letter_id: number }>>(Prisma.sql`
+    SELECT DISTINCT TOP (100) links.[letter_id]
+    FROM [dbo].[letter_tag_links] AS links
+    INNER JOIN [dbo].[letter_tags] AS tags
+      ON tags.[id] = links.[tag_id]
+    WHERE tags.[name] LIKE ${namePattern}
+      OR tags.[normalized_name] LIKE ${normalizedPattern}
+    ORDER BY links.[letter_id] DESC;
+  `);
+
+  return rows.map((row) => row.letter_id);
+}
+
+async function findLetterIdsWithAllTags(tagKeys: string[]) {
+  if (tagKeys.length === 0) return [];
+
+  const rows = await prisma.$queryRaw<Array<{ letter_id: number }>>(Prisma.sql`
+    SELECT links.[letter_id]
+    FROM [dbo].[letter_tag_links] AS links
+    INNER JOIN [dbo].[letter_tags] AS tags
+      ON tags.[id] = links.[tag_id]
+    WHERE tags.[normalized_name] IN (${Prisma.join(tagKeys)})
+    GROUP BY links.[letter_id]
+    HAVING COUNT(DISTINCT tags.[normalized_name]) = ${tagKeys.length};
+  `);
+
+  return rows.map((row) => row.letter_id);
+}
+
+async function getLetterTagsByLetterIds(letterIds: number[]) {
+  const uniqueLetterIds = [...new Set(letterIds)].filter(
+    (letterId) => Number.isInteger(letterId) && letterId > 0
+  );
+
+  if (uniqueLetterIds.length === 0) {
+    return new Map<number, LetterKeywordTag[]>();
+  }
+
+  const rows = await prisma.$queryRaw<LetterTagLinkRow[]>(Prisma.sql`
+    SELECT links.[letter_id], tags.[id], tags.[name]
+    FROM [dbo].[letter_tag_links] AS links
+    INNER JOIN [dbo].[letter_tags] AS tags
+      ON tags.[id] = links.[tag_id]
+    WHERE links.[letter_id] IN (${Prisma.join(uniqueLetterIds)})
+    ORDER BY tags.[name] ASC;
+  `);
+  const tagsByLetterId = new Map<number, LetterKeywordTag[]>();
+
+  for (const row of rows) {
+    const tags = tagsByLetterId.get(row.letter_id) || [];
+    tags.push({
+      id: row.id,
+      name: row.name,
+    });
+    tagsByLetterId.set(row.letter_id, tags);
+  }
+
+  return tagsByLetterId;
+}
+
+async function saveLetterTags(letterId: number, tagNames: string[]) {
+  const uniqueTagNames = uniqueLetterTagNames(tagNames);
+  if (uniqueTagNames.length === 0) return [];
+
+  const now = new Date();
+  const savedTags: LetterKeywordTag[] = [];
+
+  for (const name of uniqueTagNames) {
+    const normalizedName = normalizeLetterTagKey(name);
+    if (!normalizedName) continue;
+
+    const tag = await upsertLetterTagRaw(name, normalizedName, now);
+    if (!tag) continue;
+
+    await linkLetterTagRaw(letterId, tag.id, now);
+
+    savedTags.push(tag);
+  }
+
+  return savedTags;
+}
 
 function toLatinDigits(value: string) {
   const digitMap: Record<string, string> = {
@@ -101,6 +281,7 @@ export async function createLetter(formData: FormData) {
     const content = formData.get("content") as string;
     const recipientsJson = formData.get("recipients") as string;
     const relatedLettersJson = formData.get("relatedLetters") as string | null;
+    const tagNames = parseLetterTagsJson(formData.get("tags") as string | null);
 
     // Validate required fields
     if (!title || !content || !recipientsJson) {
@@ -294,6 +475,8 @@ export async function createLetter(formData: FormData) {
         },
       });
     }
+
+    await saveLetterTags(letter.id, tagNames);
   } catch (error) {
     console.error("Error creating letter:", error);
     return {
@@ -452,6 +635,47 @@ export async function searchPersons(query: string) {
   }
 }
 
+export async function searchLetterTags(query = "") {
+  try {
+    await requireUser();
+
+    const tags = await searchLetterTagsRaw(query);
+
+    return {
+      success: true,
+      tags,
+    };
+  } catch (error) {
+    console.error("Error searching letter tags:", error);
+    return {
+      success: false,
+      error: "خطا در جستجوی کلیدواژه‌ها",
+      tags: [],
+    };
+  }
+}
+
+export async function generateLetterKeywordTags(
+  title: string,
+  content: string
+): Promise<LetterKeywordTagsResult> {
+  try {
+    await requireUser();
+
+    return await generateLetterKeywordTagsWithAi(title, content);
+  } catch (error) {
+    console.error("Error generating letter keyword tags:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "خطا در تولید کلیدواژه‌های هوشمند نامه",
+      tags: [],
+    };
+  }
+}
+
 function getUserDisplayName(
   user:
     | {
@@ -514,6 +738,7 @@ export async function searchLetters(query: string, excludeLetterId?: number) {
         letters: [],
       };
     }
+    const matchingTagLetterIds = await findLetterIdsByTagSearch(trimmedQuery);
 
     const letters = await prisma.letters.findMany({
       where: {
@@ -547,6 +772,9 @@ export async function searchLetters(query: string, excludeLetterId?: number) {
                   contains: trimmedQuery,
                 },
               },
+              ...(matchingTagLetterIds.length > 0
+                ? [{ id: { in: matchingTagLetterIds } }]
+                : []),
             ],
           },
         ],
@@ -590,6 +818,8 @@ export type AdvancedLetterSearchInput = {
   title?: string;
   content?: string;
   createDate?: string;
+  tag?: string;
+  tags?: string[];
 };
 
 export type AdvancedLetterSearchResult = {
@@ -603,6 +833,7 @@ export type AdvancedLetterSearchResult = {
   isIncoming: boolean;
   isOutgoing: boolean;
   archiveFolderTitle: string | null;
+  tags: LetterKeywordTag[];
 };
 
 export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) {
@@ -610,7 +841,14 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
   const title = input.title?.trim() || "";
   const content = input.content?.trim() || "";
   const createDate = parseDateOnly(input.createDate);
-  const hasSearchCriteria = Boolean(title || content || createDate);
+  const tags = uniqueLetterTagNames([
+    ...(input.tags || []),
+    ...(input.tag ? input.tag.split(/[،,]/) : []),
+  ]);
+  const tagKeys = tags.map(normalizeLetterTagKey).filter(Boolean);
+  const hasSearchCriteria = Boolean(
+    title || content || createDate || tagKeys.length
+  );
 
   if (!hasSearchCriteria) {
     return {
@@ -621,6 +859,17 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
   }
 
   try {
+    const tagFilteredLetterIds =
+      tagKeys.length > 0 ? await findLetterIdsWithAllTags(tagKeys) : [];
+
+    if (tagKeys.length > 0 && tagFilteredLetterIds.length === 0) {
+      return {
+        success: true,
+        letters: [] as AdvancedLetterSearchResult[],
+        hasSearchCriteria,
+      };
+    }
+
     const letters = await prisma.letters.findMany({
       where: {
         AND: [
@@ -633,6 +882,9 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
           },
           ...(title ? [{ title: { contains: title } }] : []),
           ...(content ? [{ contents: { contains: content } }] : []),
+          ...(tagFilteredLetterIds.length > 0
+            ? [{ id: { in: tagFilteredLetterIds } }]
+            : []),
           ...(createDate
             ? [
                 {
@@ -681,6 +933,9 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
       orderBy: [{ create_date: "desc" }, { id: "desc" }],
       take: 200,
     });
+    const tagsByLetterId = await getLetterTagsByLetterIds(
+      letters.map((letter) => letter.id)
+    );
 
     return {
       success: true,
@@ -699,6 +954,7 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
           (referral) => referral.sender_id === currentUserId
         ),
         archiveFolderTitle: letter.letter_archive_items[0]?.folder.title || null,
+        tags: tagsByLetterId.get(letter.id) || [],
       })),
       hasSearchCriteria,
     };
@@ -1259,7 +1515,7 @@ export async function deleteFile(fileId: number) {
 
 export async function getLetter(letterId: number) {
   try {
-    await requireUser();
+    await requireUserId();
     const letter = await prisma.letters.findUnique({
       where: { id: letterId },
       include: {
@@ -1383,6 +1639,7 @@ export async function getLetter(letterId: number) {
           ])
       ).values(),
     ];
+    const tagsByLetterId = await getLetterTagsByLetterIds([letter.id]);
 
     return {
       success: true,
@@ -1402,6 +1659,7 @@ export async function getLetter(letterId: number) {
           fileName: att.files?.file_title,
         })),
         recipients: recipientsWithPersonData,
+        tags: tagsByLetterId.get(letter.id) || [],
         relatedLetters: relatedLettersData,
         referrals: letter.letter_referrals.map((referral) => ({
           id: referral.id,

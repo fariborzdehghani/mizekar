@@ -10,14 +10,15 @@ import { getPlainText } from "@/src/lib/richText";
 
 const AI_SUMMARY_MAX_LETTERS = 12;
 const AI_SUMMARY_MAX_DEPTH = 5;
-const AI_SUMMARY_CONTENT_CHAR_LIMIT = 700;
+const AI_SUMMARY_CONTENT_CHAR_LIMIT = 1600;
 const AI_SUMMARY_TIMEOUT_MS = 180_000;
-const AI_SUMMARY_MAX_TOKENS = 900;
+export const AI_SUMMARY_MAX_TOKENS = 1400;
 const AI_DRAFT_TIMEOUT_MS = 240_000;
 const AI_DRAFT_MAX_TOKENS = 1800;
 const AI_DRAFT_SUMMARY_CHAR_LIMIT = 5000;
 const AI_DRAFT_USER_PROMPT_CHAR_LIMIT = 2500;
 const AI_DRAFT_SOURCE_CONTENT_CHAR_LIMIT = 1200;
+const AI_NEW_LETTER_CONTEXT_CHAR_LIMIT = 1200;
 
 type LetterRelationTreeNode = {
   id: number;
@@ -374,10 +375,13 @@ function buildLetterRelationSummaryPrompt(
     : "The full discovered relation tree is included.";
 
   return [
-    "Summarize the full related-letter tree for the current letter.",
+    "Write a mid-length narrative summary of the full related-letter tree for the current letter.",
     "Answer in Persian. Use only the provided letter data. Do not invent missing details.",
-    "Include: overall subject, key requests/decisions/status, important timeline, how letters are connected, and open follow-ups.",
-    "Keep the result concise and useful for someone viewing the letter. Use no more than 8 short bullets.",
+    "Use the Content sections as the primary source. Use titles, dates, numbers, paths, and relations only to understand context and sequence.",
+    "Explain what happened across the letters: the initiating issue, requests and replies, decisions, status changes, responsibilities, deadlines, and open follow-ups.",
+    "Write 3 to 5 cohesive paragraphs, around 250 to 450 Persian words total.",
+    "Avoid a generic item-by-item list of letters. Mention individual letters only when they matter to the story or timeline.",
+    "If there are clear unresolved actions, add a short final paragraph beginning with \"اقدام‌های باز:\".",
     "",
     `Current letter: ${getLetterSummaryLabel(rootLetter, rootLetterId)}`,
     `Included letters: ${tree.letters.length}`,
@@ -542,6 +546,69 @@ export async function prepareLetterResponseDraft(
     truncatePromptText(trimmedSummary, AI_DRAFT_SUMMARY_CHAR_LIMIT),
     "",
     "User instruction for the response draft:",
+    truncatePromptText(trimmedInstruction, AI_DRAFT_USER_PROMPT_CHAR_LIMIT),
+  ].join("\n");
+
+  return {
+    success: true,
+    systemPrompt,
+    userPrompt,
+    fallbackTitle,
+  };
+}
+
+export async function prepareNewLetterDraft(
+  userInstruction: string,
+  existingTitle = "",
+  existingContent = ""
+): Promise<LetterResponseDraftPreparationResult> {
+  const trimmedInstruction = userInstruction.trim();
+  const trimmedTitle = existingTitle.trim();
+  const trimmedContent = getPlainText(existingContent).trim();
+
+  if (!trimmedInstruction) {
+    return {
+      success: false,
+      error: "درخواست خود برای پیش‌نویس نامه را وارد کنید.",
+    };
+  }
+
+  const fallbackTitle = trimmedTitle || "پیش‌نویس نامه";
+  const systemPrompt =
+    readAiProviderString(
+      ["AI_NEW_LETTER_DRAFT_SYSTEM_PROMPT", "AI_LETTER_DRAFT_SYSTEM_PROMPT"],
+      ["LM_STUDIO_AI_NEW_LETTER_DRAFT_SYSTEM_PROMPT", "LM_STUDIO_AI_LETTER_DRAFT_SYSTEM_PROMPT"]
+    ) ||
+    [
+      "You draft Persian office correspondence.",
+      "Use only the user's instruction and any existing draft context.",
+      "Do not invent facts, dates, approvals, names, numbers, or commitments.",
+      "If a detail is missing, write a polished draft that leaves the missing detail general instead of fabricating it.",
+      "Return only valid JSON with keys title and content.",
+      "The content value must be clean HTML suitable for a rich text editor, using p, ul, ol, li, strong, and br tags only.",
+      "Do not include hidden reasoning, chain-of-thought, markdown fences, or <think> blocks.",
+    ].join(" ");
+  const contextLines =
+    trimmedTitle || trimmedContent
+      ? [
+          "Existing draft context:",
+          `Current title: ${trimmedTitle || "-"}`,
+          "Current content excerpt:",
+          truncatePromptText(
+            trimmedContent || "(No content entered yet.)",
+            AI_NEW_LETTER_CONTEXT_CHAR_LIMIT
+          ),
+          "",
+        ]
+      : [];
+  const userPrompt = [
+    "Create a new Persian office-letter draft.",
+    "The user instruction is the highest priority.",
+    "Return exactly this JSON shape:",
+    '{"title":"short Persian title","content":"<p>draft body</p>"}',
+    "",
+    ...contextLines,
+    "User instruction for the new letter draft:",
     truncatePromptText(trimmedInstruction, AI_DRAFT_USER_PROMPT_CHAR_LIMIT),
   ].join("\n");
 

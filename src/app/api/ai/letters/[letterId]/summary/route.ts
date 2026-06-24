@@ -2,7 +2,10 @@ import {
   readAiProviderNumber,
   streamAiChatCompletion,
 } from "@/src/ai/client";
-import { prepareLetterRelationSummary } from "@/src/ai/features/letterRelationSummary";
+import {
+  AI_SUMMARY_MAX_TOKENS,
+  prepareLetterRelationSummary,
+} from "@/src/ai/features/letterRelationSummary";
 import { requireUser } from "@/src/lib/auth";
 
 export const runtime = "nodejs";
@@ -112,7 +115,7 @@ export async function POST(
         maxTokens: readAiProviderNumber(
           ["AI_LETTER_SUMMARY_MAX_TOKENS"],
           ["LM_STUDIO_AI_LETTER_SUMMARY_MAX_TOKENS"],
-          900
+          AI_SUMMARY_MAX_TOKENS
         ),
         temperature: readAiProviderNumber(
           ["AI_LETTER_SUMMARY_TEMPERATURE"],

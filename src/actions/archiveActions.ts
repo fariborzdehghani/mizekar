@@ -3,6 +3,13 @@
 import { prisma } from "@/src/lib/prisma";
 import { requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
+import { markLetterViewed } from "@/src/actions/notificationActions";
+import {
+  readAiProviderNumber,
+  readAiProviderString,
+  requestAiChatCompletion,
+} from "@/src/ai/client";
+import { getPlainText } from "@/src/lib/richText";
 
 export type ArchiveFolderNode = {
   id: number;
@@ -61,16 +68,191 @@ export type ArchivedLetterListItem = Extract<
   { type: "letter" }
 >;
 
+type ArchiveFolderPromptItem = {
+  id: number;
+  title: string;
+  path: string;
+};
+
+export type LetterArchiveSuggestionResult =
+  | {
+      success: true;
+      folderId: number;
+      folderTitle: string;
+      folderPath: string;
+      reason: string;
+      alreadyArchived?: boolean;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+type SuccessfulLetterArchiveSuggestion = Extract<
+  LetterArchiveSuggestionResult,
+  { success: true }
+>;
+
+export type LetterOpenArchiveSuggestionResult =
+  | ({ success: true; shouldSuggest: true } & Omit<
+      SuccessfulLetterArchiveSuggestion,
+      "success"
+    >)
+  | {
+      success: true;
+      shouldSuggest: false;
+    }
+  | {
+      success: false;
+      error: string;
+    };
+
+const AI_ARCHIVE_SUGGESTION_TIMEOUT_MS = 120_000;
+const AI_ARCHIVE_SUGGESTION_MAX_TOKENS = 350;
+const AI_ARCHIVE_LETTER_CONTENT_CHAR_LIMIT = 4000;
+
 function revalidateArchiveViews() {
   revalidatePath("/");
   revalidatePath("/incoming-letters");
   revalidatePath("/outgoing-letters");
   revalidatePath("/archive");
   revalidatePath("/meetings");
+  revalidatePath("/letter");
 }
 
 function normalizeFolderTitle(value: string) {
   return value.trim().replace(/\s+/g, " ").slice(0, 200);
+}
+
+function truncatePromptText(value: string, maxLength: number) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength).trim()}...`;
+}
+
+function parseJsonObject(value: string) {
+  const cleanedValue = value
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "");
+
+  try {
+    return JSON.parse(cleanedValue) as unknown;
+  } catch {
+    const startIndex = cleanedValue.indexOf("{");
+    const endIndex = cleanedValue.lastIndexOf("}");
+
+    if (startIndex >= 0 && endIndex > startIndex) {
+      try {
+        return JSON.parse(cleanedValue.slice(startIndex, endIndex + 1)) as unknown;
+      } catch {
+        return null;
+      }
+    }
+
+    return null;
+  }
+}
+
+function getStringField(value: unknown, fallback = "") {
+  return typeof value === "string" ? value.trim() : fallback;
+}
+
+function buildFolderPromptItems(
+  folders: Array<{
+    id: number;
+    title: string;
+    parent_id: number | null;
+    sort_order: number;
+  }>
+) {
+  const folderMap = new Map(folders.map((folder) => [folder.id, folder]));
+  const pathCache = new Map<number, string>();
+
+  const getPath = (folderId: number, seen = new Set<number>()): string => {
+    const cachedPath = pathCache.get(folderId);
+    if (cachedPath) return cachedPath;
+
+    const folder = folderMap.get(folderId);
+    if (!folder) return "";
+
+    if (seen.has(folderId) || !folder.parent_id) {
+      pathCache.set(folderId, folder.title);
+      return folder.title;
+    }
+
+    seen.add(folderId);
+    const parentPath = getPath(folder.parent_id, seen);
+    const path = parentPath ? `${parentPath} / ${folder.title}` : folder.title;
+    pathCache.set(folderId, path);
+    return path;
+  };
+
+  return folders
+    .map((folder) => ({
+      id: folder.id,
+      title: folder.title,
+      path: getPath(folder.id),
+    }))
+    .sort((first, second) => first.path.localeCompare(second.path));
+}
+
+function parseArchiveSuggestion(
+  aiText: string,
+  folders: ArchiveFolderPromptItem[]
+) {
+  const parsed = parseJsonObject(aiText);
+  if (!parsed || typeof parsed !== "object") return null;
+
+  const data = parsed as Record<string, unknown>;
+  const folderId = Number(data.folderId);
+  if (!Number.isInteger(folderId)) return null;
+
+  const folder = folders.find((item) => item.id === folderId);
+  if (!folder) return null;
+
+  return {
+    folder,
+    reason: getStringField(data.reason, "پیشنهاد هوش مصنوعی برای این نامه."),
+  };
+}
+
+function buildArchiveSuggestionPrompt(input: {
+  letter: {
+    id: number;
+    title: string | null;
+    contents: string | null;
+    internal_number: string | null;
+    external_number: string | null;
+  };
+  folders: ArchiveFolderPromptItem[];
+}) {
+  const number =
+    input.letter.internal_number || input.letter.external_number || `#${input.letter.id}`;
+
+  return [
+    "برای این نامه اداری، مناسب‌ترین پوشه بایگانی را از فهرست پوشه‌های مجاز انتخاب کن.",
+    "فقط از folderId های موجود در ورودی استفاده کن. حتی اگر پوشه دقیقا مناسب نبود، نزدیک‌ترین پوشه موجود را انتخاب کن و هرگز پوشه جدید پیشنهاد نده.",
+    "پاسخ فقط JSON معتبر باشد، بدون markdown و بدون توضیح اضافه.",
+    'ساختار دقیق پاسخ: {"folderId":123,"reason":"دلیل کوتاه فارسی"}',
+    "",
+    "نامه:",
+    JSON.stringify(
+      {
+        number,
+        title: input.letter.title || "",
+        content: truncatePromptText(
+          getPlainText(input.letter.contents) || "(متنی ثبت نشده است)",
+          AI_ARCHIVE_LETTER_CONTENT_CHAR_LIMIT
+        ),
+      },
+      null,
+      2
+    ),
+    "",
+    "پوشه‌های مجاز:",
+    JSON.stringify(input.folders, null, 2),
+  ].join("\n");
 }
 
 function getPlainTextSnippet(value: string | null | undefined) {
@@ -521,6 +703,197 @@ export async function archiveLetterInFolder(input: {
     console.error("Error archiving letter:", error);
     return { success: false, error: "خطا در بایگانی نامه" };
   }
+}
+
+export async function suggestLetterArchiveFolder(
+  letterIdInput: number
+): Promise<LetterArchiveSuggestionResult> {
+  const currentUserId = await requireUserId();
+  const letterId = Number(letterIdInput);
+
+  if (!Number.isInteger(letterId) || letterId <= 0) {
+    return { success: false, error: "نامه معتبر نیست" };
+  }
+
+  try {
+    const [letter, folders, existingArchiveItem, canArchive] = await Promise.all([
+      prisma.letters.findFirst({
+        where: { id: letterId },
+        select: {
+          id: true,
+          title: true,
+          contents: true,
+          internal_number: true,
+          external_number: true,
+        },
+      }),
+      prisma.letter_archive_folders.findMany({
+        where: { user_id: currentUserId },
+        select: {
+          id: true,
+          title: true,
+          parent_id: true,
+          sort_order: true,
+        },
+        orderBy: [{ sort_order: "asc" }, { title: "asc" }],
+      }),
+      prisma.letter_archive_items.findFirst({
+        where: {
+          user_id: currentUserId,
+          letter_id: letterId,
+        },
+        include: {
+          folder: {
+            select: {
+              id: true,
+              title: true,
+              parent_id: true,
+              sort_order: true,
+            },
+          },
+        },
+      }),
+      userCanArchiveLetter(currentUserId, letterId),
+    ]);
+
+    if (!letter) {
+      return { success: false, error: "نامه یافت نشد" };
+    }
+
+    if (!canArchive) {
+      return {
+        success: false,
+        error: "دسترسی به این نامه برای بایگانی ندارید",
+      };
+    }
+
+    if (folders.length === 0) {
+      return {
+        success: false,
+        error: "پوشه موجودی برای پیشنهاد بایگانی وجود ندارد.",
+      };
+    }
+
+    const promptFolders = buildFolderPromptItems(folders);
+
+    if (existingArchiveItem?.folder) {
+      const existingFolder = promptFolders.find(
+        (folder) => folder.id === existingArchiveItem.folder_id
+      );
+
+      if (existingFolder) {
+        return {
+          success: true,
+          folderId: existingFolder.id,
+          folderTitle: existingFolder.title,
+          folderPath: existingFolder.path,
+          reason: "این نامه قبلا در این پوشه بایگانی شده است.",
+          alreadyArchived: true,
+        };
+      }
+    }
+
+    const systemPrompt =
+      readAiProviderString(
+        ["AI_ARCHIVE_SUGGESTION_SYSTEM_PROMPT"],
+        ["LM_STUDIO_AI_ARCHIVE_SUGGESTION_SYSTEM_PROMPT"]
+      ) ||
+      [
+        "تو دستیار بایگانی نامه‌های اداری فارسی هستی.",
+        "باید فقط از پوشه‌های موجود یکی را انتخاب کنی و اجازه پیشنهاد یا ایجاد پوشه جدید نداری.",
+        "پاسخ فقط JSON معتبر با folderId و reason باشد.",
+        "reason کوتاه و فارسی باشد.",
+        "هیچ reasoning مخفی، markdown fence یا متن اضافه ننویس.",
+      ].join(" ");
+
+    const aiResult = await requestAiChatCompletion(
+      systemPrompt,
+      buildArchiveSuggestionPrompt({ letter, folders: promptFolders }),
+      {
+        timeoutMs: readAiProviderNumber(
+          ["AI_ARCHIVE_SUGGESTION_TIMEOUT_MS"],
+          ["LM_STUDIO_AI_ARCHIVE_SUGGESTION_TIMEOUT_MS"],
+          AI_ARCHIVE_SUGGESTION_TIMEOUT_MS
+        ),
+        retries: readAiProviderNumber(
+          ["AI_ARCHIVE_SUGGESTION_RETRIES"],
+          ["LM_STUDIO_AI_ARCHIVE_SUGGESTION_RETRIES"],
+          0
+        ),
+        maxTokens: readAiProviderNumber(
+          ["AI_ARCHIVE_SUGGESTION_MAX_TOKENS"],
+          ["LM_STUDIO_AI_ARCHIVE_SUGGESTION_MAX_TOKENS"],
+          AI_ARCHIVE_SUGGESTION_MAX_TOKENS
+        ),
+        temperature: readAiProviderNumber(
+          ["AI_ARCHIVE_SUGGESTION_TEMPERATURE"],
+          ["LM_STUDIO_AI_ARCHIVE_SUGGESTION_TEMPERATURE"],
+          0.15
+        ),
+      }
+    );
+
+    if (!aiResult.success) {
+      return { success: false, error: aiResult.error };
+    }
+
+    const parsedSuggestion = parseArchiveSuggestion(aiResult.text, promptFolders);
+    if (!parsedSuggestion) {
+      return {
+        success: false,
+        error: "پاسخ هوش مصنوعی شامل پوشه معتبر برای بایگانی نبود.",
+      };
+    }
+
+    return {
+      success: true,
+      folderId: parsedSuggestion.folder.id,
+      folderTitle: parsedSuggestion.folder.title,
+      folderPath: parsedSuggestion.folder.path,
+      reason: parsedSuggestion.reason,
+    };
+  } catch (error) {
+    console.error("Error suggesting archive folder:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "خطا در پیشنهاد پوشه بایگانی با هوش مصنوعی",
+    };
+  }
+}
+
+export async function suggestArchiveForUnreadLetterOpen(
+  letterIdInput: number
+): Promise<LetterOpenArchiveSuggestionResult> {
+  const viewResult = await markLetterViewed(letterIdInput);
+
+  if (!viewResult.success) {
+    return {
+      success: false,
+      error: viewResult.error || "خطا در ثبت مشاهده نامه",
+    };
+  }
+
+  if (!viewResult.wasUnread) {
+    return { success: true, shouldSuggest: false };
+  }
+
+  const suggestionResult = await suggestLetterArchiveFolder(letterIdInput);
+
+  if (!suggestionResult.success) {
+    return { success: false, error: suggestionResult.error };
+  }
+
+  if (suggestionResult.alreadyArchived) {
+    return { success: true, shouldSuggest: false };
+  }
+
+  return {
+    ...suggestionResult,
+    shouldSuggest: true,
+  };
 }
 
 export async function archiveFormInFolder(input: {

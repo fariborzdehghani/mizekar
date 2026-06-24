@@ -1,9 +1,14 @@
 "use client";
 import { ThemeToggleButton } from "@/src/components/common/ThemeToggleButton";
+import LetterTagInput from "@/src/components/app/letters/LetterTagInput";
 import NotificationDropdown from "@/src/components/header/NotificationDropdown";
 import UserDropdown from "@/src/components/header/UserDropdown";
 import { useInboxBrief } from "@/src/components/app/inbox-brief/InboxBriefPanel";
 import { useSidebar } from "@/src/context/SidebarContext";
+import {
+  uniqueLetterTagNames,
+  type LetterKeywordTag,
+} from "@/src/lib/letterTags";
 import type { CurrentUser } from "@/src/lib/auth-types";
 import Image from "next/image";
 import Link from "next/link";
@@ -100,6 +105,10 @@ function toDateInputValue(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
+}
+
+function getLetterTagsFromParam(value: string): LetterKeywordTag[] {
+  return uniqueLetterTagNames(value.split(/[،,]/)).map((name) => ({ name }));
 }
 
 function parseDateInputValue(value: string) {
@@ -326,8 +335,12 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
   const advancedTitle = searchParams.get("title") || "";
   const advancedContent = searchParams.get("content") || "";
   const advancedCreateDate = searchParams.get("createDate") || "";
+  const advancedTags = searchParams.get("tags") || searchParams.get("tag") || "";
   const [advancedSearchDate, setAdvancedSearchDate] =
     useState(advancedCreateDate);
+  const [advancedSearchTags, setAdvancedSearchTags] = useState<
+    LetterKeywordTag[]
+  >(() => getLetterTagsFromParam(advancedTags));
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { brief, isCreating, openBrief } = useInboxBrief();
@@ -385,10 +398,12 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
     const title = String(formData.get("title") || "").trim();
     const content = String(formData.get("content") || "").trim();
     const createDate = advancedSearchDate.trim();
+    const tags = advancedSearchTags.map((tag) => tag.name.trim()).filter(Boolean);
 
     if (title) params.set("title", title);
     if (content) params.set("content", content);
     if (createDate) params.set("createDate", createDate);
+    if (tags.length > 0) params.set("tags", tags.join(","));
 
     const queryString = params.toString();
     setIsAdvancedSearchOpen(false);
@@ -409,6 +424,10 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    setAdvancedSearchTags(getLetterTagsFromParam(advancedTags));
+  }, [advancedTags]);
 
   useEffect(() => {
     if (!isAdvancedSearchOpen) return;
@@ -436,7 +455,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
   }, [isAdvancedSearchOpen]);
 
   return (
-    <header className={`sticky top-0 z-99999 flex w-full border-app-border bg-app-header-main/95 shadow-[0_1px_0_rgba(37,83,126,0.08)] backdrop-blur dark:border-gray-800 dark:bg-gray-900 lg:border-b`}>
+    <header className={`sticky top-0 z-99999 flex w-full border-app-border bg-app-header-main/95 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:border-gray-800 dark:bg-gray-900 lg:border-b`}>
       <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-app-border dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
           <button
@@ -630,6 +649,19 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
 
                   <div>
                     <span className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      کلیدواژه‌ها
+                    </span>
+                    <LetterTagInput
+                      name="tags"
+                      selectedTags={advancedSearchTags}
+                      onChange={setAdvancedSearchTags}
+                      allowCreate={false}
+                      placeholder="جستجوی کلیدواژه"
+                    />
+                  </div>
+
+                  <div>
+                    <span className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                       تاریخ ایجاد از
                     </span>
                     <ShamsiDatePicker
@@ -644,6 +676,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                       type="button"
                       onClick={() => {
                         setAdvancedSearchDate("");
+                        setAdvancedSearchTags([]);
                         setIsAdvancedSearchOpen(false);
                         router.push("/letter-search");
                       }}

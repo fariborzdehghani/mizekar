@@ -115,7 +115,7 @@ export default function FileAttachmentManager({
         </label>
 
         {/* File List */}
-        <div className="flex h-50 w-full flex-wrap content-start items-start gap-2 overflow-y-auto mb-4 p-3 rounded-lg border border-gray-200 dark:border-gray-600">
+        <div className="flex h-50 w-full flex-wrap content-start items-start gap-2 overflow-y-auto mb-4 p-3 rounded-lg border border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900">
           {attachments.length > 0 ? (
             attachments.map((attachment) => (
               <div

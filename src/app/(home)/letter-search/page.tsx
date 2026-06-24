@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Eye } from "lucide-react";
 import { searchAccessibleLetters } from "@/src/actions/letterActions";
+import InboxListRow from "@/src/components/app/letters/InboxListRow";
+import { uniqueLetterTagNames } from "@/src/lib/letterTags";
 
 interface LetterSearchPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,6 +14,15 @@ function getParam(
 ) {
   const value = params[key];
   return (Array.isArray(value) ? value[0] : value)?.trim() || "";
+}
+
+function getTagsParam(params: { [key: string]: string | string[] | undefined }) {
+  return uniqueLetterTagNames(
+    [getParam(params, "tags"), getParam(params, "tag")]
+      .filter(Boolean)
+      .join(",")
+      .split(/[،,]/)
+  );
 }
 
 function formatDate(value: Date | string | null) {
@@ -48,7 +59,8 @@ export default async function LetterSearchPage({
   const title = getParam(params, "title");
   const content = getParam(params, "content");
   const createDate = getParam(params, "createDate");
-  const result = await searchAccessibleLetters({ title, content, createDate });
+  const tags = getTagsParam(params);
+  const result = await searchAccessibleLetters({ title, content, createDate, tags });
 
   return (
     <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
@@ -83,7 +95,7 @@ export default async function LetterSearchPage({
         </div>
       ) : (
         <div className="overflow-x-auto bg-white shadow-md dark:bg-gray-800">
-          <table className="w-full min-w-[980px]">
+          <table className="w-full min-w-[920px]">
             <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -108,8 +120,9 @@ export default async function LetterSearchPage({
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {result.letters.map((letter) => (
-                <tr
+                <InboxListRow
                   key={letter.id}
+                  href={`/letter?id=${letter.id}&viewOnly=true`}
                   className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
                 >
                   <td className="w-44 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -120,11 +133,6 @@ export default async function LetterSearchPage({
                       <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {letter.title || "(بدون عنوان)"}
                       </p>
-                      {letter.contentSnippet && (
-                        <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                          {letter.contentSnippet}
-                        </p>
-                      )}
                     </div>
                   </td>
                   <td className="w-52 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
@@ -145,7 +153,7 @@ export default async function LetterSearchPage({
                       <Eye className="h-4 w-4" />
                     </Link>
                   </td>
-                </tr>
+                </InboxListRow>
               ))}
             </tbody>
           </table>

@@ -2,8 +2,9 @@ import Link from "next/link";
 import type { ArchiveFolderNode } from "@/src/actions/archiveActions";
 import ArchiveLetterButton from "./ArchiveLetterButton";
 import ArchiveSelectionProvider from "./ArchiveSelectionProvider";
+import InboxListRow from "./InboxListRow";
 import LetterArchiveSidebar from "./LetterArchiveSidebar";
-import { Eye } from "lucide-react";
+import { CalendarDays, ClipboardList, Eye, Mail } from "lucide-react";
 
 type ReferralListItem = {
   id: number;
@@ -295,7 +296,7 @@ export default function LetterReferralList({
     <ArchiveSelectionProvider>
       <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)] lg:flex-row">
         <main className="flex min-w-0 flex-1 flex-col">
-          <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(37,83,126,0.1)] backdrop-blur dark:bg-gray-900 lg:top-19.25">
+          <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:bg-gray-900 lg:top-19.25">
             <div>
               <Link
                 href="/letter"
@@ -355,6 +356,9 @@ export default function LetterReferralList({
               <table className="w-full table-auto">
                 <thead className="border-b border-app-border bg-app-table-head dark:border-gray-600 dark:bg-gray-700">
                   <tr>
+                    <th className="w-10 px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:text-white">
+                      <span className="sr-only">نوع</span>
+                    </th>
                     <th className="w-px whitespace-nowrap px-3 py-2 text-right text-sm font-semibold text-gray-900 dark:text-white">
                       شماره
                     </th>
@@ -388,14 +392,24 @@ export default function LetterReferralList({
                         perspective === "incoming" && !meetingReferral.read_at;
 
                       return (
-                        <tr
+                        <InboxListRow
                           key={item.key}
+                          href={`/meeting?id=${meeting.id}&viewOnly=true`}
+                          archiveItemType="meeting"
+                          archiveItemId={meeting.id}
+                          archiveFolders={archiveFolders}
                           className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                             isUnreadIncoming
                               ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
                               : ""
                           }`}
                         >
+                          <td className="w-10 px-3 py-2">
+                            <CalendarDays
+                              className="mx-auto h-4 w-4 text-blue-500"
+                              aria-label="جلسه"
+                            />
+                          </td>
                           <td className="w-px whitespace-nowrap px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
                             #{meeting.id}
                           </td>
@@ -456,7 +470,7 @@ export default function LetterReferralList({
                               />
                             </div>
                           </td>
-                        </tr>
+                        </InboxListRow>
                       );
                     }
 
@@ -470,20 +484,36 @@ export default function LetterReferralList({
                         perspective === "incoming" && !form.readAt;
 
                       return (
-                        <tr
+                        <InboxListRow
                           key={item.key}
+                          href={`/form?id=${form.id}`}
+                          archiveItemType="form"
+                          archiveItemId={form.id}
+                          archiveFolders={archiveFolders}
                           className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                             isUnreadIncoming
                               ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
                               : ""
                           }`}
                         >
+                          <td className="w-10 px-3 py-2">
+                            <ClipboardList
+                              className="mx-auto h-4 w-4 text-blue-500"
+                              aria-label="فرم"
+                            />
+                          </td>
                           <td className="w-px whitespace-nowrap px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
                             #{form.id}
                           </td>
                           <td className="w-full max-w-0 px-3 py-2">
                             <div className="min-w-0">
                               <div className="flex items-center gap-2">
+                                {isUnreadIncoming && (
+                                  <span
+                                    className="h-2 w-2 shrink-0 rounded-full bg-blue-500"
+                                    title="خوانده نشده"
+                                  />
+                                )}
                                 <p
                                   className={`min-w-0 truncate text-sm text-gray-900 dark:text-white ${
                                     isUnreadIncoming
@@ -494,9 +524,6 @@ export default function LetterReferralList({
                                   {form.title || "(بدون عنوان)"}
                                 </p>
                               </div>
-                              <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                                {form.templateTitle}
-                              </p>
                             </div>
                           </td>
                           <td className="w-px whitespace-nowrap px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
@@ -532,7 +559,7 @@ export default function LetterReferralList({
                               />
                             </div>
                           </td>
-                        </tr>
+                        </InboxListRow>
                       );
                     }
 
@@ -546,26 +573,49 @@ export default function LetterReferralList({
                       perspective === "incoming" && !referral.read_at;
 
                     return (
-                      <tr
+                      <InboxListRow
                         key={item.key}
+                        href={letter ? `/letter?id=${letter.id}&viewOnly=true` : null}
+                        archiveItemType="letter"
+                        archiveItemId={letter?.id}
+                        archiveFolders={archiveFolders}
+                        markUnreadReferralId={
+                          perspective === "incoming" && referral.read_at
+                            ? referral.id
+                            : undefined
+                        }
                         className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                           isUnreadIncoming
                             ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
                             : ""
                         }`}
                       >
+                        <td className="w-10 px-3 py-2">
+                          <Mail
+                            className="mx-auto h-4 w-4 text-blue-500"
+                            aria-label="نامه"
+                          />
+                        </td>
                         <td className="w-px whitespace-nowrap px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
                           {getLetterNumber(referral)}
                         </td>
                         <td className="w-full max-w-0 px-3 py-2">
                           <div className="min-w-0">
-                            <p
-                              className={`min-w-0 truncate text-sm text-gray-900 dark:text-white ${
-                                isUnreadIncoming ? "font-bold" : "font-medium"
-                              }`}
-                            >
-                              {letter?.title || "(بدون عنوان)"}
-                            </p>
+                            <div className="flex items-center gap-2">
+                              {isUnreadIncoming && (
+                                <span
+                                  className="h-2 w-2 shrink-0 rounded-full bg-blue-500"
+                                  title="خوانده نشده"
+                                />
+                              )}
+                              <p
+                                className={`min-w-0 truncate text-sm text-gray-900 dark:text-white ${
+                                  isUnreadIncoming ? "font-bold" : "font-medium"
+                                }`}
+                              >
+                                {letter?.title || "(بدون عنوان)"}
+                              </p>
+                            </div>
                           </div>
                         </td>
                         <td className="w-px whitespace-nowrap px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
@@ -605,7 +655,7 @@ export default function LetterReferralList({
                             <span className="text-gray-400">-</span>
                           )}
                         </td>
-                      </tr>
+                      </InboxListRow>
                     );
                   })}
                 </tbody>

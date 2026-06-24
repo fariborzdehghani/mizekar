@@ -1,12 +1,22 @@
 "use client";
 
-import { createLetter } from "@/src/actions/letterActions";
+import {
+  createLetter,
+  generateLetterKeywordTags,
+} from "@/src/actions/letterActions";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Editor from "@/src/components/common/editor/editor";
 import RecipientsModal from "./RecipientsModal";
 import FileAttachmentManager from "./FileAttachmentManager";
 import RelatedLettersModal, { RelatedLetter } from "./RelatedLettersModal";
 import LetterReferrals, { LetterReferral } from "./LetterReferrals";
+import LetterTagInput from "./LetterTagInput";
+import LetterAiArchiveSuggestionButton from "./LetterAiArchiveSuggestionButton";
+import {
+  MAX_LETTER_TAGS,
+  normalizeLetterTagKey,
+  type LetterKeywordTag,
+} from "@/src/lib/letterTags";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Sparkles, X } from "lucide-react";
@@ -51,6 +61,7 @@ interface LetterData {
   }>;
   relatedLetters?: RelatedLetter[];
   referrals?: LetterReferral[];
+  tags?: LetterKeywordTag[];
 }
 
 interface LetterFormProps {
@@ -150,6 +161,22 @@ async function readAiStream(
   }
 }
 
+function getPlainTextFromEditorHtml(value: string) {
+  return value
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<(br|\/p|\/div|\/li|\/tr|\/h[1-6])\b[^>]*>/gi, "\n")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export default function LetterForm({
   initialLetter,
   isViewMode = false,
@@ -166,15 +193,24 @@ export default function LetterForm({
   const [selectedRelatedLetters, setSelectedRelatedLetters] = useState<
     RelatedLetter[]
   >([]);
+  const [selectedTags, setSelectedTags] = useState<LetterKeywordTag[]>([]);
   const [attachments, setAttachments] = useState<FileAttachment[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [isTagGenerationLoading, setIsTagGenerationLoading] = useState(false);
+  const [tagGenerationError, setTagGenerationError] = useState<string | null>(
+    null
+  );
   const [aiSummary, setAiSummary] = useState<string | null>(null);
   const [aiSummaryError, setAiSummaryError] = useState<string | null>(null);
   const [isAiSummaryLoading, setIsAiSummaryLoading] = useState(false);
   const [draftPrompt, setDraftPrompt] = useState("");
   const [draftError, setDraftError] = useState<string | null>(null);
   const [isDraftLoading, setIsDraftLoading] = useState(false);
+  const [isNewDraftModalOpen, setIsNewDraftModalOpen] = useState(false);
+  const [newDraftPrompt, setNewDraftPrompt] = useState("");
+  const [newDraftError, setNewDraftError] = useState<string | null>(null);
+  const [isNewDraftLoading, setIsNewDraftLoading] = useState(false);
   const [aiSummaryMeta, setAiSummaryMeta] = useState<{
     letterCount: number;
     relatedLetterCount: number;
@@ -183,6 +219,8 @@ export default function LetterForm({
   } | null>(null);
   const summaryAbortControllerRef = useRef<AbortController | null>(null);
   const draftAbortControllerRef = useRef<AbortController | null>(null);
+  const newDraftAbortControllerRef = useRef<AbortController | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
 
   // Initialize form with letter data if in edit/view mode
   useEffect(() => {
@@ -194,10 +232,17 @@ export default function LetterForm({
     setDraftPrompt("");
     setDraftError(null);
     setIsDraftLoading(false);
+    setIsNewDraftModalOpen(false);
+    setNewDraftPrompt("");
+    setNewDraftError(null);
+    setIsNewDraftLoading(false);
+    setTagGenerationError(null);
+    setIsTagGenerationLoading(false);
 
     if (initialLetter) {
       setTitle(initialLetter.title || "");
       setContent(initialLetter.contents || "");
+      setSelectedTags(initialLetter.tags || []);
 
       // Load attachments
       if (initialLetter.attachments && initialLetter.attachments.length > 0) {
@@ -242,6 +287,7 @@ export default function LetterForm({
       setAttachments([]);
       setSelectedRecipients([]);
       setSelectedRelatedLetters([]);
+      setSelectedTags([]);
     }
   }, [initialLetter]);
 
@@ -260,6 +306,7 @@ export default function LetterForm({
       setContent(draft.content || "");
       setAttachments([]);
       setSelectedRecipients([]);
+      setSelectedTags([]);
       setSelectedRelatedLetters(draft.relatedLetter ? [draft.relatedLetter] : []);
     } catch (draftParseError) {
       console.error("AI response draft restore error:", draftParseError);
@@ -335,6 +382,57 @@ export default function LetterForm({
     setSelectedRelatedLetters((prev) =>
       prev.filter((letter) => letter.id !== letterId),
     );
+  };
+
+  const mergeGeneratedTags = (generatedTags: string[]) => {
+    const tagsByKey = new Map<string, LetterKeywordTag>();
+
+    for (const tag of selectedTags) {
+      tagsByKey.set(normalizeLetterTagKey(tag.name), tag);
+    }
+
+    for (const tagName of generatedTags) {
+      const key = normalizeLetterTagKey(tagName);
+      if (!key || tagsByKey.has(key)) continue;
+
+      tagsByKey.set(key, { name: tagName });
+    }
+
+    setSelectedTags(Array.from(tagsByKey.values()).slice(0, MAX_LETTER_TAGS));
+  };
+
+  const handleGenerateKeywordTags = async () => {
+    if (isViewMode || initialLetter || isTagGenerationLoading) return;
+
+    const formData = formRef.current ? new FormData(formRef.current) : null;
+    const currentContent = String(formData?.get("content") || content || "");
+    const plainLetterText = getPlainTextFromEditorHtml(currentContent);
+
+    if (!plainLetterText) {
+      setTagGenerationError(
+        "برای تولید کلیدواژه، ابتدا متن نامه را وارد کنید."
+      );
+      return;
+    }
+
+    setIsTagGenerationLoading(true);
+    setTagGenerationError(null);
+
+    try {
+      const result = await generateLetterKeywordTags("", currentContent);
+
+      if (!result.success) {
+        setTagGenerationError(result.error);
+        return;
+      }
+
+      mergeGeneratedTags(result.tags);
+    } catch (tagError) {
+      console.error("AI keyword tag generation error:", tagError);
+      setTagGenerationError("خطا در تولید کلیدواژه‌های هوشمند نامه");
+    } finally {
+      setIsTagGenerationLoading(false);
+    }
   };
 
   const handleSummarizeRelatedLetters = async () => {
@@ -444,6 +542,103 @@ export default function LetterForm({
     setIsAiSummaryLoading(false);
     setIsDraftLoading(false);
     setIsAiSummaryModalOpen(false);
+  };
+
+  const handleCloseNewDraftModal = () => {
+    newDraftAbortControllerRef.current?.abort();
+    newDraftAbortControllerRef.current = null;
+    setIsNewDraftLoading(false);
+    setIsNewDraftModalOpen(false);
+  };
+
+  const handleGenerateNewLetterDraft = async () => {
+    if (isViewMode || initialLetter || isNewDraftLoading) return;
+
+    const trimmedPrompt = newDraftPrompt.trim();
+    if (!trimmedPrompt) {
+      setNewDraftError("درخواست خود برای پیش‌نویس نامه را وارد کنید.");
+      return;
+    }
+
+    setNewDraftError(null);
+    setIsNewDraftLoading(true);
+    newDraftAbortControllerRef.current?.abort();
+
+    try {
+      const controller = new AbortController();
+      let result: {
+        success: boolean;
+        title?: string;
+        content?: string;
+        error?: string;
+      } | null = null;
+
+      newDraftAbortControllerRef.current = controller;
+      const response = await fetch("/api/ai/letter-draft", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: trimmedPrompt,
+          title,
+          content,
+        }),
+        signal: controller.signal,
+      });
+
+      await readAiStream(response, (event) => {
+        if (event.type === "draft") {
+          result = {
+            success: true,
+            title: event.title,
+            content: event.content,
+          };
+        }
+      });
+
+      const draftResult = (result ?? {
+        success: false,
+        error: "خطا در تولید پیش‌نویس نامه.",
+      }) as
+        | {
+            success: true;
+            title: string;
+            content: string;
+          }
+        | {
+            success: false;
+            error?: string;
+          };
+
+      result = draftResult;
+
+      if (!draftResult.success) {
+        setNewDraftError(result.error || "خطا در تولید پیش‌نویس نامه.");
+        return;
+      }
+
+      setTitle(draftResult.title);
+      setContent(draftResult.content);
+      setIsNewDraftModalOpen(false);
+    } catch (draftGenerationError) {
+      if (
+        draftGenerationError instanceof DOMException &&
+        draftGenerationError.name === "AbortError"
+      ) {
+        return;
+      }
+
+      console.error("AI new letter draft error:", draftGenerationError);
+      if (draftGenerationError instanceof Error) {
+        setNewDraftError(draftGenerationError.message);
+        return;
+      }
+      setNewDraftError("خطا در تولید پیش‌نویس نامه.");
+    } finally {
+      newDraftAbortControllerRef.current = null;
+      setIsNewDraftLoading(false);
+    }
   };
 
   const handleGenerateResponseDraft = async () => {
@@ -574,6 +769,7 @@ export default function LetterForm({
       // Add selected recipients as JSON
       formData.set("recipients", JSON.stringify(selectedRecipients));
       formData.set("relatedLetters", JSON.stringify(selectedRelatedLetters));
+      formData.set("tags", JSON.stringify(selectedTags.map((tag) => tag.name)));
 
       // Add all attached files that are new (have file property)
       for (const attachment of attachments) {
@@ -616,6 +812,52 @@ export default function LetterForm({
   const canCreateResponseDraft = Boolean(
     aiSummary && !isAiSummaryLoading && !aiSummaryError
   );
+  const canGenerateKeywordTags = Boolean(
+    !isViewMode &&
+      !initialLetter &&
+      getPlainTextFromEditorHtml(content)
+  );
+  const tagsSection = (!initialLetter || selectedTags.length > 0) ? (
+    <div className="mb-2">
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          کلیدواژه‌های نامه
+        </label>
+        {!isViewMode && !initialLetter && (
+          <button
+            type="button"
+            onClick={handleGenerateKeywordTags}
+            disabled={isTagGenerationLoading || !canGenerateKeywordTags}
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-blue-light-200 bg-blue-light-50 px-3 text-sm font-medium text-blue-light-800 transition hover:bg-blue-light-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-light-300"
+          >
+            {isTagGenerationLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Sparkles className="h-4 w-4" />
+            )}
+            {isTagGenerationLoading
+              ? "در حال تولید..."
+              : "تولید با هوش مصنوعی"}
+          </button>
+        )}
+      </div>
+
+      <LetterTagInput
+        name="tags"
+        selectedTags={selectedTags}
+        onChange={setSelectedTags}
+        allowCreate={!isViewMode && !initialLetter}
+        disabled={isViewMode || Boolean(initialLetter)}
+        placeholder="جستجو یا افزودن کلیدواژه"
+      />
+
+      {tagGenerationError && !isViewMode && !initialLetter && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-300">
+          {tagGenerationError}
+        </p>
+      )}
+    </div>
+  ) : null;
 
   return (
     <>
@@ -636,6 +878,98 @@ export default function LetterForm({
         onRemoveLetter={handleRemoveRelatedLetter}
         currentLetterId={initialLetter?.id}
       />
+
+      {!isViewMode && !initialLetter && isNewDraftModalOpen && (
+        <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
+          <div
+            dir="rtl"
+            className="flex w-full max-w-2xl flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800"
+          >
+            <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                  {isNewDraftLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    تولید پیش‌نویس نامه
+                  </h2>
+                  <p className="mt-1 text-sm leading-6 text-gray-600 dark:text-gray-300">
+                    موضوع، لحن، گیرنده و نکات مهم نامه را بنویسید.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseNewDraftModal}
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-white"
+                aria-label="بستن تولید پیش‌نویس نامه"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-4 px-6 py-5">
+              <label
+                htmlFor="new-letter-draft-prompt"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+              >
+                درخواست شما
+              </label>
+              <textarea
+                id="new-letter-draft-prompt"
+                value={newDraftPrompt}
+                onChange={(event) => setNewDraftPrompt(event.target.value)}
+                rows={7}
+                disabled={isNewDraftLoading}
+                placeholder="مثلا یک نامه رسمی برای درخواست تمدید قرارداد بنویس؛ لحن محترمانه باشد و به پیوست بودن مستندات اشاره کن."
+                className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm leading-7 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:disabled:bg-gray-900/50"
+              />
+
+              {newDraftError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+                  {newDraftError}
+                </div>
+              )}
+
+              {isNewDraftLoading && (
+                <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-800 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-100">
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                  <span>پیش‌نویس نامه در حال تولید است...</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap justify-end gap-3 border-t border-gray-200 px-6 py-4 dark:border-gray-700">
+              <button
+                type="button"
+                onClick={handleCloseNewDraftModal}
+                disabled={isNewDraftLoading}
+                className="h-10 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                انصراف
+              </button>
+              <button
+                type="button"
+                onClick={handleGenerateNewLetterDraft}
+                disabled={isNewDraftLoading}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isNewDraftLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {isNewDraftLoading ? "در حال تولید..." : "تولید پیش‌نویس"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {isViewMode && initialLetter?.id && isAiSummaryModalOpen && (
         <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
@@ -778,7 +1112,7 @@ export default function LetterForm({
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form ref={formRef} onSubmit={handleSubmit} className="bg-white dark:bg-gray-900">
         <div className="sticky top-16.25 lg:top-19.25 z-30 p-4 flex justify-between items-center border-b border-gray-300 bg-white dark:bg-gray-900">
           <div className="flex items-center gap-3">
             <Link
@@ -801,6 +1135,27 @@ export default function LetterForm({
                     ? "بروزرسانی نامه"
                     : "ایجاد نامه"}
               </button>
+            )}
+            {!isViewMode && !initialLetter && (
+              <button
+                type="button"
+                onClick={() => {
+                  setNewDraftError(null);
+                  setIsNewDraftModalOpen(true);
+                }}
+                disabled={isNewDraftLoading}
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isNewDraftLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
+                {isNewDraftLoading ? "در حال تولید..." : "پیش‌نویس با هوش مصنوعی"}
+              </button>
+            )}
+            {isViewMode && initialLetter?.id && (
+              <LetterAiArchiveSuggestionButton letterId={initialLetter.id} />
             )}
             {isViewMode && initialLetter?.id && (
               <button
@@ -827,7 +1182,7 @@ export default function LetterForm({
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="bg-white p-6 dark:bg-gray-900">
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-md text-sm">
               {error}
@@ -863,7 +1218,7 @@ export default function LetterForm({
 
             {/* Selected Recipients Display */}
             <div className="flex flex-col">
-              <div className="w-full flex flex-wrap h-30 gap-2 overflow-y-auto mb-3 p-4 space-y-2 rounded-lg border border-gray-300">
+              <div className="w-full flex flex-wrap h-30 gap-2 overflow-y-auto mb-3 p-4 space-y-2 rounded-lg border border-gray-300 bg-white dark:bg-gray-900">
                 {selectedRecipients.length > 0 ? (
                   selectedRecipients.map((recipient) => (
                     <div
@@ -911,7 +1266,7 @@ export default function LetterForm({
             </label>
 
             <div className="flex flex-col">
-              <div className="w-full min-h-30 max-h-48 overflow-y-auto mb-3 rounded-lg border border-gray-300 p-4 dark:border-gray-600">
+              <div className="w-full min-h-30 max-h-48 overflow-y-auto mb-3 rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
                 {selectedRelatedLetters.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {selectedRelatedLetters.map((letter) => (
@@ -981,17 +1336,18 @@ export default function LetterForm({
             </label>
             {isViewMode ? (
               <div
-                className="prose max-w-none min-h-80 rounded-lg border border-gray-300 p-4 text-gray-900 dark:prose-invert dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="prose max-w-none min-h-80 rounded-lg border border-gray-300 bg-white p-4 text-gray-900 dark:prose-invert dark:border-gray-600 dark:bg-gray-900 dark:text-white"
                 dangerouslySetInnerHTML={{
                   __html: content || "<p>محتوایی ثبت نشده است</p>",
                 }}
               />
             ) : (
               <Editor
-                key={content}
+                key={initialLetter?.id ?? "new-letter"}
                 name="content"
                 height={320}
                 initialValue={content}
+                onChange={setContent}
               />
             )}
           </div>
@@ -1017,7 +1373,7 @@ export default function LetterForm({
                 نامه های مرتبط ({selectedRelatedLetters.length})
               </label>
 
-              <div className="mb-4 flex h-50 w-full flex-col gap-2 overflow-y-auto rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <div className="mb-4 flex h-50 w-full flex-col gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-900">
                 {selectedRelatedLetters.length > 0 ? (
                   selectedRelatedLetters.map((letter) => (
                     <div
@@ -1069,6 +1425,8 @@ export default function LetterForm({
               )}
             </div>
           </div>
+
+          {!initialLetter && tagsSection}
         </div>
       </form>
 
@@ -1078,6 +1436,8 @@ export default function LetterForm({
           referrals={initialLetter.referrals || []}
         />
       )}
+
+      {initialLetter && tagsSection}
     </>
   );
 }

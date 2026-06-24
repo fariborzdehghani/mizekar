@@ -1,9 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
+import { subscribeToAiActivity } from "@/src/lib/aiActivity";
+import { Sparkles } from "lucide-react";
 import {
   CalenderIcon,
   ChevronDownIcon,
@@ -102,6 +104,15 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
   const isSidebarWide = isExpanded || isHovered || isMobileOpen;
+  const [activeAiTaskCount, setActiveAiTaskCount] = useState(0);
+
+  useEffect(() => {
+    return subscribeToAiActivity(({ delta }) => {
+      setActiveAiTaskCount((currentCount) =>
+        Math.max(0, currentCount + delta),
+      );
+    });
+  }, []);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -250,7 +261,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 right-0 bg-app-sidebar text-white shadow-[0_20px_45px_rgba(0,20,51,0.22)] dark:bg-gray-900 dark:border-gray-800 h-screen z-[999999] border-l border-digital-blue-800 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 right-0 bg-app-sidebar text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] dark:bg-gray-900 dark:border-gray-800 dark:text-white h-screen z-[999999] border-l border-app-border
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -263,8 +274,8 @@ const AppSidebar: React.FC = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-center border-b border-white/10 py-7 dark:border-gray-800">
-        <Link href="/" className="inline-flex rounded-lg bg-white px-3 py-2 shadow-theme-xs">
+      <div className="flex justify-center border-b border-app-border py-7 dark:border-gray-800">
+        <Link href="/" className="inline-flex rounded-lg bg-white px-3 py-2 shadow-theme-xs ring-1 ring-gray-200 dark:ring-0">
           {isSidebarWide ? (
             <>
               <Image
@@ -297,7 +308,7 @@ const AppSidebar: React.FC = () => {
         </Link>
       </div>
 
-      <div className="flex flex-col overflow-y-auto pt-5 duration-300 ease-linear no-scrollbar">
+      <div className="flex flex-1 flex-col overflow-y-auto pt-5 duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>{renderMenuItems(navItems, "main")}</div>
@@ -306,6 +317,19 @@ const AppSidebar: React.FC = () => {
           </div>
         </nav>
       </div>
+
+      {activeAiTaskCount > 0 && (
+        <div className="mt-auto flex shrink-0 justify-center border-t border-app-border py-4 dark:border-gray-800">
+          <div
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 shadow-theme-xs dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-200"
+            title="هوش مصنوعی در حال کار است"
+            role="status"
+            aria-label="هوش مصنوعی در حال کار است"
+          >
+            <Sparkles className="h-4 w-4 animate-pulse" />
+          </div>
+        </div>
+      )}
     </aside>
   );
 };

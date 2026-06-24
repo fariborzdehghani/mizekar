@@ -1,6 +1,6 @@
 import LetterForm from "@/src/components/app/letters/letter";
 import { getLetter } from "@/src/actions/letterActions";
-import LetterReadMarker from "@/src/components/app/letters/LetterReadMarker";
+import LetterArchiveSuggestionToast from "@/src/components/app/letters/LetterArchiveSuggestionToast";
 
 interface LetterPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -30,7 +30,12 @@ export default async function LetterPage({ searchParams }: LetterPageProps) {
 
   return (
     <div className="w-full">
-      {letterId && isViewMode && <LetterReadMarker letterId={letterId} />}
+      {letterId && isViewMode && (
+        <LetterArchiveSuggestionToast
+          key={letterId}
+          letterId={letterId}
+        />
+      )}
       <LetterForm
         initialLetter={letterData}
         isViewMode={isViewMode}
