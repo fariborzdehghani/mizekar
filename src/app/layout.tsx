@@ -1,6 +1,11 @@
 import { ThemeProvider } from "@/src/context/ThemeContext";
 import { SidebarProvider } from '@/src/context/SidebarContext';
+import type { Metadata } from "next";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "میز کار",
+};
 
 export default function RootLayout({
   children,

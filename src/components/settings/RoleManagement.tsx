@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import {
   createRoleAction,
   deleteRoleAction,
@@ -320,7 +321,7 @@ function RolesList({
       {filteredRoles.length > 0 ? (
         <div className="bg-white dark:bg-gray-800">
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[780px]">
+            <table className="w-full min-w-[620px]">
               <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -328,9 +329,6 @@ function RolesList({
                   </th>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     تعداد کاربران
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    دسترسی‌ها
                   </th>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     عملیات
@@ -349,17 +347,16 @@ function RolesList({
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {role.userCount}
                     </td>
-                    <td className="max-w-xl px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {getPermissionSummary(role.permissionIds, permissions)}
-                    </td>
                     <td className="px-6 py-4 text-sm">
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => onEdit(role)}
-                          className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                          title="ویرایش نقش"
+                          aria-label="ویرایش نقش"
                         >
-                          ویرایش
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <form
                           action={deleteRoleAction}
@@ -373,9 +370,19 @@ function RolesList({
                           <button
                             type="submit"
                             disabled={role.userCount > 0}
-                            className="font-medium text-red-600 hover:text-red-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-red-400 dark:hover:text-red-300"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-red-300 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-300"
+                            title={
+                              role.userCount > 0
+                                ? "این نقش دارای کاربر است"
+                                : "حذف نقش"
+                            }
+                            aria-label={
+                              role.userCount > 0
+                                ? "این نقش دارای کاربر است"
+                                : "حذف نقش"
+                            }
                           >
-                            {role.userCount > 0 ? "دارای کاربر" : "حذف"}
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </form>
                       </div>
@@ -451,3 +458,4 @@ export default function RoleManagement({
     />
   );
 }
+

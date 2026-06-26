@@ -26,7 +26,8 @@ export default function LoginForm() {
           type="text"
           autoComplete="username"
           required
-          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          dir="ltr"
+          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-left text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
       </div>
 
@@ -43,7 +44,8 @@ export default function LoginForm() {
           type="password"
           autoComplete="current-password"
           required
-          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          dir="ltr"
+          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-left text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
         />
       </div>
 

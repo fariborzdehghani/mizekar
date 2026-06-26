@@ -9,6 +9,7 @@ import { Sparkles } from "lucide-react";
 import {
   CalenderIcon,
   ChevronDownIcon,
+  GridIcon,
   TableIcon,
   MailIcon,
   ChatIcon,
@@ -27,6 +28,11 @@ type OpenSubmenu = {
 } | null;
 
 const navItems: NavItem[] = [
+  {
+    icon: <GridIcon />,
+    name: "داشبورد",
+    path: "/dashboard",
+  },
   {
     icon: <MailIcon />,
     name: "کارتابل",
@@ -275,34 +281,37 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex justify-center border-b border-app-border py-7 dark:border-gray-800">
-        <Link href="/" className="inline-flex rounded-lg bg-white px-3 py-2 shadow-theme-xs ring-1 ring-gray-200 dark:ring-0">
+        <Link
+          href="/"
+          className={`inline-flex h-14 items-center rounded-lg bg-white dark:ring-0 ${
+            isSidebarWide ? "px-3" : "px-0"
+          }`}
+        >
           {isSidebarWide ? (
             <>
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
+                className="h-14 w-auto dark:hidden"
+                src="/images/logo/logo.png"
                 alt="Logo"
-                width={150}
-                height={40}
+                width={175}
+                height={56}
                 loading="eager"
-                style={{ width: "auto", height: "auto" }}
               />
               <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
+                className="hidden h-14 w-auto dark:block"
+                src="/images/logo/logo-dark.png"
                 alt="Logo"
-                width={150}
-                height={40}
-                style={{ width: "auto", height: "auto" }}
+                width={175}
+                height={56}
               />
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
+              className="h-14 w-14"
+              src="/images/logo/logo-icon.png"
               alt="Logo"
-              width={32}
-              height={32}
-              style={{ width: "auto", height: "auto" }}
+              width={56}
+              height={56}
             />
           )}
         </Link>

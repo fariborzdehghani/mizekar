@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { FileUp, Trash2, UserPlus } from "lucide-react";
+import { FileUp, Pencil, Trash2, UserPlus } from "lucide-react";
 import {
   createFormTemplateAction,
   deleteFormTemplateAction,
@@ -414,17 +414,11 @@ function TemplatesList({
       {filteredTemplates.length > 0 ? (
         <div className="bg-white dark:bg-gray-800">
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[980px]">
+            <table className="w-full min-w-[720px]">
               <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    عنوان
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    فایل
-                  </th>
-                  <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                    فرآیند تایید
+                    {"\u0639\u0646\u0648\u0627\u0646"}
                   </th>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     وضعیت
@@ -450,16 +444,6 @@ function TemplatesList({
                         </p>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {template.fileName}
-                    </td>
-                    <td className="max-w-md px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {template.steps.length > 0
-                        ? template.steps
-                            .map((step) => `${step.order}. ${step.approverName}`)
-                            .join("، ")
-                        : "-"}
-                    </td>
                     <td className="px-6 py-4 text-sm">
                       <span
                         className={`rounded-full px-2.5 py-1 text-xs font-medium ${
@@ -472,13 +456,15 @@ function TemplatesList({
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
-                      <div className="flex flex-wrap gap-3">
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           onClick={() => onEdit(template)}
-                          className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                          title="ویرایش قالب فرم"
+                          aria-label="ویرایش قالب فرم"
                         >
-                          ویرایش
+                          <Pencil className="h-4 w-4" />
                         </button>
                         <form
                           action={deleteFormTemplateAction}
@@ -491,9 +477,11 @@ function TemplatesList({
                           <input type="hidden" name="id" value={template.id} />
                           <button
                             type="submit"
-                            className="font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-red-300 hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-300"
+                            title="حذف قالب فرم"
+                            aria-label="حذف قالب فرم"
                           >
-                            حذف
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </form>
                       </div>
@@ -564,3 +552,4 @@ export default function FormTemplateManager({
     />
   );
 }
+
