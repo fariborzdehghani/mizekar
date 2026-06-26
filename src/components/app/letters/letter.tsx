@@ -211,6 +211,8 @@ export default function LetterForm({
   const [newDraftPrompt, setNewDraftPrompt] = useState("");
   const [newDraftError, setNewDraftError] = useState<string | null>(null);
   const [isNewDraftLoading, setIsNewDraftLoading] = useState(false);
+  const [polishError, setPolishError] = useState<string | null>(null);
+  const [isPolishLoading, setIsPolishLoading] = useState(false);
   const [aiSummaryMeta, setAiSummaryMeta] = useState<{
     letterCount: number;
     relatedLetterCount: number;
@@ -220,6 +222,7 @@ export default function LetterForm({
   const summaryAbortControllerRef = useRef<AbortController | null>(null);
   const draftAbortControllerRef = useRef<AbortController | null>(null);
   const newDraftAbortControllerRef = useRef<AbortController | null>(null);
+  const polishAbortControllerRef = useRef<AbortController | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
   // Initialize form with letter data if in edit/view mode
@@ -236,6 +239,8 @@ export default function LetterForm({
     setNewDraftPrompt("");
     setNewDraftError(null);
     setIsNewDraftLoading(false);
+    setPolishError(null);
+    setIsPolishLoading(false);
     setTagGenerationError(null);
     setIsTagGenerationLoading(false);
 
@@ -549,6 +554,97 @@ export default function LetterForm({
     newDraftAbortControllerRef.current = null;
     setIsNewDraftLoading(false);
     setIsNewDraftModalOpen(false);
+  };
+
+  const handlePolishLetterContent = async () => {
+    if (isViewMode || initialLetter || isPolishLoading) return;
+
+    const formData = formRef.current ? new FormData(formRef.current) : null;
+    const currentContent = String(formData?.get("content") || content || "");
+    const plainLetterText = getPlainTextFromEditorHtml(currentContent);
+
+    if (!plainLetterText) {
+      setPolishError("برای ویرایش هوشمند، ابتدا متن نامه را وارد کنید.");
+      return;
+    }
+
+    setPolishError(null);
+    setIsPolishLoading(true);
+    polishAbortControllerRef.current?.abort();
+
+    try {
+      const controller = new AbortController();
+      let result: {
+        success: boolean;
+        title?: string;
+        content?: string;
+        error?: string;
+      } | null = null;
+
+      polishAbortControllerRef.current = controller;
+      const response = await fetch("/api/ai/letter-polish", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          content: currentContent,
+        }),
+        signal: controller.signal,
+      });
+
+      await readAiStream(response, (event) => {
+        if (event.type === "draft") {
+          result = {
+            success: true,
+            title: event.title,
+            content: event.content,
+          };
+        }
+      });
+
+      const polishResult = (result ?? {
+        success: false,
+        error: "خطا در ویرایش هوشمند متن نامه.",
+      }) as
+        | {
+            success: true;
+            title: string;
+            content: string;
+          }
+        | {
+            success: false;
+            error?: string;
+          };
+
+      result = polishResult;
+
+      if (!polishResult.success) {
+        setPolishError(result.error || "خطا در ویرایش هوشمند متن نامه.");
+        return;
+      }
+
+      setTitle(polishResult.title);
+      setContent(polishResult.content);
+    } catch (polishGenerationError) {
+      if (
+        polishGenerationError instanceof DOMException &&
+        polishGenerationError.name === "AbortError"
+      ) {
+        return;
+      }
+
+      console.error("AI letter polish error:", polishGenerationError);
+      if (polishGenerationError instanceof Error) {
+        setPolishError(polishGenerationError.message);
+        return;
+      }
+      setPolishError("خطا در ویرایش هوشمند متن نامه.");
+    } finally {
+      polishAbortControllerRef.current = null;
+      setIsPolishLoading(false);
+    }
   };
 
   const handleGenerateNewLetterDraft = async () => {
@@ -1334,6 +1430,28 @@ export default function LetterForm({
             >
               محتوای نامه
             </label>
+            {!isViewMode && !initialLetter && (
+              <div className="mb-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={handlePolishLetterContent}
+                  disabled={isPolishLoading}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 dark:hover:bg-indigo-900/50"
+                >
+                  {isPolishLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                  {isPolishLoading ? "در حال ویرایش..." : "ویرایش هوشمند متن"}
+                </button>
+              </div>
+            )}
+            {polishError && (
+              <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+                {polishError}
+              </div>
+            )}
             {isViewMode ? (
               <div
                 className="prose max-w-none min-h-80 rounded-lg border border-gray-300 bg-white p-4 text-gray-900 dark:prose-invert dark:border-gray-600 dark:bg-gray-900 dark:text-white"

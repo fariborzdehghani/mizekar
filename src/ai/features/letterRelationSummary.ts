@@ -19,6 +19,7 @@ const AI_DRAFT_SUMMARY_CHAR_LIMIT = 5000;
 const AI_DRAFT_USER_PROMPT_CHAR_LIMIT = 2500;
 const AI_DRAFT_SOURCE_CONTENT_CHAR_LIMIT = 1200;
 const AI_NEW_LETTER_CONTEXT_CHAR_LIMIT = 1200;
+const AI_LETTER_POLISH_CONTENT_CHAR_LIMIT = 8000;
 
 type LetterRelationTreeNode = {
   id: number;
@@ -610,6 +611,55 @@ export async function prepareNewLetterDraft(
     ...contextLines,
     "User instruction for the new letter draft:",
     truncatePromptText(trimmedInstruction, AI_DRAFT_USER_PROMPT_CHAR_LIMIT),
+  ].join("\n");
+
+  return {
+    success: true,
+    systemPrompt,
+    userPrompt,
+    fallbackTitle,
+  };
+}
+
+export async function preparePolishedNewLetterDraft(
+  existingTitle = "",
+  existingContent = ""
+): Promise<LetterResponseDraftPreparationResult> {
+  const trimmedTitle = existingTitle.trim();
+  const trimmedContent = getPlainText(existingContent).trim();
+
+  if (!trimmedContent) {
+    return {
+      success: false,
+      error: "برای ویرایش هوشمند، ابتدا متن نامه را وارد کنید.",
+    };
+  }
+
+  const fallbackTitle = trimmedTitle || "نامه ویرایش‌شده";
+  const systemPrompt =
+    readAiProviderString(
+      ["AI_LETTER_POLISH_SYSTEM_PROMPT"],
+      ["LM_STUDIO_AI_LETTER_POLISH_SYSTEM_PROMPT"]
+    ) ||
+    [
+      "You polish Persian office correspondence drafts.",
+      "Improve clarity, grammar, structure, and professional tone while preserving the user's meaning.",
+      "Do not add facts, dates, approvals, names, numbers, legal claims, or commitments that are not present in the draft.",
+      "Keep the letter concise and suitable for formal office correspondence.",
+      "Return only valid JSON with keys title and content.",
+      "The title should be polished only if needed.",
+      "The content value must be clean HTML suitable for a rich text editor, using p, ul, ol, li, strong, and br tags only.",
+      "Do not include hidden reasoning, chain-of-thought, markdown fences, or <think> blocks.",
+    ].join(" ");
+  const userPrompt = [
+    "Polish this Persian office-letter draft.",
+    "Preserve the original intent and all concrete details.",
+    "Return exactly this JSON shape:",
+    '{"title":"polished Persian title","content":"<p>polished body</p>"}',
+    "",
+    `Current title: ${trimmedTitle || "-"}`,
+    "Current content:",
+    truncatePromptText(trimmedContent, AI_LETTER_POLISH_CONTENT_CHAR_LIMIT),
   ].join("\n");
 
   return {
