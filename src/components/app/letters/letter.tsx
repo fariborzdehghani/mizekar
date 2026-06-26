@@ -71,6 +71,12 @@ interface LetterFormProps {
 }
 
 const AI_RESPONSE_DRAFT_STORAGE_KEY = "mizekar:ai-response-draft";
+const AI_SOLID_BUTTON_CLASS =
+  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+const AI_SOFT_BUTTON_CLASS =
+  AI_SOLID_BUTTON_CLASS;
+const AI_ICON_CLASS =
+  "bg-purple-600 text-white dark:bg-purple-600";
 
 type StoredAiResponseDraft = {
   title: string;
@@ -924,7 +930,7 @@ export default function LetterForm({
             type="button"
             onClick={handleGenerateKeywordTags}
             disabled={isTagGenerationLoading || !canGenerateKeywordTags}
-            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-blue-light-200 bg-blue-light-50 px-3 text-sm font-medium text-blue-light-800 transition hover:bg-blue-light-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500/30 dark:bg-blue-500/15 dark:text-blue-light-300"
+            className={`${AI_SOFT_BUTTON_CLASS} h-9 rounded-lg px-3 text-sm font-medium`}
           >
             {isTagGenerationLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -983,7 +989,7 @@ export default function LetterForm({
           >
             <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <div className="flex min-w-0 items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${AI_ICON_CLASS}`}>
                   {isNewDraftLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -1053,7 +1059,7 @@ export default function LetterForm({
                 type="button"
                 onClick={handleGenerateNewLetterDraft}
                 disabled={isNewDraftLoading}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
               >
                 {isNewDraftLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1072,7 +1078,7 @@ export default function LetterForm({
           <div className="flex h-[82vh] max-h-[760px] w-full max-w-6xl flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800">
             <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
               <div className="flex min-w-0 items-start gap-3">
-                <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${AI_ICON_CLASS}`}>
                   {isAiSummaryLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
@@ -1141,7 +1147,7 @@ export default function LetterForm({
                       type="button"
                       onClick={handleGenerateResponseDraft}
                       disabled={!canCreateResponseDraft || isDraftLoading}
-                      className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
                     >
                       {isDraftLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -1240,7 +1246,7 @@ export default function LetterForm({
                   setIsNewDraftModalOpen(true);
                 }}
                 disabled={isNewDraftLoading}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
               >
                 {isNewDraftLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1258,7 +1264,7 @@ export default function LetterForm({
                 type="button"
                 onClick={handleSummarizeRelatedLetters}
                 disabled={isAiSummaryLoading}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
               >
                 {isAiSummaryLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1436,7 +1442,7 @@ export default function LetterForm({
                   type="button"
                   onClick={handlePolishLetterContent}
                   disabled={isPolishLoading}
-                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-4 text-sm font-medium text-indigo-700 transition hover:bg-indigo-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200 dark:hover:bg-indigo-900/50"
+                  className={`${AI_SOFT_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
                 >
                   {isPolishLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

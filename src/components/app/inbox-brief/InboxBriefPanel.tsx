@@ -45,6 +45,12 @@ type InboxBriefContextValue = {
   openBrief: () => void;
   closeBrief: () => void;
 };
+const AI_SOLID_BUTTON_CLASS =
+  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+const AI_SOFT_BUTTON_CLASS =
+  AI_SOLID_BUTTON_CLASS;
+const AI_ICON_CLASS =
+  "bg-purple-600 text-white dark:bg-purple-600";
 
 const InboxBriefContext = createContext<InboxBriefContextValue | null>(null);
 
@@ -194,7 +200,7 @@ export function InboxBriefProvider({
 
       {isReadyNotificationOpen && brief && !isOpen && (
         <div
-          className="fixed bottom-4 left-4 z-[1000000] w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-blue-light-200 bg-app-panel p-3 text-right shadow-2xl dark:border-blue-900/60 dark:bg-gray-900"
+          className="fixed bottom-4 left-4 z-[1000000] w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-purple-600 bg-app-panel p-3 text-right shadow-2xl dark:border-purple-600 dark:bg-gray-900"
           dir="rtl"
           role="status"
         >
@@ -204,7 +210,7 @@ export function InboxBriefProvider({
               onClick={openBrief}
               className="flex min-w-0 flex-1 items-start gap-3 text-right"
             >
-              <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300">
+              <span className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${AI_ICON_CLASS}`}>
                 <Sparkles className="h-5 w-5" />
               </span>
               <span className="min-w-0">
@@ -237,7 +243,7 @@ export function InboxBriefProvider({
             <header className="flex items-start justify-between gap-4 border-b border-app-border bg-app-header-page/80 px-5 py-4 dark:border-gray-800">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                  <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-600" />
                   <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                     اقدامات پیشنهادی هوش مصنوعی
                   </h2>
@@ -262,7 +268,7 @@ export function InboxBriefProvider({
             <div className="min-h-56 overflow-y-auto p-5">
               {isCreating ? (
                 <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center text-sm text-gray-600 dark:text-gray-300">
-                  <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-300" />
+                  <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-600" />
                   در حال آماده‌سازی اقدامات پیشنهادی هوش مصنوعی...
                 </div>
               ) : error ? (
@@ -274,7 +280,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
+                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     تلاش دوباره
@@ -300,7 +306,7 @@ export function InboxBriefProvider({
                             <Link
                               href={item.actionHref}
                               onClick={closeBrief}
-                              className="inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
+                              className={`${AI_SOLID_BUTTON_CLASS} h-9 shrink-0 rounded-md px-3 text-sm font-medium`}
                             >
                               {item.actionLabel}
                               <ArrowUpRight className="h-4 w-4" />
@@ -317,7 +323,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-app-border bg-white/70 px-3 text-sm font-medium text-gray-700 transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
+                    className={`${AI_SOFT_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     ایجاد اقدامات جدید
@@ -331,7 +337,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
+                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     ایجاد اقدامات پیشنهادی

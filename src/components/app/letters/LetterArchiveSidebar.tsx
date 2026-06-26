@@ -461,7 +461,7 @@ export default function LetterArchiveSidebar({
   }
 
   return (
-    <aside className="w-full shrink-0 border-t border-app-border bg-app-archive-panel p-4 dark:border-gray-800 dark:bg-gray-900 lg:w-96 lg:border-r lg:border-t-0 xl:w-[26rem] 2xl:w-[30rem] 3xl:w-[34rem]">
+    <aside className="w-full shrink-0 border-t border-app-border bg-app-archive-panel p-4 dark:border-gray-800 dark:bg-gray-900 lg:w-80 lg:border-r lg:border-t-0 xl:w-80 2xl:w-80 3xl:w-80">
       <div className="mb-4 flex items-center gap-3">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-gray-900 dark:text-white">
           بایگانی

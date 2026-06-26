@@ -293,8 +293,8 @@ export default function MeetingForm({
         requireUser
       />
 
-      <form onSubmit={handleSubmit}>
-        <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-19.25">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-white">
+        <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-19.25">
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/incoming-letters"

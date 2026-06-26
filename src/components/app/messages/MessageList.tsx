@@ -140,7 +140,7 @@ export default function MessageList({
                 return (
                   <tr
                     key={message.id}
-                    className={`transition hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                    className={`cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 ${
                       isUnreadIncoming
                         ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
                         : ""
@@ -172,11 +172,6 @@ export default function MessageList({
                               <span className="h-2 w-2 shrink-0 rounded-full bg-orange-400" />
                             )}
                         </div>
-                        {message.contentSnippet && (
-                          <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                            {message.contentSnippet}
-                          </p>
-                        )}
                       </div>
                     </td>
                     <td className="w-80 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">

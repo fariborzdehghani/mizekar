@@ -42,6 +42,9 @@ const PERSIAN_MONTHS = [
 
 const PERSIAN_WEEK_DAYS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 
+const AI_HEADER_BUTTON_CLASS =
+  "border-app-border bg-white/75 text-gray-600 shadow-theme-xs hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+
 const persianPartsFormatter = new Intl.DateTimeFormat(
   "fa-IR-u-ca-persian",
   {
@@ -721,11 +724,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
               onClick={openBrief}
               title={aiButtonLabel}
               aria-label={aiButtonLabel}
-              className={`inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors ${
-                isCreating
-                  ? "border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
-                  : "border-app-border bg-white/75 text-gray-600 shadow-theme-xs hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-              }`}
+              className={`inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors ${AI_HEADER_BUTTON_CLASS}`}
             >
               {isCreating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

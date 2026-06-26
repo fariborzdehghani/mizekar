@@ -88,8 +88,8 @@ function RelatedMessageLink({
 
 export default function MessageView({ message }: MessageViewProps) {
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-white dark:bg-gray-900 lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <main className="min-h-[calc(100vh-65px)] bg-white dark:bg-white lg:min-h-[calc(100vh-77px)]">
+      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-[77px]">
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href={message.isSender ? "/outgoing-messages" : "/incoming-messages"}

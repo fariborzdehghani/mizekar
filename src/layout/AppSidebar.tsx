@@ -321,7 +321,7 @@ const AppSidebar: React.FC = () => {
       {activeAiTaskCount > 0 && (
         <div className="mt-auto flex shrink-0 justify-center border-t border-app-border py-4 dark:border-gray-800">
           <div
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 shadow-theme-xs dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-200"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-purple-600 bg-purple-600 text-white shadow-theme-xs dark:border-purple-600 dark:bg-purple-600 dark:text-white"
             title="هوش مصنوعی در حال کار است"
             role="status"
             aria-label="هوش مصنوعی در حال کار است"

@@ -143,7 +143,10 @@ export default function MessageForm({
         requireUser
       />
 
-      <form onSubmit={handleSubmit} className="min-h-[calc(100vh-65px)]">
+      <form
+        onSubmit={handleSubmit}
+        className="min-h-[calc(100vh-65px)] bg-white dark:bg-white"
+      >
         <input
           type="hidden"
           name="parentMessageId"
@@ -155,7 +158,7 @@ export default function MessageForm({
           value={prefill?.forwardedFromMessageId || ""}
         />
 
-        <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+        <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-[77px]">
           <div className="flex items-center gap-3">
             <Link
               href="/incoming-messages"
@@ -174,10 +177,10 @@ export default function MessageForm({
           </div>
 
           <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-900">
               {pageTitle}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
               {getModeText(prefill?.mode)}
             </p>
           </div>

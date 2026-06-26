@@ -14,6 +14,10 @@ interface LetterAiArchiveSuggestionButtonProps {
 }
 
 type Suggestion = Extract<LetterArchiveSuggestionResult, { success: true }>;
+const AI_SOLID_BUTTON_CLASS =
+  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+const AI_SOFT_BUTTON_CLASS =
+  AI_SOLID_BUTTON_CLASS;
 
 export default function LetterAiArchiveSuggestionButton({
   letterId,
@@ -79,7 +83,7 @@ export default function LetterAiArchiveSuggestionButton({
         type="button"
         onClick={handleSuggest}
         disabled={isSuggesting || isArchiving}
-        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 text-sm font-medium text-amber-800 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-100 dark:hover:bg-amber-900/50"
+        className={`${AI_SOFT_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
       >
         {isSuggesting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -128,7 +132,7 @@ export default function LetterAiArchiveSuggestionButton({
                   type="button"
                   onClick={handleArchive}
                   disabled={suggestion.alreadyArchived || isArchiving}
-                  className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
                 >
                   {isArchiving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CalendarCheck, Eye, MapPin, Plus, Video } from "lucide-react";
 import type { ArchiveFolderNode } from "@/src/actions/archiveActions";
 import ArchiveLetterButton from "@/src/components/app/letters/ArchiveLetterButton";
@@ -58,6 +61,8 @@ export default function MeetingList({
   searchQuery = "",
   error,
 }: MeetingListProps) {
+  const router = useRouter();
+
   return (
     <ArchiveSelectionProvider>
       <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)] lg:flex-row">
@@ -100,7 +105,7 @@ export default function MeetingList({
             </div>
           ) : (
             <div className="overflow-x-auto bg-white shadow-md dark:bg-gray-800">
-              <table className="w-full min-w-[1060px]">
+              <table className="w-full min-w-[960px]">
             <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -116,9 +121,6 @@ export default function MeetingList({
                   رئیس / دبیر
                 </th>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
-                  تعداد
-                </th>
-                <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                   وضعیت
                 </th>
                 <th className="w-px whitespace-nowrap px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -130,18 +132,16 @@ export default function MeetingList({
               {meetings.map((meeting) => (
                 <tr
                   key={meeting.id}
-                  className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="cursor-pointer select-none transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                  onDoubleClick={() =>
+                    router.push(`/meeting?id=${meeting.id}&viewOnly=true`)
+                  }
+                  title="برای مشاهده دوبار کلیک کنید"
                 >
                   <td className="px-6 py-4">
                     <div className="max-w-md">
                       <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {meeting.title || "(بدون عنوان)"}
-                      </p>
-                      <p className="mt-1 truncate text-xs text-gray-500 dark:text-gray-400">
-                        #{meeting.id}
-                        {meeting.descriptionSnippet
-                          ? ` - ${meeting.descriptionSnippet}`
-                          : ""}
                       </p>
                     </div>
                   </td>
@@ -157,9 +157,6 @@ export default function MeetingList({
                       )}
                       <span className="truncate">
                         {meeting.location_type === 1 ? "آنلاین" : "حضوری"}
-                        {meeting.location_title
-                          ? ` - ${meeting.location_title}`
-                          : ""}
                       </span>
                     </span>
                   </td>
@@ -169,12 +166,6 @@ export default function MeetingList({
                     </span>
                     <span className="mt-1 block max-w-80 truncate text-xs text-gray-500 dark:text-gray-400">
                       دبیر: {meeting.secretaryName}
-                    </span>
-                  </td>
-                  <td className="w-36 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                    <span className="block">حاضرین: {meeting.attendeesCount}</span>
-                    <span className="mt-1 block text-xs">
-                      ارجاعات: {meeting.referralsCount}
                     </span>
                   </td>
                   <td className="w-40 px-6 py-4 text-sm">

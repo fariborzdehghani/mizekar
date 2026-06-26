@@ -149,7 +149,7 @@ export default function MeetingReferrals({
   };
 
   return (
-    <section className="border-t border-gray-200 bg-white px-6 py-6 dark:border-gray-800 dark:bg-gray-900">
+    <section className="border-t border-gray-200 bg-white px-6 py-6 dark:border-gray-800 dark:bg-white">
       <RecipientsModal
         isOpen={isReceiversModalOpen}
         onClose={() => setIsReceiversModalOpen(false)}
