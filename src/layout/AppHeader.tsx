@@ -596,7 +596,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
               aria-expanded={isAdvancedSearchOpen}
             >
               <SlidersHorizontal className="h-5 w-5" />
-              <span>جستجوی پیشرفته-test</span>
+              <span>جستجوی پیشرفته</span>
             </button>
 
             {isAdvancedSearchOpen && (
