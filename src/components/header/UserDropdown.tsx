@@ -4,8 +4,9 @@ import { logoutAction } from "@/src/actions/authActions";
 import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/src/components/ui/dropdown/DropdownItem";
 import type { CurrentUser } from "@/src/lib/auth-types";
-import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
+const DEFAULT_USER_IMAGE = "/images/user/owner.jpg";
 
 export default function UserDropdown({ user }: { user: CurrentUser }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,9 +20,15 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
     setIsOpen(false);
   }
 
-  const userImage = user.photo?.startsWith("/")
-    ? user.photo
-    : "/images/user/owner.jpg";
+  const userImage = useMemo(
+    () => (user.photo?.startsWith("/") ? user.photo : DEFAULT_USER_IMAGE),
+    [user.photo]
+  );
+  const [avatarSrc, setAvatarSrc] = useState(userImage);
+
+  useEffect(() => {
+    setAvatarSrc(userImage);
+  }, [userImage]);
 
   return (
     <div className="relative">
@@ -30,12 +37,12 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
         className="dropdown-toggle flex items-center rounded-full border border-app-border bg-white/65 py-1 pr-1 pl-3 text-gray-700 shadow-theme-xs transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
       >
         <span className="relative ml-3 h-11 w-11 overflow-hidden rounded-full">
-          <Image
-            fill
-            sizes="44px"
-            src={userImage}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={avatarSrc}
             alt="User"
-            className="object-cover"
+            className="h-full w-full object-cover"
+            onError={() => setAvatarSrc(DEFAULT_USER_IMAGE)}
           />
         </span>
 

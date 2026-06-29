@@ -25,6 +25,44 @@ function getSessionSecret() {
   );
 }
 
+function parseBooleanFlag(value: string | undefined) {
+  if (!value) return null;
+
+  const normalizedValue = value.trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(normalizedValue)) return true;
+  if (["0", "false", "no", "off"].includes(normalizedValue)) return false;
+
+  return null;
+}
+
+function shouldUseSecureSessionCookie() {
+  const explicitValue = parseBooleanFlag(process.env.AUTH_COOKIE_SECURE);
+  if (explicitValue !== null) return explicitValue;
+
+  const publicUrl =
+    process.env.APP_PUBLIC_URL ||
+    process.env.NEXTAUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL;
+
+  if (!publicUrl) return false;
+
+  try {
+    return new URL(publicUrl).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function getSessionCookieOptions(maxAge: number) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: shouldUseSecureSessionCookie(),
+    path: "/",
+    maxAge,
+  };
+}
+
 function signPayload(encodedPayload: string) {
   return crypto
     .createHmac("sha256", getSessionSecret())
@@ -154,18 +192,16 @@ export async function createSession(
   });
 
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, session, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  });
+  cookieStore.set(
+    SESSION_COOKIE_NAME,
+    session,
+    getSessionCookieOptions(SESSION_MAX_AGE_SECONDS)
+  );
 }
 
 export async function deleteSession() {
   const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  cookieStore.set(SESSION_COOKIE_NAME, "", getSessionCookieOptions(0));
 }
 
 export async function getSession() {

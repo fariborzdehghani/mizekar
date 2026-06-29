@@ -5,6 +5,11 @@ import path from "path";
 import { revalidatePath } from "next/cache";
 import { requireUserId } from "@/src/lib/auth";
 import { hashPassword, verifyPassword } from "@/src/lib/password";
+import {
+  getProfilePhotoFilePath,
+  getProfilePhotoPublicPath,
+  getProfilePhotoStorageDir,
+} from "@/src/lib/profilePhotos";
 import { prisma } from "@/src/lib/prisma";
 
 export type ProfileFormState = {
@@ -45,16 +50,14 @@ async function saveProfilePhoto(file: File, userId: number) {
     throw new Error("فرمت تصویر پروفایل باید JPG، PNG یا WebP باشد.");
   }
 
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", "profiles");
-  await fs.mkdir(uploadsDir, { recursive: true });
+  await fs.mkdir(getProfilePhotoStorageDir(), { recursive: true });
 
   const fileName = `${userId}_${Date.now()}${getFileExtension(file)}`;
-  const filePath = path.join(uploadsDir, fileName);
   const bytes = new Uint8Array(await file.arrayBuffer());
 
-  await fs.writeFile(filePath, bytes);
+  await fs.writeFile(getProfilePhotoFilePath(fileName), bytes);
 
-  return `/uploads/profiles/${fileName}`;
+  return getProfilePhotoPublicPath(fileName);
 }
 
 export async function updateProfileAction(
