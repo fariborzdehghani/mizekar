@@ -142,7 +142,7 @@ export default function MessageList({
                     key={message.id}
                     className={`cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 ${
                       isUnreadIncoming
-                        ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
+                        ? "bg-blue-100/50 dark:bg-blue-950/25"
                         : ""
                     }`}
                   >

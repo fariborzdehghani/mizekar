@@ -461,8 +461,8 @@ export default function LetterArchiveSidebar({
   }
 
   return (
-    <aside className="w-full shrink-0 border-t border-app-border bg-app-archive-panel p-4 dark:border-gray-800 dark:bg-gray-900 lg:w-80 lg:border-r lg:border-t-0 xl:w-80 2xl:w-80 3xl:w-80">
-      <div className="mb-4 flex items-center gap-3">
+    <aside className="flex max-h-full w-full shrink-0 flex-col overflow-hidden border-t border-app-border bg-app-archive-panel p-4 dark:border-gray-800 dark:bg-gray-900 lg:w-80 lg:border-r lg:border-t-0 xl:w-80 2xl:w-80 3xl:w-80">
+      <div className="mb-4 flex shrink-0 items-center gap-3">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-gray-900 dark:text-white">
           بایگانی
         </h2>
@@ -481,12 +481,12 @@ export default function LetterArchiveSidebar({
       </div>
 
       {archiveSelection?.pendingItem && (
-        <div className="mb-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs leading-5 text-blue-700 dark:border-blue-800 dark:bg-blue-500/15 dark:text-blue-200">
+        <div className="mb-3 shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs leading-5 text-blue-700 dark:border-blue-800 dark:bg-blue-500/15 dark:text-blue-200">
           برای بایگانی مورد انتخاب‌شده، روی پوشه مقصد کلیک کنید.
         </div>
       )}
 
-      <div>
+      <div className="min-h-0 flex-1 overflow-y-auto">
         <div
           onContextMenu={openRootMenu}
           className="flex h-8 items-center gap-1 rounded-md px-1.5 text-sm text-gray-800 transition hover:bg-white/70 hover:text-blue-light-700 dark:text-gray-100 dark:hover:bg-white/5"

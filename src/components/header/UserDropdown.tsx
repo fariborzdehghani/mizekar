@@ -4,12 +4,12 @@ import { logoutAction } from "@/src/actions/authActions";
 import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/src/components/ui/dropdown/DropdownItem";
 import type { CurrentUser } from "@/src/lib/auth-types";
-import React, { useEffect, useMemo, useState } from "react";
-
-const DEFAULT_USER_IMAGE = "/images/user/owner.jpg";
+import { UserRound } from "lucide-react";
+import React, { useMemo, useState } from "react";
 
 export default function UserDropdown({ user }: { user: CurrentUser }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [failedAvatarSrc, setFailedAvatarSrc] = useState<string | null>(null);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -21,14 +21,15 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
   }
 
   const userImage = useMemo(
-    () => (user.photo?.startsWith("/") ? user.photo : DEFAULT_USER_IMAGE),
+    () => (user.photo?.startsWith("/") ? user.photo : null),
     [user.photo]
   );
-  const [avatarSrc, setAvatarSrc] = useState(userImage);
+  const avatarSrc = failedAvatarSrc === userImage ? null : userImage;
 
-  useEffect(() => {
-    setAvatarSrc(userImage);
-  }, [userImage]);
+  const handleAvatarError = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    event.currentTarget.style.display = "none";
+    if (avatarSrc) setFailedAvatarSrc(avatarSrc);
+  };
 
   return (
     <div className="relative">
@@ -37,13 +38,19 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
         className="dropdown-toggle flex items-center rounded-full border border-app-border bg-white/65 py-1 pr-1 pl-3 text-gray-700 shadow-theme-xs transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
       >
         <span className="relative ml-3 h-11 w-11 overflow-hidden rounded-full">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={avatarSrc}
-            alt="User"
-            className="h-full w-full object-cover"
-            onError={() => setAvatarSrc(DEFAULT_USER_IMAGE)}
-          />
+          {avatarSrc ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={avatarSrc}
+              alt="User"
+              className="h-full w-full object-cover"
+              onError={handleAvatarError}
+            />
+          ) : (
+            <span className="flex h-full w-full items-center justify-center bg-blue-light-50 text-blue-light-600 dark:bg-blue-500/15 dark:text-blue-300">
+              <UserRound className="h-6 w-6" aria-hidden="true" />
+            </span>
+          )}
         </span>
 
         <span className="block ml-1 font-medium text-theme-sm">

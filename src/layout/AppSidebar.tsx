@@ -5,12 +5,11 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { subscribeToAiActivity } from "@/src/lib/aiActivity";
-import { Sparkles } from "lucide-react";
+import { Settings, Sparkles } from "lucide-react";
 import {
   CalenderIcon,
   ChevronDownIcon,
   GridIcon,
-  TableIcon,
   MailIcon,
   ChatIcon,
 } from "../icons/index";
@@ -64,7 +63,7 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    icon: <TableIcon />,
+    icon: <Settings className="h-5 w-5" />,
     name: "تنظیمات",
     subItems: [
       { name: "تعاریف", path: "/settings/general" },

@@ -294,9 +294,9 @@ export default function LetterReferralList({
 
   return (
     <ArchiveSelectionProvider>
-      <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)] lg:flex-row">
-        <main className="flex min-w-0 flex-1 flex-col">
-          <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:bg-gray-900 lg:top-19.25">
+      <div className="flex h-[calc(100vh-65px)] min-h-0 w-full flex-col overflow-hidden lg:h-[calc(100vh-77px)] lg:flex-row">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:bg-gray-900">
             <div>
               <Link
                 href="/letter"
@@ -352,9 +352,9 @@ export default function LetterReferralList({
               </div>
             </div>
           ) : (
-            <div className="overflow-x-auto border-y border-app-border bg-app-panel shadow-md dark:border-gray-800 dark:bg-gray-800">
+            <div className="flex-1 overflow-auto border-y border-app-border bg-app-panel shadow-md dark:border-gray-800 dark:bg-gray-800">
               <table className="w-full table-auto">
-                <thead className="border-b border-app-border bg-app-table-head dark:border-gray-600 dark:bg-gray-700">
+                <thead className="sticky top-0 z-20 border-b border-app-border bg-app-table-head shadow-[0_1px_0_rgba(16,24,40,0.08)] dark:border-gray-600 dark:bg-gray-700">
                   <tr>
                     <th className="w-10 px-3 py-2 text-center text-sm font-semibold text-gray-900 dark:text-white">
                       <span className="sr-only">نوع</span>
@@ -400,7 +400,7 @@ export default function LetterReferralList({
                           archiveFolders={archiveFolders}
                           className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                             isUnreadIncoming
-                              ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
+                              ? "bg-blue-100/50 dark:bg-blue-950/25"
                               : ""
                           }`}
                         >
@@ -492,7 +492,7 @@ export default function LetterReferralList({
                           archiveFolders={archiveFolders}
                           className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                             isUnreadIncoming
-                              ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
+                              ? "bg-blue-100/50 dark:bg-blue-950/25"
                               : ""
                           }`}
                         >
@@ -586,7 +586,7 @@ export default function LetterReferralList({
                         }
                         className={`transition hover:bg-white/70 dark:hover:bg-gray-700 ${
                           isUnreadIncoming
-                            ? "border-r-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20"
+                            ? "bg-blue-100/50 dark:bg-blue-950/25"
                             : ""
                         }`}
                       >

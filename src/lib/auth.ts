@@ -1,11 +1,16 @@
 import "server-only";
 
 import crypto from "crypto";
+import fs from "fs/promises";
 import { cache } from "react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE_NAME } from "@/src/lib/auth-constants";
 import type { CalculatedPermission, CurrentUser } from "@/src/lib/auth-types";
+import {
+  getProfilePhotoFilePath,
+  isSafeProfilePhotoFileName,
+} from "@/src/lib/profilePhotos";
 import { prisma } from "@/src/lib/prisma";
 
 const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
@@ -226,6 +231,20 @@ function getDisplayName(user: {
   return fullName || user.user_id || `User #${user.id}`;
 }
 
+async function getExistingProfilePhoto(photo: string | null) {
+  if (!photo?.startsWith("/uploads/profiles/")) return photo;
+
+  const fileName = photo.split("/").pop() || "";
+  if (!isSafeProfilePhotoFileName(fileName)) return null;
+
+  try {
+    await fs.access(getProfilePhotoFilePath(fileName));
+    return photo;
+  } catch {
+    return null;
+  }
+}
+
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const session = await getSession();
   if (!session) return null;
@@ -253,7 +272,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     id: user.id,
     userId: user.user_id || String(user.id),
     roleId: user.role_id,
-    photo: user.photo,
+    photo: await getExistingProfilePhoto(user.photo),
     displayName: getDisplayName(user),
     permissions: session.permissions || [],
   };

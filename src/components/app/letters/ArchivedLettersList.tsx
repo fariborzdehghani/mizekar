@@ -97,9 +97,9 @@ export default function ArchivedLettersList({
   );
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)] lg:flex-row">
-      <main className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="flex h-[calc(100vh-65px)] min-h-0 w-full flex-col overflow-hidden lg:h-[calc(100vh-77px)] lg:flex-row">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
           <Link
             href="/letter"
             className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
@@ -129,9 +129,9 @@ export default function ArchivedLettersList({
             این پوشه هنوز موردی ندارد
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white shadow-md dark:bg-gray-800">
+          <div className="flex-1 overflow-auto bg-white shadow-md dark:bg-gray-800">
             <table className="w-full min-w-[820px]">
-              <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+              <thead className="sticky top-0 z-20 border-b border-gray-200 bg-gray-50 shadow-[0_1px_0_rgba(16,24,40,0.08)] dark:border-gray-600 dark:bg-gray-700">
                 <tr>
                   <th className="w-28 px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     نوع

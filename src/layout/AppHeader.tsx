@@ -387,10 +387,6 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
     });
   };
 
-  const submitFastSearch = () => {
-    inputRef.current?.form?.requestSubmit();
-  };
-
   const handleAdvancedSearchSubmit = (
     event: React.FormEvent<HTMLFormElement>
   ) => {
@@ -570,17 +566,8 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                   type="text"
                   defaultValue={searchValue}
                   placeholder="جستجو در فهرست‌ها..."
-                  className="dark:bg-dark-900 h-11 w-full rounded-lg border border-app-border bg-white/80 py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-light-300 focus:outline-hidden focus:ring-3 focus:ring-blue-light-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                  className="dark:bg-dark-900 h-11 w-full rounded-lg border border-app-border bg-white/80 py-2.5 pl-12 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-light-300 focus:outline-hidden focus:ring-3 focus:ring-blue-light-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
                 />
-
-                <button
-                  type="button"
-                  onClick={submitFastSearch}
-                  className="absolute right-2.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-app-border bg-app-surface-strong px-[7px] py-[4.5px] text-xs text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400"
-                >
-                  <span> ⌘ </span>
-                  <span> K </span>
-                </button>
               </div>
             </form>
             <button
