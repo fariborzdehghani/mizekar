@@ -71,8 +71,8 @@ export default function MessageList({
   const personColumnLabel = perspective === "incoming" ? "فرستنده" : "گیرندگان";
 
   return (
-    <main className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <main className="flex min-h-full w-full flex-col">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
         <Link
           href="/new-message"
           className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"

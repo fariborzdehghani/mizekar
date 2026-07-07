@@ -29,7 +29,7 @@ export default async function LetterPage({ searchParams }: LetterPageProps) {
   }
 
   return (
-    <div className="w-full">
+    <div className="min-h-full w-full">
       {letterId && isViewMode && (
         <LetterArchiveSuggestionToast
           key={letterId}

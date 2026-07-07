@@ -32,17 +32,17 @@ export default async function GeneralSettingsPage({
   });
 
   return (
-    <div className="w-full">
-      <div className="sticky top-16.25 lg:top-19.25 z-30 p-4 flex justify-between items-center border-b border-gray-300 bg-white dark:bg-gray-900">
+    <div className="min-h-full w-full">
+      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-gray-300 bg-white px-4 py-3 dark:bg-gray-900">
         <button
           type="submit"
           form="general-settings-form"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+          className="inline-flex h-9 items-center rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
         >
           ذخیره
         </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="shrink-0">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             تعاریف
           </h1>
         </div>

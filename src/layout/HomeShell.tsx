@@ -32,15 +32,17 @@ export default function HomeShell({
 
   return (
     <InboxBriefProvider initialBrief={initialInboxBrief}>
-      <div className="min-h-screen bg-app-canvas xl:flex dark:bg-gray-950">
+      <div className="flex h-dvh min-h-0 overflow-hidden bg-app-canvas dark:bg-gray-950">
         <AppSidebar />
         <Backdrop />
         <div
-          className="mr-22.5 min-h-screen flex-1 bg-app-canvas transition-all duration-300 ease-in-out dark:bg-gray-950"
+          className="mr-22.5 flex min-h-0 flex-1 flex-col overflow-hidden bg-app-canvas transition-all duration-300 ease-in-out dark:bg-gray-950"
           onClick={handleMainContentClick}
         >
           <AppHeader user={user} />
-          <div className="mx-auto w-full">{children}</div>
+          <div className="no-scrollbar mx-auto flex min-h-0 w-full flex-1 flex-col overflow-y-auto">
+            {children}
+          </div>
         </div>
       </div>
     </InboxBriefProvider>

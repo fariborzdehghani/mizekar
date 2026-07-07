@@ -1214,12 +1214,12 @@ export default function LetterForm({
         </div>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="bg-white dark:bg-gray-900">
-        <div className="sticky top-16.25 lg:top-19.25 z-30 p-4 flex justify-between items-center border-b border-gray-300 bg-white dark:bg-gray-900">
-          <div className="flex items-center gap-3">
+      <form ref={formRef} onSubmit={handleSubmit} className="min-h-full bg-white dark:bg-gray-900">
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-gray-300 bg-white px-4 py-3 dark:bg-gray-900">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+              className="inline-flex h-9 items-center rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               بازگشت
             </Link>
@@ -1227,7 +1227,7 @@ export default function LetterForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
+                className="inline-flex h-9 items-center rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
                   ? initialLetter
@@ -1246,7 +1246,7 @@ export default function LetterForm({
                   setIsNewDraftModalOpen(true);
                 }}
                 disabled={isNewDraftLoading}
-                className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
+                className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-lg px-3 text-sm font-medium`}
               >
                 {isNewDraftLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1264,7 +1264,7 @@ export default function LetterForm({
                 type="button"
                 onClick={handleSummarizeRelatedLetters}
                 disabled={isAiSummaryLoading}
-                className={`${AI_SOLID_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
+                className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-lg px-3 text-sm font-medium`}
               >
                 {isAiSummaryLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -1277,8 +1277,8 @@ export default function LetterForm({
               </button>
             )}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="shrink-0">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               {pageTitle}
             </h1>
           </div>

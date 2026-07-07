@@ -65,7 +65,7 @@ export default function MeetingList({
 
   return (
     <ArchiveSelectionProvider>
-      <div className="flex h-[calc(100vh-65px)] min-h-0 w-full flex-col overflow-hidden lg:h-[calc(100vh-77px)] lg:flex-row">
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden lg:flex-row">
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
             <Link

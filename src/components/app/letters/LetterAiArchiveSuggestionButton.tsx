@@ -95,7 +95,7 @@ export default function LetterAiArchiveSuggestionButton({
 
       {(suggestion || error || message) && (
         <div
-          className="absolute right-0 top-12 z-[1000000] max-h-[calc(100vh-8rem)] w-[min(28rem,calc(100vw-8rem))] overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 pl-12 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
+          className="absolute right-0 top-12 z-[1000000] max-h-[calc(100dvh-8rem)] w-[min(28rem,calc(100vw-8rem))] overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 pl-12 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
           dir="rtl"
         >
           <button

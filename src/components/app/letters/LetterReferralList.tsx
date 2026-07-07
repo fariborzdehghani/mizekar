@@ -294,7 +294,7 @@ export default function LetterReferralList({
 
   return (
     <ArchiveSelectionProvider>
-      <div className="flex h-[calc(100vh-65px)] min-h-0 w-full flex-col overflow-hidden lg:h-[calc(100vh-77px)] lg:flex-row">
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden lg:flex-row">
         <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:bg-gray-900">
             <div>

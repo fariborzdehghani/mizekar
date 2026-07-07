@@ -293,12 +293,12 @@ export default function MeetingForm({
         requireUser
       />
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-white">
-        <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-19.25">
+      <form onSubmit={handleSubmit} className="min-h-full bg-white dark:bg-white">
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-gray-300 bg-white px-4 py-3 dark:bg-white">
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/incoming-letters"
-              className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="inline-flex h-9 items-center rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               بازگشت
             </Link>
@@ -306,7 +306,7 @@ export default function MeetingForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
                 {loading ? "در حال ایجاد..." : "ایجاد جلسه"}
@@ -317,15 +317,15 @@ export default function MeetingForm({
                 type="button"
                 onClick={handleApprove}
                 disabled={approving}
-                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-green-600 px-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {approving ? "در حال تایید..." : "تایید جلسه"}
               </button>
             )}
           </div>
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="shrink-0 text-right">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               {pageTitle}
             </h1>
             {initialMeeting && (

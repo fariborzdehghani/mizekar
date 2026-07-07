@@ -145,7 +145,7 @@ export default function MessageForm({
 
       <form
         onSubmit={handleSubmit}
-        className="min-h-[calc(100vh-65px)] bg-white dark:bg-white"
+        className="min-h-full bg-white dark:bg-white"
       >
         <input
           type="hidden"
@@ -158,7 +158,7 @@ export default function MessageForm({
           value={prefill?.forwardedFromMessageId || ""}
         />
 
-        <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-[77px]">
+        <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white">
           <div className="flex items-center gap-3">
             <Link
               href="/incoming-messages"

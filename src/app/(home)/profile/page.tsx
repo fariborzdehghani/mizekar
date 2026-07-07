@@ -13,7 +13,7 @@ export default async function ProfilePage() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-gray-50 p-4 dark:bg-gray-950 lg:min-h-[calc(100vh-77px)] lg:p-6">
+    <div className="min-h-full bg-gray-50 p-4 dark:bg-gray-950 lg:p-6">
       <div className="mx-auto max-w-5xl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
