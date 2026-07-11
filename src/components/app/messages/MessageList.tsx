@@ -71,13 +71,8 @@ export default function MessageList({
   const personColumnLabel = perspective === "incoming" ? "فرستنده" : "گیرندگان";
 
   return (
-<<<<<<< HEAD
     <main className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
       <div className="liquid-page-header liquid-page-header-inset sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
-=======
-    <main className="flex min-h-full w-full flex-col">
-      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
->>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <Link
           href="/new-message"
           className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"

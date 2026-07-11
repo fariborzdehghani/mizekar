@@ -268,18 +268,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-<<<<<<< HEAD
       className={`liquid-glass-sidebar fixed right-0 top-0 z-[999999] flex h-screen w-[280px] flex-col border-l border-app-border bg-app-sidebar px-5 text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] transition-transform duration-300 dark:border-gray-800 dark:bg-gray-900 dark:text-white
-=======
-      className={`fixed mt-16 flex h-[calc(100dvh-4rem)] flex-col lg:mt-0 lg:h-dvh top-0 px-5 right-0 bg-app-sidebar text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] dark:bg-gray-900 dark:border-gray-800 dark:text-white z-[999999] border-l border-app-border
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-              ? "w-[290px]"
-              : "w-[90px]"
-        }
->>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         ${isMobileOpen ? "translate-x-0" : "translate-x-full"}
         lg:translate-x-0`}
     >

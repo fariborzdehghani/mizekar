@@ -13,11 +13,7 @@ export default async function ProfilePage() {
   });
 
   return (
-<<<<<<< HEAD
     <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] py-4 sm:py-6 lg:py-8">
-=======
-    <div className="min-h-full bg-gray-50 p-4 dark:bg-gray-950 lg:p-6">
->>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
       <div className="mx-auto max-w-5xl">
         <div className="liquid-page-header mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">

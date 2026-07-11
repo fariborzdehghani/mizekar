@@ -9,7 +9,6 @@ import {
   Mail,
   MessageSquare,
   Send,
-  Sparkles,
 } from "lucide-react";
 import { getDashboardStats } from "@/src/actions/dashboardActions";
 
@@ -329,11 +328,6 @@ function ColumnChart({
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
-  const todayLabel = new Intl.DateTimeFormat("fa-IR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  }).format(new Date());
 
   const totalWork =
     stats.letters.total +

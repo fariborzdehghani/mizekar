@@ -23,11 +23,7 @@ export default async function MeetingPage({ searchParams }: MeetingPageProps) {
   }
 
   return (
-<<<<<<< HEAD
     <div className="liquid-glass-page w-full bg-transparent">
-=======
-    <div className="min-h-full w-full bg-white dark:bg-white">
->>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
       {meetingId && isViewMode && <MeetingReadMarker meetingId={meetingId} />}
       <MeetingForm
         initialMeeting={meetingData}

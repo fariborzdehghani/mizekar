@@ -33,7 +33,6 @@ export default async function GeneralSettingsPage({
   });
 
   return (
-<<<<<<< HEAD
     <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8">
       <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
@@ -48,19 +47,6 @@ export default async function GeneralSettingsPage({
             <SlidersHorizontal className="h-4 w-4" /> مدیریت سامانه
           </p>
           <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-=======
-    <div className="min-h-full w-full">
-      <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-gray-300 bg-white px-4 py-3 dark:bg-gray-900">
-        <button
-          type="submit"
-          form="general-settings-form"
-          className="inline-flex h-9 items-center rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700"
-        >
-          ذخیره
-        </button>
-        <div className="shrink-0">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
->>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
             تعاریف
           </h1>
           <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
