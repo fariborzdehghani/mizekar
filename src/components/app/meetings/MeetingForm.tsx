@@ -293,6 +293,7 @@ export default function MeetingForm({
         requireUser
       />
 
+<<<<<<< HEAD
       <div className="liquid-content-frame liquid-glass-page space-y-6 py-4 sm:py-6 lg:py-8">
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -300,6 +301,14 @@ export default function MeetingForm({
             <Link
               href="/incoming-letters"
               className="liquid-glass-control rounded-xl border px-4 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
+=======
+      <form onSubmit={handleSubmit} className="min-h-full bg-white dark:bg-white">
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 border-b border-gray-300 bg-white px-4 py-3 dark:bg-white">
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/incoming-letters"
+              className="inline-flex h-9 items-center rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
             >
               بازگشت
             </Link>
@@ -307,7 +316,11 @@ export default function MeetingForm({
               <button
                 type="submit"
                 disabled={loading}
+<<<<<<< HEAD
                 className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+=======
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
               >
                 <Save className="h-4 w-4" />
                 {loading ? "در حال ایجاد..." : "ایجاد جلسه"}
@@ -318,15 +331,15 @@ export default function MeetingForm({
                 type="button"
                 onClick={handleApprove}
                 disabled={approving}
-                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-green-600 px-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <CheckCircle2 className="h-4 w-4" />
                 {approving ? "در حال تایید..." : "تایید جلسه"}
               </button>
             )}
           </div>
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <div className="shrink-0 text-right">
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               {pageTitle}
             </h1>
             {initialMeeting && (

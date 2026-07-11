@@ -189,7 +189,11 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
+<<<<<<< HEAD
     <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+=======
+    <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -233,7 +237,11 @@ function CreateRoleForm({
   return (
     <form
       action={formAction}
+<<<<<<< HEAD
       className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
+=======
+      className="flex min-h-full w-full flex-col"
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
     >
       <FormHeader
         title="نقش جدید"
@@ -270,7 +278,11 @@ function EditRoleForm({
   return (
     <form
       action={formAction}
+<<<<<<< HEAD
       className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
+=======
+      className="flex min-h-full w-full flex-col"
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
     >
       <FormHeader
         title="ویرایش نقش"
@@ -309,8 +321,13 @@ function RolesList({
   );
 
   return (
+<<<<<<< HEAD
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
       <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+=======
+    <div className="flex min-h-full w-full flex-col">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <button
           type="button"
           onClick={onCreate}

@@ -374,41 +374,34 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <main className="liquid-glass-page liquid-page-frame">
-      <div className="flex w-full flex-col gap-6">
-        <section className="liquid-glass-surface relative overflow-hidden rounded-[28px] border border-white/70 p-5 dark:border-white/10 md:p-6">
-          <div className="pointer-events-none absolute -left-12 -top-16 h-44 w-44 rounded-full bg-brand-400/15 blur-3xl" />
-          <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-            <div className="text-right">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/35 px-3 py-1.5 text-xs font-medium text-brand-700 dark:border-white/10 dark:bg-white/5 dark:text-brand-300">
-                <Sparkles className="h-3.5 w-3.5" />
-                مرکز اتوماسیون سازمانی
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
-                سلام، به میزکار امروز خوش آمدید
-              </h1>
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                {todayLabel} · نمای یکپارچه نامه‌ها، پیام‌ها، فرم‌ها و جلسات
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2 md:justify-end">
-              <Link
-                href="/letter"
-                className="liquid-glass-control inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-brand-300 hover:text-brand-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
-              >
-                <FileText className="h-4 w-4" />
-                نامه جدید
-              </Link>
-              <Link
-                href="/new-message"
-                className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
-              >
-                <Send className="h-4 w-4" />
-                پیام جدید
-              </Link>
-            </div>
+    <main className="min-h-[calc(100vh-65px)] bg-app-canvas p-4 dark:bg-gray-950 lg:min-h-[calc(100vh-77px)] lg:p-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
+        <div className="flex flex-col gap-4 border-b border-gray-200 pb-5 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
+          <div className="text-right">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              داشبورد
+            </h1>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              نمای کلی آمار حساب کاربری شما
+            </p>
           </div>
-        </section>
+          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+            <Link
+              href="/letter"
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
+            >
+              <FileText className="h-4 w-4" />
+              نامه جدید
+            </Link>
+            <Link
+              href="/new-message"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+            >
+              <Send className="h-4 w-4" />
+              پیام جدید
+            </Link>
+          </div>
+        </div>
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard

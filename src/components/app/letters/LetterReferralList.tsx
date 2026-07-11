@@ -316,6 +316,7 @@ export default function LetterReferralList({
   };
   return (
     <ArchiveSelectionProvider>
+<<<<<<< HEAD
       <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] overflow-x-hidden py-4 sm:py-5 lg:py-6">
         <section className="flex min-w-0 flex-col gap-6">
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
@@ -374,6 +375,12 @@ export default function LetterReferralList({
               <ArchivePanelToggleButton />
             </div>
             <div className="hidden">
+=======
+      <div className="flex h-full min-h-0 w-full flex-col overflow-hidden lg:flex-row">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-app-border bg-app-header-page/95 p-4 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:bg-gray-900">
+            <div>
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
               <Link
                 href="/letter"
                 className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"

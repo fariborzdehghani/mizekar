@@ -86,9 +86,15 @@ export default function NewFormLauncher({
   return (
     <form
       onSubmit={handleCreate}
+<<<<<<< HEAD
       className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
       <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+=======
+      className="flex h-full min-h-0 w-full flex-col"
+    >
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <button
           type="submit"
           disabled={isSubmitting || !selectedTemplate}
@@ -102,14 +108,22 @@ export default function NewFormLauncher({
         </h1>
       </div>
 
+<<<<<<< HEAD
       <div className="liquid-glass-panel flex flex-1 flex-col rounded-3xl border lg:flex-row">
+=======
+      <div className="flex min-h-0 flex-1 flex-col bg-white dark:bg-gray-800 lg:flex-row">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         {error && (
           <div className="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200 lg:hidden">
             {error}
           </div>
         )}
 
+<<<<<<< HEAD
         <aside className="liquid-glass-inset flex h-full min-h-[220px] border-0 border-b lg:min-h-[calc(100vh-142px)] lg:w-96 lg:shrink-0 lg:border-b-0 lg:border-l">
+=======
+        <aside className="flex h-full min-h-[220px] border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 lg:min-h-0 lg:w-96 lg:shrink-0 lg:border-b-0 lg:border-l">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
           <div className="flex w-full flex-col">
             <div className="border-b border-gray-200 p-4 dark:border-gray-700">
               <div className="flex items-center gap-3">
@@ -181,7 +195,7 @@ export default function NewFormLauncher({
           </div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto p-4 lg:min-h-[calc(100vh-142px)] lg:p-6">
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 lg:p-6">
           <div className="mx-auto w-full space-y-5">
             {error && (
               <div className="hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200 lg:block">

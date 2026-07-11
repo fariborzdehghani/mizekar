@@ -97,7 +97,11 @@ export default function ArchivedLettersList({
   );
 
   return (
+<<<<<<< HEAD
     <div className="liquid-content-frame liquid-glass-page flex h-[calc(100vh-92px)] min-h-0 flex-col gap-6 overflow-hidden py-4 sm:py-6 lg:flex-row lg:py-8">
+=======
+    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden lg:flex-row">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <div className="liquid-page-header liquid-page-header-inset sticky top-0 z-30 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link

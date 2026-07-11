@@ -169,7 +169,11 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         requireUser
       />
 
+<<<<<<< HEAD
       <div className="liquid-page-header sticky top-[92px] z-40 flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:justify-between">
+=======
+      <div className="sticky top-0 z-40 flex flex-col gap-3 border-b border-gray-300 bg-white p-4 shadow-sm dark:bg-gray-900 lg:flex-row lg:items-start lg:justify-between">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {form.title}

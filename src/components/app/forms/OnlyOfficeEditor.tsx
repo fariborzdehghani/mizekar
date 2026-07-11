@@ -91,7 +91,7 @@ export default function OnlyOfficeEditor({
   }
 
   return (
-    <div className="h-[calc(100vh-16rem)] min-h-[38rem] overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
+    <div className="h-[calc(100dvh-16rem)] min-h-[38rem] overflow-hidden rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
       <div id={placeholderId} className="h-full w-full" />
     </div>
   );

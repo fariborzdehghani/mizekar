@@ -39,8 +39,13 @@ export default function FormList({
   perspective,
 }: FormListProps) {
   return (
+<<<<<<< HEAD
     <div className="liquid-page-frame flex w-full flex-col gap-5 bg-transparent">
       <div className="liquid-glass-surface sticky top-[92px] z-30 flex items-center justify-between rounded-3xl border p-5">
+=======
+    <div className="flex min-h-full w-full flex-col bg-white dark:bg-gray-900">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <Link
           href="/new-form"
           className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"

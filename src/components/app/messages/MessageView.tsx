@@ -88,8 +88,13 @@ function RelatedMessageLink({
 
 export default function MessageView({ message }: MessageViewProps) {
   return (
+<<<<<<< HEAD
     <main className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8">
       <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+=======
+    <main className="min-h-full bg-white dark:bg-white">
+      <div className="sticky top-0 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white">
+>>>>>>> cded0e3936ca9b0b93b03023a66f720b1653c148
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href={message.isSender ? "/outgoing-messages" : "/incoming-messages"}
