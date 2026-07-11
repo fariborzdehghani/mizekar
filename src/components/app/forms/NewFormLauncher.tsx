@@ -86,13 +86,13 @@ export default function NewFormLauncher({
   return (
     <form
       onSubmit={handleCreate}
-      className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]"
+      className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+      <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="submit"
           disabled={isSubmitting || !selectedTemplate}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <SendHorizontal className="h-4 w-4" />
           {isSubmitting ? "در حال ایجاد..." : "ایجاد فرم"}
@@ -102,14 +102,14 @@ export default function NewFormLauncher({
         </h1>
       </div>
 
-      <div className="flex flex-1 flex-col bg-white dark:bg-gray-800 lg:flex-row">
+      <div className="liquid-glass-panel flex flex-1 flex-col rounded-3xl border lg:flex-row">
         {error && (
           <div className="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200 lg:hidden">
             {error}
           </div>
         )}
 
-        <aside className="flex h-full min-h-[220px] border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-900 lg:min-h-[calc(100vh-142px)] lg:w-96 lg:shrink-0 lg:border-b-0 lg:border-l">
+        <aside className="liquid-glass-inset flex h-full min-h-[220px] border-0 border-b lg:min-h-[calc(100vh-142px)] lg:w-96 lg:shrink-0 lg:border-b-0 lg:border-l">
           <div className="flex w-full flex-col">
             <div className="border-b border-gray-200 p-4 dark:border-gray-700">
               <div className="flex items-center gap-3">
@@ -144,15 +144,15 @@ export default function NewFormLauncher({
                         onClick={() => handleTemplateSelect(template)}
                         className={`group flex w-full items-center gap-3 rounded-lg border p-3 text-right transition ${
                           isSelected
-                            ? "border-brand-500 bg-white shadow-sm ring-4 ring-brand-500/10 dark:border-brand-400 dark:bg-gray-800"
-                            : "border-transparent bg-transparent hover:border-gray-200 hover:bg-white dark:hover:border-gray-700 dark:hover:bg-gray-800"
+                            ? "liquid-glass-control border-brand-500 shadow-sm ring-4 ring-brand-500/10 dark:border-brand-400"
+                            : "border-transparent bg-transparent hover:border-brand-200 hover:bg-white/40 dark:hover:border-brand-500/20 dark:hover:bg-white/5"
                         }`}
                       >
                         <div
                           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
                             isSelected
                               ? "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
-                              : "bg-white text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+                              : "liquid-glass-inset text-gray-500 dark:text-gray-400"
                           }`}
                         >
                           <FileText className="h-5 w-5" />
@@ -193,7 +193,7 @@ export default function NewFormLauncher({
               <>
                 <input type="hidden" name="templateId" value={selectedTemplate.id} />
 
-                <section className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+                <section className="liquid-glass-inset rounded-2xl p-5">
                   <div className="mb-5 flex flex-col gap-4 border-b border-gray-100 pb-5 dark:border-gray-800 sm:flex-row sm:items-start sm:justify-between">
                     <div className="min-w-0">
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -216,13 +216,13 @@ export default function NewFormLauncher({
                         name="title"
                         value={formTitle}
                         onChange={(event) => setFormTitle(event.target.value)}
-                        className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                        className="liquid-glass-control h-11 w-full rounded-xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
                       />
                     </div>
                   </div>
                 </section>
 
-                <section className="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+                <section className="liquid-glass-inset rounded-2xl p-5">
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <div>
                       <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -238,9 +238,9 @@ export default function NewFormLauncher({
                     {selectedTemplate.steps.map((step, index) => (
                       <div
                         key={step.id}
-                        className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
+                        className="liquid-glass-control flex items-center gap-3 rounded-xl border p-3"
                       >
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-sm font-bold text-gray-700 dark:bg-gray-900 dark:text-gray-200">
+                        <div className="liquid-glass-inset flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200">
                           {step.order}
                         </div>
                         <div className="min-w-0 flex-1">

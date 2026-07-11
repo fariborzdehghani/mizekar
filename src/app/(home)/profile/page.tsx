@@ -13,9 +13,9 @@ export default async function ProfilePage() {
   });
 
   return (
-    <div className="min-h-[calc(100vh-65px)] bg-gray-50 p-4 dark:bg-gray-950 lg:min-h-[calc(100vh-77px)] lg:p-6">
+    <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] py-4 sm:py-6 lg:py-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-6">
+        <div className="liquid-page-header mb-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             ویرایش پروفایل
           </h1>
@@ -24,7 +24,7 @@ export default async function ProfilePage() {
           </p>
         </div>
 
-        <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
+        <section className="liquid-glass-panel rounded-[24px] border border-app-border bg-app-panel p-6 shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <ProfileForm
             profile={{
               userId: user.userId,

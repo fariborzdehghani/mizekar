@@ -10,15 +10,12 @@ import {
   type LetterKeywordTag,
 } from "@/src/lib/letterTags";
 import type { CurrentUser } from "@/src/lib/auth-types";
-import Image from "next/image";
-import Link from "next/link";
 import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
   Loader2,
-  Mail,
-  MessageSquareText,
+  Search,
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
@@ -43,7 +40,7 @@ const PERSIAN_MONTHS = [
 const PERSIAN_WEEK_DAYS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 
 const AI_HEADER_BUTTON_CLASS =
-  "border-app-border bg-white/75 text-gray-600 shadow-theme-xs hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white";
+  "border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:text-brand-300";
 
 const persianPartsFormatter = new Intl.DateTimeFormat(
   "fa-IR-u-ca-persian",
@@ -184,6 +181,29 @@ function formatPersianDate(value: string) {
   return date ? persianDisplayFormatter.format(date) : "";
 }
 
+function getHeaderTitle(pathname: string, hasRecordId: boolean) {
+  if (pathname === "/" || pathname === "/incoming-letters") return "کارتابل ورودی";
+  if (pathname === "/dashboard") return "داشبورد";
+  if (pathname === "/outgoing-letters") return "کارتابل خروجی";
+  if (pathname === "/archive") return "بایگانی";
+  if (pathname === "/letter") return hasRecordId ? "مشاهده نامه" : "نامه جدید";
+  if (pathname === "/incoming-messages") return "پیام‌های ورودی";
+  if (pathname === "/outgoing-messages") return "پیام‌های خروجی";
+  if (pathname === "/new-message") return "پیام جدید";
+  if (pathname === "/message") return "مشاهده پیام";
+  if (pathname === "/meetings") return "جلسات";
+  if (pathname === "/meeting") return hasRecordId ? "مشاهده جلسه" : "جلسه جدید";
+  if (pathname === "/new-form") return "فرم جدید";
+  if (pathname === "/form") return "مشاهده فرم";
+  if (pathname === "/form-templates") return "مدیریت فرم‌ها";
+  if (pathname === "/letter-search") return "جستجوی نامه‌ها";
+  if (pathname === "/profile") return "پروفایل";
+  if (pathname === "/settings/general") return "تعاریف";
+  if (pathname === "/settings/users") return "مدیریت کاربران";
+  if (pathname === "/settings/roles") return "مدیریت نقش‌ها";
+  return "میزکار";
+}
+
 function ShamsiDatePicker({
   name,
   value,
@@ -238,7 +258,7 @@ function ShamsiDatePicker({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-12 z-[60] w-72 rounded-lg border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="liquid-glass-surface absolute left-0 top-12 z-[60] w-72 rounded-[20px] border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
@@ -329,12 +349,12 @@ function ShamsiDatePicker({
 }
 
 const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
-  const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("q") || "";
+  const pageTitle = getHeaderTitle(pathname, Boolean(searchParams.get("id")));
   const advancedTitle = searchParams.get("title") || "";
   const advancedContent = searchParams.get("content") || "";
   const advancedCreateDate = searchParams.get("createDate") || "";
@@ -345,7 +365,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
     LetterKeywordTag[]
   >(() => getLetterTagsFromParam(advancedTags));
 
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { isMobileOpen, toggleMobileSidebar } = useSidebar();
   const { brief, isCreating, openBrief } = useInboxBrief();
   const aiButtonLabel = isCreating
     ? "هوش مصنوعی در حال آماده‌سازی اقدامات پیشنهادی است"
@@ -354,16 +374,9 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
       : "اقدامات پیشنهادی هوش مصنوعی";
 
   const handleToggle = () => {
-    if (window.innerWidth >= 1024) {
-      toggleSidebar();
-    } else {
-      toggleMobileSidebar();
-    }
+    toggleMobileSidebar();
   };
 
-  const toggleApplicationMenu = () => {
-    setApplicationMenuOpen(!isApplicationMenuOpen);
-  };
   const inputRef = useRef<HTMLInputElement>(null);
   const advancedSearchRef = useRef<HTMLDivElement>(null);
 
@@ -454,13 +467,14 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
   }, [isAdvancedSearchOpen]);
 
   return (
-    <header className={`sticky top-0 z-99999 flex w-full border-app-border bg-app-header-main/95 shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:border-gray-800 dark:bg-gray-900 lg:border-b`}>
-      <div className="flex flex-col items-center justify-between grow lg:flex-row lg:px-6">
-        <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-app-border dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+    <header className="sticky top-0 z-[99999] h-[92px] w-full bg-transparent px-4 pt-4 sm:px-6 lg:px-8">
+      <div className="liquid-glass-header relative mx-auto flex h-[76px] max-w-[1540px] items-center gap-3 rounded-[24px] border border-white/60 px-3 dark:border-white/10 sm:px-5">
           <button
-            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg border border-app-border bg-white/70 text-gray-600 shadow-theme-xs transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 lg:h-11 lg:w-11"
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-500 transition hover:bg-black/5 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-white/5 lg:hidden"
             onClick={handleToggle}
-            aria-label="Toggle Sidebar"
+            aria-label="باز کردن منو"
+            aria-expanded={isMobileOpen}
+            type="button"
           >
             {isMobileOpen ? (
               <svg
@@ -496,29 +510,9 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             {/* Cross Icon */}
           </button>
 
-          <Link href="/" className="lg:hidden">
-            <Image
-              width={154}
-              height={32}
-              className="dark:hidden"
-              src="/images/logo/logo.png"
-              alt="Logo"
-              loading="eager"
-              style={{ width: "auto", height: "auto" }}
-            />
-            <Image
-              width={154}
-              height={32}
-              className="hidden dark:block"
-              src="/images/logo/logo-dark.png"
-              alt="Logo"
-              style={{ width: "auto", height: "auto" }}
-            />
-          </Link>
-
           <button
-            onClick={toggleApplicationMenu}
-            className="z-99999 flex h-10 w-10 items-center justify-center rounded-lg bg-white/60 text-gray-700 transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:text-gray-400 dark:hover:bg-gray-800 lg:hidden"
+            onClick={() => setIsAdvancedSearchOpen((current) => !current)}
+            className="hidden"
           >
             <svg
               width="24"
@@ -536,58 +530,53 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             </svg>
           </button>
 
+          <div className="hidden min-w-32 text-right md:block">
+            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+              فضای کاری /
+            </p>
+            <h1 className="mt-0.5 text-[17px] font-extrabold text-gray-900 dark:text-white">
+              {pageTitle}
+            </h1>
+          </div>
+
           <div
             ref={advancedSearchRef}
-            className="relative hidden items-center gap-2 lg:flex"
+            className="relative mr-0 min-w-0 flex-1 md:mr-4 md:max-w-xl"
           >
-            <form onSubmit={handleFastSearchSubmit}>
+            <div className="flex items-center gap-2">
+            <form className="min-w-0 flex-1" onSubmit={handleFastSearchSubmit}>
               <div className="relative">
-                <span className="absolute -translate-y-1/2 left-4 top-1/2 pointer-events-none">
-                  <svg
-                    className="fill-gray-500 dark:fill-gray-400"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                      fill=""
-                    />
-                  </svg>
-                </span>
+                <Search className="pointer-events-none absolute right-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--liquid-muted)]" />
                 <input
                   key={`${pathname}-${searchValue}`}
                   ref={inputRef}
                   name="q"
-                  type="text"
+                  type="search"
                   defaultValue={searchValue}
-                  placeholder="جستجو در فهرست‌ها..."
-                  className="dark:bg-dark-900 h-11 w-full rounded-lg border border-app-border bg-white/80 py-2.5 pl-12 pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-light-300 focus:outline-hidden focus:ring-3 focus:ring-blue-light-500/10 dark:border-gray-800 dark:bg-gray-900 dark:bg-white/[0.03] dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]"
+                  aria-label="جستجو در سامانه"
+                  placeholder="جستجوی نامه، همکار یا واحد..."
+                  className="h-11 w-full rounded-[15px] border border-black/[0.045] bg-black/[0.035] pr-11 pl-4 text-sm font-medium text-[var(--liquid-ink)] outline-none transition placeholder:text-[var(--liquid-muted)] focus:border-brand-500/30 focus:bg-white/65 focus:ring-4 focus:ring-brand-500/10 dark:border-white/[0.06] dark:bg-white/[0.045] dark:focus:bg-white/[0.07]"
                 />
               </div>
             </form>
             <button
               type="button"
               onClick={() => setIsAdvancedSearchOpen((current) => !current)}
-              className={`inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg border px-3 text-sm font-medium text-gray-500 transition dark:hover:bg-gray-800 dark:hover:text-white ${
+              className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition hover:-translate-y-0.5 sm:grid ${
                 isAdvancedSearchOpen
-                  ? "border-blue-light-200 bg-blue-light-50 text-blue-light-800 hover:bg-blue-light-100 dark:border-blue-800 dark:bg-blue-500/15 dark:text-blue-300"
-                  : "border-app-border bg-white/70 text-gray-600 hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400"
+                  ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
+                  : "border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045]"
               }`}
               title="جستجوی پیشرفته نامه‌ها"
               aria-label="جستجوی پیشرفته نامه‌ها"
               aria-expanded={isAdvancedSearchOpen}
             >
-              <SlidersHorizontal className="h-5 w-5" />
-              <span>جستجوی پیشرفته</span>
+              <SlidersHorizontal className="h-[18px] w-[18px]" />
             </button>
+            </div>
 
             {isAdvancedSearchOpen && (
-              <div className="absolute left-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-lg border border-app-border bg-app-panel p-4 text-right shadow-xl dark:border-gray-800 dark:bg-gray-900">
+              <div className="liquid-glass-surface absolute left-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[22px] border border-app-border bg-app-panel p-4 text-right shadow-xl dark:border-gray-800 dark:bg-gray-900">
                 <div className="mb-4 flex items-center justify-between gap-3 border-b border-app-border pb-3 dark:border-gray-800">
                   <button
                     type="button"
@@ -685,54 +674,23 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
               </div>
             )}
           </div>
-        </div>
-        <div
-          className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-between w-full gap-4 bg-app-header-main/95 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:bg-transparent lg:px-0 lg:shadow-none`}
-        >
-          <div className="flex flex-wrap items-center gap-2 2xsm:gap-3">
-            <Link
-              href="/incoming-letters"
-              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-app-border bg-white/75 px-4 text-sm font-medium text-gray-600 shadow-theme-xs transition-colors hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-            >
-              <Mail className="h-4 w-4" />
-              <span>کارتابل ورودی</span>
-            </Link>
-            <Link
-              href="/incoming-messages"
-              className="inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-app-border bg-white/75 px-4 text-sm font-medium text-gray-600 shadow-theme-xs transition-colors hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white"
-            >
-              <MessageSquareText className="h-4 w-4" />
-              <span>پیام‌های ورودی</span>
-            </Link>
-            <button
-              type="button"
-              onClick={openBrief}
-              title={aiButtonLabel}
-              aria-label={aiButtonLabel}
-              className={`inline-flex h-11 items-center justify-center gap-2 whitespace-nowrap rounded-full border px-4 text-sm font-medium transition-colors ${AI_HEADER_BUTTON_CLASS}`}
-            >
-              {isCreating ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              <span className="hidden sm:inline">
-                اقدامات پیشنهادی هوش مصنوعی
-              </span>
-              <span className="sm:hidden">AI</span>
-            </button>
-            {/* <!-- Dark Mode Toggler --> */}
-            <ThemeToggleButton />
-            {/* <!-- Dark Mode Toggler --> */}
-
-           <NotificationDropdown /> 
-            {/* <!-- Notification Menu Area --> */}
-          </div>
-          {/* <!-- User Area --> */}
-          <UserDropdown user={user} /> 
-    
+        <div className="mr-auto flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={openBrief}
+            title={aiButtonLabel}
+            aria-label={aiButtonLabel}
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition hover:-translate-y-0.5 sm:grid ${AI_HEADER_BUTTON_CLASS}`}
+          >
+            {isCreating ? (
+              <Loader2 className="h-[18px] w-[18px] animate-spin" />
+            ) : (
+              <Sparkles className="h-[18px] w-[18px]" />
+            )}
+          </button>
+          <ThemeToggleButton />
+          <NotificationDropdown />
+          <UserDropdown user={user} />
         </div>
       </div>
     </header>

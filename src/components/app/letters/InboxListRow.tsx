@@ -72,7 +72,7 @@ export default function InboxListRow({
       target.closest("a, button, input, select, textarea, [role='button']"),
     );
 
-  const handleDoubleClick = (event: MouseEvent<HTMLTableRowElement>) => {
+  const handleRowClick = (event: MouseEvent<HTMLTableRowElement>) => {
     if (!href || isInteractiveTarget(event.target)) return;
 
     router.push(href);
@@ -148,8 +148,8 @@ export default function InboxListRow({
           .filter(Boolean)
           .join(" ")}
         onContextMenu={handleContextMenu}
-        onDoubleClick={handleDoubleClick}
-        title={href ? "برای مشاهده دوبار کلیک کنید" : undefined}
+        onClick={handleRowClick}
+        title={href ? "برای مشاهده کلیک کنید" : undefined}
       >
         {children}
       </tr>
@@ -158,7 +158,7 @@ export default function InboxListRow({
         <tr className="contents">
           <td className="contents" colSpan={99}>
             <div
-              className="fixed z-[1000001] min-w-52 overflow-hidden rounded-lg border border-gray-200 bg-white py-1 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
+              className="liquid-glass-surface fixed z-[1000001] min-w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
               style={{ left: menuPosition.x, top: menuPosition.y }}
               dir="rtl"
               onClick={(event) => event.stopPropagation()}

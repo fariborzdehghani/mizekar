@@ -35,9 +35,11 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="dropdown-toggle flex items-center rounded-full border border-app-border bg-white/65 py-1 pr-1 pl-3 text-gray-700 shadow-theme-xs transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
+        aria-label="منوی پروفایل"
+        aria-expanded={isOpen}
+        className="dropdown-toggle flex shrink-0 items-center gap-2 rounded-[16px] border border-black/[0.045] bg-white/55 p-1.5 pl-2.5 text-right text-[var(--liquid-ink)] transition hover:bg-white/80 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:bg-white/[0.08]"
       >
-        <span className="relative ml-3 h-11 w-11 overflow-hidden rounded-full">
+        <span className="relative h-[34px] w-[34px] overflow-hidden rounded-xl">
           {avatarSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -47,18 +49,23 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
               onError={handleAvatarError}
             />
           ) : (
-            <span className="flex h-full w-full items-center justify-center bg-blue-light-50 text-blue-light-600 dark:bg-blue-500/15 dark:text-blue-300">
-              <UserRound className="h-6 w-6" aria-hidden="true" />
+            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-cyan-500 text-white shadow-sm">
+              <UserRound className="h-5 w-5" aria-hidden="true" />
             </span>
           )}
         </span>
 
-        <span className="block ml-1 font-medium text-theme-sm">
-          {user.displayName}
+        <span className="hidden xl:block">
+          <span className="block text-[11px] font-bold text-[var(--liquid-ink)]">
+            {user.displayName}
+          </span>
+          <span className="block text-[9px] text-[var(--liquid-muted)]">
+            {user.userId}
+          </span>
         </span>
 
         <svg
-          className={`stroke-gray-500 transition-transform duration-200 dark:stroke-gray-400 ${
+          className={`hidden stroke-gray-500 transition-transform duration-200 dark:stroke-gray-400 ${
             isOpen ? "rotate-180" : ""
           }`}
           width="18"

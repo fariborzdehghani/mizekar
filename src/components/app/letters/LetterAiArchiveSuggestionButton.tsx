@@ -15,7 +15,7 @@ interface LetterAiArchiveSuggestionButtonProps {
 
 type Suggestion = Extract<LetterArchiveSuggestionResult, { success: true }>;
 const AI_SOLID_BUTTON_CLASS =
-  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+  "inline-flex items-center justify-center gap-2 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-brand-400/40 dark:bg-brand-500 dark:hover:bg-brand-600";
 const AI_SOFT_BUTTON_CLASS =
   AI_SOLID_BUTTON_CLASS;
 
@@ -83,7 +83,7 @@ export default function LetterAiArchiveSuggestionButton({
         type="button"
         onClick={handleSuggest}
         disabled={isSuggesting || isArchiving}
-        className={`${AI_SOFT_BUTTON_CLASS} h-10 rounded-lg px-4 text-sm font-medium`}
+        className={`${AI_SOFT_BUTTON_CLASS} h-10 rounded-2xl px-4 text-sm font-medium`}
       >
         {isSuggesting ? (
           <Loader2 className="h-4 w-4 animate-spin" />
@@ -95,13 +95,13 @@ export default function LetterAiArchiveSuggestionButton({
 
       {(suggestion || error || message) && (
         <div
-          className="absolute right-0 top-12 z-[1000000] max-h-[calc(100vh-8rem)] w-[min(28rem,calc(100vw-8rem))] overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 pl-12 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
+          className="liquid-glass-surface absolute right-0 top-12 z-[1000000] max-h-[calc(100vh-8rem)] w-[min(28rem,calc(100vw-8rem))] overflow-y-auto rounded-3xl border p-4 pl-12 text-right shadow-2xl ring-1 ring-brand-500/10"
           dir="rtl"
         >
           <button
             type="button"
             onClick={handleClose}
-            className="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
+            className="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-xl text-gray-400 transition hover:bg-white/45 hover:text-gray-700 dark:hover:bg-white/[0.06] dark:hover:text-white"
             aria-label="بستن پیشنهاد بایگانی"
           >
             <X className="h-4 w-4" />
@@ -132,7 +132,7 @@ export default function LetterAiArchiveSuggestionButton({
                   type="button"
                   onClick={handleArchive}
                   disabled={suggestion.alreadyArchived || isArchiving}
-                  className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
+                  className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-xl px-3 text-sm font-medium`}
                 >
                   {isArchiving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -151,7 +151,7 @@ export default function LetterAiArchiveSuggestionButton({
                   type="button"
                   onClick={handleSuggest}
                   disabled={isSuggesting || isArchiving}
-                  className="h-9 rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="liquid-glass-control h-9 rounded-xl border px-3 text-sm font-medium text-gray-700 transition hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-300 dark:hover:text-brand-300"
                 >
                   پیشنهاد دوباره
                 </button>

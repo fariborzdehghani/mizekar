@@ -20,7 +20,7 @@ export default async function SampleDataPage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-white">
+    <main className="liquid-glass-app liquid-glass-page min-h-screen bg-transparent text-gray-900 dark:text-white">
       <SampleDataCreator
         currentUserName={currentUser.displayName}
         defaults={SAMPLE_DATA_DEFAULTS}

@@ -69,7 +69,7 @@ function RelatedMessageLink({
   return (
     <Link
       href={`/message?id=${message.id}`}
-      className="block rounded-lg border border-gray-200 p-3 transition hover:border-blue-300 hover:bg-blue-50 dark:border-gray-700 dark:hover:border-blue-500 dark:hover:bg-blue-500/10"
+      className="liquid-glass-control block rounded-xl border p-3 transition hover:border-brand-300 dark:hover:border-brand-500/40"
     >
       <span className="mb-1 block text-xs font-medium text-gray-500 dark:text-gray-400">
         {label}
@@ -88,25 +88,25 @@ function RelatedMessageLink({
 
 export default function MessageView({ message }: MessageViewProps) {
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-white dark:bg-white lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-[77px]">
+    <main className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8">
+      <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-3">
           <Link
             href={message.isSender ? "/outgoing-messages" : "/incoming-messages"}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+            className="liquid-glass-control rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
           >
             بازگشت
           </Link>
           <Link
             href={`/new-message?replyTo=${message.id}`}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+            className="liquid-glass-control inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium text-brand-700 transition hover:border-brand-300 dark:text-brand-300"
           >
             <CornerUpLeft className="h-4 w-4" />
             پاسخ
           </Link>
           <Link
             href={`/new-message?forwardFrom=${message.id}`}
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
           >
             <Forward className="h-4 w-4" />
             ارجاع
@@ -123,8 +123,8 @@ export default function MessageView({ message }: MessageViewProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 p-6 xl:grid-cols-[1fr_22rem]">
-        <section className="min-w-0">
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <section className="liquid-glass-panel min-w-0 rounded-3xl border p-5 sm:p-6">
           <div className="mb-5 flex flex-wrap items-center gap-3 border-b border-gray-200 pb-4 dark:border-gray-700">
             <span
               className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${getImportanceClass(
@@ -156,7 +156,7 @@ export default function MessageView({ message }: MessageViewProps) {
           )}
 
           <div
-            className="prose max-w-none min-h-96 text-gray-900 dark:prose-invert dark:text-white"
+            className="liquid-glass-inset prose min-h-96 max-w-none rounded-2xl p-5 text-gray-900 dark:prose-invert dark:text-white"
             dangerouslySetInnerHTML={{
               __html:
                 message.contents ||
@@ -166,7 +166,7 @@ export default function MessageView({ message }: MessageViewProps) {
         </section>
 
         <aside className="min-w-0">
-          <div className="rounded-lg border border-gray-200 dark:border-gray-700">
+          <div className="liquid-glass-panel rounded-3xl border">
             <div className="border-b border-gray-200 px-4 py-3 dark:border-gray-700">
               <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                 گیرندگان

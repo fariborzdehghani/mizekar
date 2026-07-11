@@ -63,11 +63,11 @@ export default async function LetterSearchPage({
   const result = await searchAccessibleLetters({ title, content, createDate, tags });
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
+      <div className="liquid-page-header liquid-page-header-inset sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/letter"
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           نامه جدید
         </Link>
@@ -86,17 +86,17 @@ export default async function LetterSearchPage({
           {result.error}
         </div>
       ) : !result.hasSearchCriteria ? (
-        <div className="flex flex-1 items-center justify-center bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+        <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
           از دکمه جستجوی پیشرفته در سربرگ، عنوان، متن یا تاریخ ایجاد نامه را وارد کنید.
         </div>
       ) : result.letters.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+        <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
           نامه‌ای با این معیارها پیدا نشد.
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white shadow-md dark:bg-gray-800">
+        <div className="liquid-glass-panel m-4 overflow-x-auto! rounded-[24px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <table className="w-full min-w-[920px]">
-            <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+            <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                   شماره
@@ -123,7 +123,7 @@ export default async function LetterSearchPage({
                 <InboxListRow
                   key={letter.id}
                   href={`/letter?id=${letter.id}&viewOnly=true`}
-                  className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="transition hover:bg-white/70 dark:hover:bg-white/5"
                 >
                   <td className="w-44 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     {getLetterNumber(letter)}
@@ -147,7 +147,7 @@ export default async function LetterSearchPage({
                   <td className="w-px whitespace-nowrap px-6 py-4 text-sm">
                     <Link
                       href={`/letter?id=${letter.id}&viewOnly=true`}
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                      className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
                       title="مشاهده نامه"
                     >
                       <Eye className="h-4 w-4" />

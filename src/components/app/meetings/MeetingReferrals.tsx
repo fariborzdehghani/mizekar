@@ -149,7 +149,7 @@ export default function MeetingReferrals({
   };
 
   return (
-    <section className="border-t border-gray-200 bg-white px-6 py-6 dark:border-gray-800 dark:bg-white">
+    <>
       <RecipientsModal
         isOpen={isReceiversModalOpen}
         onClose={() => setIsReceiversModalOpen(false)}
@@ -164,6 +164,7 @@ export default function MeetingReferrals({
         requireUser
       />
 
+      <section className="liquid-glass-panel rounded-3xl border p-5 sm:p-6">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -176,7 +177,7 @@ export default function MeetingReferrals({
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(300px,380px)_1fr]">
-        <div className="h-[30rem] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="liquid-glass-inset h-[30rem] overflow-hidden rounded-2xl">
           {referrals.length > 0 ? (
             <div className="h-full overflow-y-auto">
               {referrals.map((referral) => {
@@ -190,14 +191,14 @@ export default function MeetingReferrals({
                     className={`flex w-full flex-col gap-1 border-b border-gray-200 px-3 py-2 text-right transition last:border-b-0 dark:border-gray-700 ${
                       isSelected
                         ? "bg-brand-50 dark:bg-brand-500/15"
-                        : "bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/5"
+                        : "bg-transparent hover:bg-white/40 dark:hover:bg-white/5"
                     }`}
                   >
                     <span className="flex items-center justify-between gap-2">
                       <span className="min-w-0 truncate text-xs font-semibold text-gray-900 dark:text-white">
                         {referral.senderName} ← {referral.receiverName}
                       </span>
-                      <span className="shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <span className="liquid-glass-inset shrink-0 rounded-full px-1.5 py-0.5 text-[10px] text-gray-600 dark:text-gray-300">
                         {getStatusLabel(referral.status)}
                       </span>
                     </span>
@@ -220,7 +221,7 @@ export default function MeetingReferrals({
           )}
         </div>
 
-        <div className="h-[30rem] overflow-hidden rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+        <div className="liquid-glass-inset h-[30rem] overflow-hidden rounded-2xl p-4">
           {selectedReferral ? (
             <div className="flex h-full flex-col">
               <div className="mb-4 flex flex-col gap-2 border-b border-gray-200 pb-4 dark:border-gray-700 sm:flex-row sm:items-start sm:justify-between">
@@ -233,7 +234,7 @@ export default function MeetingReferrals({
                     {formatDate(selectedReferral.date_time)}
                   </p>
                 </div>
-                <span className="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <span className="liquid-glass-inset w-fit rounded-full px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300">
                   {getStatusLabel(selectedReferral.status)}
                 </span>
               </div>
@@ -256,7 +257,7 @@ export default function MeetingReferrals({
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+        className="liquid-glass-inset mt-6 rounded-2xl p-4"
       >
         <input type="hidden" name="meetingId" value={meetingId} />
 
@@ -273,7 +274,7 @@ export default function MeetingReferrals({
             <button
               type="button"
               onClick={() => setIsReceiversModalOpen(true)}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+              className="liquid-glass-control inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium text-brand-700 transition hover:border-brand-300 dark:text-brand-300"
             >
               <UserPlus className="h-4 w-4" />
               گیرندگان ارجاع
@@ -294,7 +295,7 @@ export default function MeetingReferrals({
             {selectedReceivers.map((receiver) => (
               <span
                 key={receiver.id}
-                className="inline-flex h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm text-gray-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-white"
+                className="inline-flex h-9 max-w-full items-center gap-2 rounded-xl border border-brand-200/80 bg-brand-50/70 px-3 text-sm text-gray-900 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-white"
               >
                 <span className="truncate">{getPersonName(receiver)}</span>
                 <button
@@ -324,6 +325,7 @@ export default function MeetingReferrals({
           </div>
         )}
       </form>
-    </section>
+      </section>
+    </>
   );
 }

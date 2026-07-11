@@ -267,7 +267,7 @@ function ShamsiDatePicker({
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-10 w-full min-w-48 items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 sm:w-auto"
+        className="liquid-glass-control inline-flex h-10 w-full min-w-48 items-center justify-between gap-2 rounded-2xl border px-3 text-sm text-gray-700 transition hover:border-brand-300 hover:text-brand-600 dark:text-gray-200 dark:hover:text-brand-300 sm:w-auto"
       >
         <span className="inline-flex min-w-0 items-center gap-2">
           <CalendarDays className="h-4 w-4 shrink-0 text-gray-500" />
@@ -278,12 +278,12 @@ function ShamsiDatePicker({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-12 z-40 w-72 rounded-lg border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="liquid-glass-surface absolute left-0 top-12 z-40 w-72 rounded-2xl border border-white/70 p-3 shadow-theme-lg dark:border-white/10">
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
               onClick={() => moveMonth(1)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="liquid-glass-control flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
               aria-label="ماه بعد"
             >
               <ChevronRight className="h-4 w-4" />
@@ -294,7 +294,7 @@ function ShamsiDatePicker({
             <button
               type="button"
               onClick={() => moveMonth(-1)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="liquid-glass-control flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
               aria-label="ماه قبل"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -327,7 +327,7 @@ function ShamsiDatePicker({
                       ? "bg-brand-500 text-white"
                       : isToday
                         ? "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                        : "text-gray-700 hover:bg-brand-500/10 dark:text-gray-200 dark:hover:bg-white/5"
                   }`}
                 >
                   {day.day}
@@ -336,7 +336,7 @@ function ShamsiDatePicker({
             })}
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+          <div className="mt-3 flex items-center justify-between border-t border-white/60 pt-3 dark:border-white/10">
             <button
               type="button"
               onClick={() => {
@@ -453,7 +453,7 @@ export default function LetterReferrals({
   };
 
   return (
-    <section className="border-t border-gray-200 bg-white px-6 py-6 dark:border-gray-800 dark:bg-gray-900">
+    <section className="liquid-glass-surface mx-4 mb-6 rounded-[28px] border border-white/60 px-6 py-6 dark:border-white/10 sm:mx-6">
       <RecipientsModal
         isOpen={isReceiversModalOpen}
         onClose={() => setIsReceiversModalOpen(false)}
@@ -480,7 +480,7 @@ export default function LetterReferrals({
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(300px,380px)_1fr]">
-        <div className="h-[36rem] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="liquid-glass-inset h-[36rem] overflow-hidden rounded-2xl">
           {referrals.length > 0 ? (
             <div className="h-full overflow-y-auto">
               {referrals.map((referral) => {
@@ -491,17 +491,17 @@ export default function LetterReferrals({
                     key={referral.id}
                     type="button"
                     onClick={() => setSelectedReferralId(referral.id)}
-                    className={`flex w-full flex-col gap-1 border-b border-gray-200 px-3 py-2 text-right transition last:border-b-0 dark:border-gray-700 ${
+                    className={`flex w-full flex-col gap-1 border-b border-white/60 px-3 py-2 text-right transition last:border-b-0 dark:border-white/10 ${
                       isSelected
-                        ? "bg-brand-50 dark:bg-brand-500/15"
-                        : "bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/5"
+                        ? "bg-brand-500/10 dark:bg-brand-500/15"
+                        : "bg-transparent hover:bg-white/35 dark:hover:bg-white/5"
                     }`}
                   >
                     <span className="flex items-center justify-between gap-2">
                       <span className="min-w-0 truncate text-xs font-semibold text-gray-900 dark:text-white">
                         {referral.senderName} ← {referral.receiverName}
                       </span>
-                      <span className="shrink-0 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <span className="liquid-glass-control shrink-0 rounded-full px-1.5 py-0.5 text-[10px] text-gray-600 dark:text-gray-300">
                         {getStatusLabel(referral.status)}
                       </span>
                     </span>
@@ -527,10 +527,10 @@ export default function LetterReferrals({
           )}
         </div>
 
-        <div className="h-[36rem] overflow-hidden rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+        <div className="liquid-glass-inset h-[36rem] overflow-hidden rounded-2xl p-4">
           {selectedReferral ? (
             <div className="flex h-full flex-col">
-              <div className="mb-4 flex flex-col gap-2 border-b border-gray-200 pb-4 dark:border-gray-700 sm:flex-row sm:items-start sm:justify-between">
+              <div className="mb-4 flex flex-col gap-2 border-b border-white/60 pb-4 dark:border-white/10 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
                   <h3 className="text-base font-semibold text-gray-900 dark:text-white">
                     {selectedReferral.senderName} ←{" "}
@@ -545,7 +545,7 @@ export default function LetterReferrals({
                     </p>
                   )}
                 </div>
-                <span className="w-fit rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                <span className="liquid-glass-control w-fit rounded-full px-3 py-1 text-xs font-medium text-gray-600 dark:text-gray-300">
                   {getStatusLabel(selectedReferral.status)}
                 </span>
               </div>
@@ -568,7 +568,7 @@ export default function LetterReferrals({
 
       <form
         onSubmit={handleSubmit}
-        className="mt-6 rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+        className="liquid-glass-inset mt-6 rounded-2xl p-4"
       >
         <input type="hidden" name="letterId" value={letterId} />
 
@@ -586,7 +586,7 @@ export default function LetterReferrals({
             <button
               type="button"
               onClick={() => setIsReceiversModalOpen(true)}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+              className="liquid-glass-control inline-flex h-10 items-center justify-center gap-2 rounded-2xl border px-4 text-sm font-medium text-brand-700 transition hover:border-brand-300 hover:bg-brand-500/10 dark:text-brand-300"
             >
               <UserPlus className="h-4 w-4" />
               گیرندگان ارجاع
@@ -594,7 +594,7 @@ export default function LetterReferrals({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-brand-500 px-5 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-2xl bg-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <SendHorizontal className="h-4 w-4" />
               {isSubmitting ? "در حال ثبت..." : "ثبت ارجاع"}
@@ -607,7 +607,7 @@ export default function LetterReferrals({
             {selectedReceivers.map((receiver) => (
               <span
                 key={receiver.id}
-                className="inline-flex h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm text-gray-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-white"
+                className="inline-flex h-9 max-w-full items-center gap-2 rounded-2xl border border-brand-200/70 bg-brand-500/10 px-3 text-sm text-gray-900 dark:border-brand-400/20 dark:bg-brand-500/10 dark:text-white"
               >
                 <span className="truncate">{getPersonName(receiver)}</span>
                 <button
@@ -627,7 +627,7 @@ export default function LetterReferrals({
 
         {(error || success) && (
           <div
-            className={`mt-4 rounded-lg border px-4 py-3 text-sm ${
+            className={`mt-4 rounded-2xl border px-4 py-3 text-sm ${
               error
                 ? "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
                 : "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, ShieldCheck, Trash2 } from "lucide-react";
 import {
   createRoleAction,
   deleteRoleAction,
@@ -100,7 +100,7 @@ function PermissionChecklist({
 
   if (permissions.length === 0) {
     return (
-      <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400">
+      <p className="liquid-glass-inset rounded-2xl border border-app-border px-4 py-3 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400">
         هیچ دسترسی‌ای برای انتخاب تعریف نشده است.
       </p>
     );
@@ -111,14 +111,14 @@ function PermissionChecklist({
       {permissions.map((permission) => (
         <label
           key={permission.id}
-          className="flex min-h-12 items-start gap-3 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300"
+          className="liquid-glass-inset flex min-h-12 items-start gap-3 rounded-2xl border border-app-border bg-white/55 px-3 py-2 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300"
         >
           <input
             name="permissionIds"
             type="checkbox"
             value={permission.id}
             defaultChecked={selectedPermissions.has(permission.id)}
-            className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-500 focus:ring-brand-500"
           />
           <span className="min-w-0">
             <span className="block font-medium text-gray-900 dark:text-white">
@@ -156,7 +156,7 @@ function RoleFields({
           type="text"
           required
           defaultValue={role?.title || ""}
-          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="liquid-glass-control h-11 w-full rounded-2xl border border-app-border bg-white/70 px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -189,26 +189,31 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
-    <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          className="liquid-glass-control rounded-2xl border border-app-border bg-white/70 px-4 py-2 font-medium text-gray-700 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
         >
           بازگشت
         </button>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? pendingText : submitText}
         </button>
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        {title}
-      </h1>
+      <div className="text-right">
+        <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
+          <ShieldCheck className="h-4 w-4" /> مدیریت سامانه
+        </p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+          {title}
+        </h1>
+      </div>
     </div>
   );
 }
@@ -228,7 +233,7 @@ function CreateRoleForm({
   return (
     <form
       action={formAction}
-      className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]"
+      className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
       <FormHeader
         title="نقش جدید"
@@ -238,7 +243,7 @@ function CreateRoleForm({
         onCancel={onCancel}
       />
 
-      <div className="bg-white p-6 dark:bg-gray-800">
+      <div className="liquid-glass-panel rounded-[28px] border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="w-full max-w-3xl space-y-5">
           <RoleFields permissions={permissions} />
           <StateMessage state={state} />
@@ -265,7 +270,7 @@ function EditRoleForm({
   return (
     <form
       action={formAction}
-      className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]"
+      className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
       <FormHeader
         title="ویرایش نقش"
@@ -275,7 +280,7 @@ function EditRoleForm({
         onCancel={onCancel}
       />
 
-      <div className="bg-white p-6 dark:bg-gray-800">
+      <div className="liquid-glass-panel rounded-[28px] border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="w-full max-w-3xl space-y-5">
           <input type="hidden" name="id" value={role.id} />
           <RoleFields permissions={permissions} role={role} />
@@ -304,25 +309,33 @@ function RolesList({
   );
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
+      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="button"
           onClick={onCreate}
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           نقش جدید
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          مدیریت نقش‌ها
-        </h1>
+        <div className="text-right">
+          <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
+            <ShieldCheck className="h-4 w-4" /> مدیریت سامانه
+          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            مدیریت نقش‌ها
+          </h1>
+          <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+            تعریف نقش‌ها و کنترل دسترسی‌های سازمانی
+          </p>
+        </div>
       </div>
 
       {filteredRoles.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800">
+        <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <div className="w-full overflow-x-auto">
             <table className="w-full min-w-[620px]">
-              <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+              <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     عنوان نقش
@@ -339,7 +352,7 @@ function RolesList({
                 {filteredRoles.map((role) => (
                   <tr
                     key={role.id}
-                    className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="transition hover:bg-white/70 dark:hover:bg-white/5"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                       {role.title}
@@ -352,7 +365,7 @@ function RolesList({
                         <button
                           type="button"
                           onClick={() => onEdit(role)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                          className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
                           title="ویرایش نقش"
                           aria-label="ویرایش نقش"
                         >
@@ -370,7 +383,7 @@ function RolesList({
                           <button
                             type="submit"
                             disabled={role.userCount > 0}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-red-300 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-300"
+                            className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:text-gray-300 dark:hover:text-red-300"
                             title={
                               role.userCount > 0
                                 ? "این نقش دارای کاربر است"
@@ -394,14 +407,14 @@ function RolesList({
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 text-center dark:bg-gray-800">
+        <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
           <p className="mb-4 text-gray-600 dark:text-gray-400">
             هیچ نقشی ثبت نشده است.
           </p>
           <button
             type="button"
             onClick={onCreate}
-            className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+            className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white transition hover:bg-brand-600"
           >
             ایجاد نقش
           </button>

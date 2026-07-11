@@ -85,7 +85,7 @@ const Editor = ({
   const minHeight = typeof height === "number" ? `${height}px` : height;
 
   return (
-    <div className="rounded-lg border bg-white p-4 dark:bg-gray-900">
+    <div className="liquid-glass-inset rounded-3xl p-3 sm:p-4">
       {/* Hidden input so form submissions include the HTML content */}
       {name && (
         <input
@@ -98,7 +98,7 @@ const Editor = ({
       {!readOnly && <Toolbar editor={editor} />}
       <EditorContent
         editor={editor}
-        className="prose max-w-none mt-4"
+        className="liquid-glass-control prose mt-4 max-w-none overflow-auto rounded-2xl border text-gray-800 dark:prose-invert dark:text-gray-100"
         style={{ minHeight: minHeight || "200px" }}
       />
     </div>

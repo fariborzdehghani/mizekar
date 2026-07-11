@@ -19,7 +19,6 @@ interface LetterAttachmentsViewerProps {
 }
 
 export default function LetterAttachmentsViewer({
-  letterId,
   attachments,
   onAttachmentDeleted,
   editable = false,
@@ -164,7 +163,7 @@ export default function LetterAttachmentsViewer({
 
   if (items.length === 0) {
     return (
-      <div className="p-6 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg border-dashed text-center">
+      <div className="liquid-glass-inset rounded-2xl border-dashed p-6 text-center">
         <Paperclip className="mx-auto mb-3 text-gray-400" size={32} />
         <p className="text-gray-500 dark:text-gray-400">
           این نامه دارای پیوست نیست
@@ -176,7 +175,7 @@ export default function LetterAttachmentsViewer({
   return (
     <div className="w-full">
       {error && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-md text-sm">
+        <div className="mb-4 rounded-2xl border border-red-200 bg-red-50/80 p-3 text-sm text-red-800 dark:border-red-700/60 dark:bg-red-900/20 dark:text-red-200">
           {error}
         </div>
       )}
@@ -185,7 +184,7 @@ export default function LetterAttachmentsViewer({
         {items.map((attachment) => (
           <div
             key={attachment.id}
-            className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg group hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            className="liquid-glass-control group flex items-center justify-between rounded-2xl border p-4 transition hover:border-brand-200 dark:hover:border-brand-400/20"
           >
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <span className="text-2xl shrink-0">
@@ -201,7 +200,7 @@ export default function LetterAttachmentsViewer({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex shrink-0 items-center gap-2 opacity-70 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
               {/* View Button */}
               <button
                 type="button"
@@ -209,7 +208,7 @@ export default function LetterAttachmentsViewer({
                   handleViewFile(attachment.fileId, attachment.fileName)
                 }
                 title="مشاهده فایل"
-                className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition disabled:opacity-50"
+                className="rounded-xl p-2 text-brand-600 transition hover:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/15 disabled:opacity-50"
                 disabled={loading === attachment.id}
               >
                 <Eye size={18} />
@@ -222,7 +221,7 @@ export default function LetterAttachmentsViewer({
                   handleDownload(attachment.fileId, attachment.fileName)
                 }
                 title="دانلود فایل"
-                className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition disabled:opacity-50"
+                className="rounded-xl p-2 text-emerald-600 transition hover:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/15 disabled:opacity-50"
                 disabled={loading === attachment.id}
               >
                 <Download size={18} />
@@ -234,7 +233,7 @@ export default function LetterAttachmentsViewer({
                   type="button"
                   onClick={() => handleDeleteAttachment(attachment.id)}
                   title="حذف فایل"
-                  className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition disabled:opacity-50"
+                  className="rounded-xl p-2 text-red-600 transition hover:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/15 disabled:opacity-50"
                   disabled={loading === attachment.id}
                 >
                   {loading === attachment.id ? (

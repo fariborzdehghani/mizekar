@@ -168,9 +168,9 @@ export default function NotificationDropdown() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative hidden sm:block">
       <button
-        className="dropdown-toggle relative flex h-11 w-11 items-center justify-center rounded-full border border-app-border bg-white/75 text-gray-500 shadow-theme-xs transition-colors hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="dropdown-toggle relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] transition hover:-translate-y-0.5 hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:text-brand-300"
         onClick={toggleDropdown}
         aria-label="اعلان‌ها"
         aria-expanded={isOpen}
@@ -181,7 +181,7 @@ export default function NotificationDropdown() {
             {unreadCount > 9 ? "+9" : unreadCount}
           </span>
         )}
-        <Bell className="h-5 w-5" />
+        <Bell className="h-[18px] w-[18px]" />
       </button>
 
       <Dropdown

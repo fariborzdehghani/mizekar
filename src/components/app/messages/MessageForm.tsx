@@ -145,7 +145,7 @@ export default function MessageForm({
 
       <form
         onSubmit={handleSubmit}
-        className="min-h-[calc(100vh-65px)] bg-white dark:bg-white"
+        className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8"
       >
         <input
           type="hidden"
@@ -158,18 +158,18 @@ export default function MessageForm({
           value={prefill?.forwardedFromMessageId || ""}
         />
 
-        <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-[77px]">
+        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/incoming-messages"
-              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+              className="liquid-glass-control rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
             >
               بازگشت
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <SendHorizontal className="h-4 w-4" />
               {isSubmitting ? "در حال ارسال..." : "ارسال پیام"}
@@ -177,16 +177,16 @@ export default function MessageForm({
           </div>
 
           <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-900">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               {pageTitle}
             </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-500">
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
               {getModeText(prefill?.mode)}
             </p>
           </div>
         </div>
 
-        <div className="space-y-6 p-6">
+        <div className="liquid-glass-panel space-y-6 rounded-3xl border p-5 sm:p-6">
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
               {error}
@@ -208,7 +208,7 @@ export default function MessageForm({
                 required
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
-                className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
               />
             </div>
 
@@ -224,7 +224,7 @@ export default function MessageForm({
                 name="importance"
                 value={importance}
                 onChange={(event) => setImportance(event.target.value)}
-                className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
               >
                 {IMPORTANCE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -243,20 +243,20 @@ export default function MessageForm({
               <button
                 type="button"
                 onClick={() => setIsRecipientsModalOpen(true)}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+                className="liquid-glass-control inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium text-brand-700 transition hover:border-brand-300 dark:text-brand-300"
               >
                 <UserPlus className="h-4 w-4" />
                 انتخاب گیرندگان
               </button>
             </div>
 
-            <div className="min-h-24 rounded-lg border border-gray-200 p-3 dark:border-gray-700">
+            <div className="liquid-glass-inset min-h-24 rounded-2xl p-3">
               {selectedRecipients.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {selectedRecipients.map((recipient) => (
                     <span
                       key={`${recipient.id}-${recipient.user_id}`}
-                      className="inline-flex h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm text-gray-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-white"
+                      className="inline-flex h-9 max-w-full items-center gap-2 rounded-xl border border-brand-200/80 bg-brand-50/70 px-3 text-sm text-gray-900 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-white"
                     >
                       <span className="truncate">{getPersonName(recipient)}</span>
                       <button

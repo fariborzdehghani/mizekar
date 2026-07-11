@@ -97,12 +97,12 @@ export default function ArchivedLettersList({
   );
 
   return (
-    <div className="flex h-[calc(100vh-65px)] min-h-0 w-full flex-col overflow-hidden lg:h-[calc(100vh-77px)] lg:flex-row">
+    <div className="liquid-content-frame liquid-glass-page flex h-[calc(100vh-92px)] min-h-0 flex-col gap-6 overflow-hidden py-4 sm:py-6 lg:flex-row lg:py-8">
       <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="sticky top-0 z-30 flex shrink-0 items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900">
+        <div className="liquid-page-header liquid-page-header-inset sticky top-0 z-30 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
             href="/letter"
-            className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+            className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
           >
             نامه جدید
           </Link>
@@ -121,17 +121,17 @@ export default function ArchivedLettersList({
             {error}
           </div>
         ) : !selectedFolderId ? (
-          <div className="flex flex-1 items-center justify-center bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
             برای مشاهده موارد بایگانی‌شده، یک پوشه را از سمت چپ انتخاب کنید
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center bg-white p-8 text-center text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+          <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
             این پوشه هنوز موردی ندارد
           </div>
         ) : (
-          <div className="flex-1 overflow-auto bg-white shadow-md dark:bg-gray-800">
+          <div className="liquid-glass-panel m-4 flex-1 overflow-auto! rounded-[24px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
             <table className="w-full min-w-[820px]">
-              <thead className="sticky top-0 z-20 border-b border-gray-200 bg-gray-50 shadow-[0_1px_0_rgba(16,24,40,0.08)] dark:border-gray-600 dark:bg-gray-700">
+              <thead className="sticky top-0 z-20 border-b border-app-border bg-app-table-head shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="w-28 px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     نوع
@@ -162,7 +162,7 @@ export default function ArchivedLettersList({
                   return (
                     <tr
                       key={`${item.type}-${item.archiveItemId}`}
-                      className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="transition hover:bg-white/70 dark:hover:bg-white/5"
                     >
                       <td className="w-28 px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
                         <span className="inline-flex items-center gap-2">
@@ -202,7 +202,7 @@ export default function ArchivedLettersList({
                         <div className="flex items-center gap-2">
                           <Link
                             href={href}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                            className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
                             title={
                               item.type === "meeting"
                                 ? "مشاهده جلسه"

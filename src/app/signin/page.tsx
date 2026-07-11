@@ -11,8 +11,8 @@ export default async function SignInPage() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 lg:flex-row">
-      <section className="flex w-full items-center justify-center border-gray-200 bg-white px-5 py-10 dark:border-gray-800 dark:bg-gray-950 sm:px-8 lg:min-h-screen lg:w-[430px] lg:shrink-0 lg:border-l xl:w-[460px]">
+    <main className="liquid-auth-page flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950 lg:flex-row">
+      <section className="liquid-auth-side flex w-full items-center justify-center border-gray-200 bg-white px-5 py-10 dark:border-gray-800 dark:bg-gray-950 sm:px-8 lg:min-h-screen lg:w-[430px] lg:shrink-0 lg:border-l xl:w-[460px]">
         <div className="w-full max-w-[380px]">
           <div className="mb-8 flex justify-center">
             <Image
@@ -59,7 +59,7 @@ export default async function SignInPage() {
         />
         <div className="absolute inset-0 bg-gray-950/35" />
 
-        <div className="relative mx-5 flex w-full max-w-[680px] flex-col items-center rounded-lg border border-white/25 bg-white/45 px-8 py-12 text-center shadow-theme-xl backdrop-blur-sm dark:border-white/15 dark:bg-gray-950/35 sm:px-16 sm:py-16">
+        <div className="liquid-glass-panel relative mx-5 flex w-full max-w-[680px] flex-col items-center rounded-[28px] border border-white/25 bg-white/45 px-8 py-12 text-center shadow-theme-xl backdrop-blur-sm dark:border-white/15 dark:bg-gray-950/35 sm:px-16 sm:py-16">
           <Image
             src="/images/logo/logo-icon.png"
             alt="Mizekar"

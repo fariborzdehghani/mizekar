@@ -209,7 +209,7 @@ export default function PersianDatePicker({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="liquid-glass-control inline-flex h-11 w-full items-center justify-between gap-2 rounded-2xl border px-3 text-sm text-gray-700 transition hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-200 dark:hover:text-brand-300"
       >
         <span className="inline-flex min-w-0 items-center gap-2">
           <CalendarDays className="h-4 w-4 shrink-0 text-gray-500" />
@@ -220,12 +220,12 @@ export default function PersianDatePicker({
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute left-0 top-12 z-40 w-72 rounded-lg border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="liquid-modal absolute left-0 top-12 z-40 w-72 rounded-3xl p-4 shadow-2xl">
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
               onClick={() => moveMonth(1)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="liquid-glass-control flex h-8 w-8 items-center justify-center rounded-xl border text-gray-500 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
               aria-label="ماه بعد"
             >
               <ChevronRight className="h-4 w-4" />
@@ -236,7 +236,7 @@ export default function PersianDatePicker({
             <button
               type="button"
               onClick={() => moveMonth(-1)}
-              className="flex h-8 w-8 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+              className="liquid-glass-control flex h-8 w-8 items-center justify-center rounded-xl border text-gray-500 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
               aria-label="ماه قبل"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -264,12 +264,12 @@ export default function PersianDatePicker({
                     onChange(day.value);
                     setIsOpen(false);
                   }}
-                  className={`flex h-8 items-center justify-center rounded-md text-sm transition ${
+                  className={`flex h-8 items-center justify-center rounded-xl text-sm transition ${
                     isSelected
-                      ? "bg-brand-500 text-white"
+                      ? "bg-brand-500 text-white shadow-md shadow-brand-500/20"
                       : isToday
                         ? "bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
-                        : "text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800"
+                        : "text-gray-700 hover:bg-white/50 dark:text-gray-200 dark:hover:bg-white/[0.07]"
                   }`}
                 >
                   {day.day}
@@ -278,7 +278,7 @@ export default function PersianDatePicker({
             })}
           </div>
 
-          <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+          <div className="mt-3 flex items-center justify-between border-t border-white/55 pt-3 dark:border-white/10">
             <button
               type="button"
               onClick={() => {

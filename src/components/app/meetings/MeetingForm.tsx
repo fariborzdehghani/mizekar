@@ -293,12 +293,13 @@ export default function MeetingForm({
         requireUser
       />
 
-      <form onSubmit={handleSubmit} className="bg-white dark:bg-white">
-        <div className="sticky top-16.25 z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-white lg:top-19.25">
+      <div className="liquid-content-frame liquid-glass-page space-y-6 py-4 sm:py-6 lg:py-8">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/incoming-letters"
-              className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              className="liquid-glass-control rounded-xl border px-4 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
             >
               بازگشت
             </Link>
@@ -306,7 +307,7 @@ export default function MeetingForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <Save className="h-4 w-4" />
                 {loading ? "در حال ایجاد..." : "ایجاد جلسه"}
@@ -336,7 +337,7 @@ export default function MeetingForm({
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="liquid-glass-header rounded-3xl border p-5 sm:p-6">
           {(error || success) && (
             <div
               className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
@@ -364,7 +365,7 @@ export default function MeetingForm({
                 onChange={(event) => setTitle(event.target.value)}
                 required
                 disabled={isViewMode}
-                className="h-11 w-full rounded-lg border border-gray-300 px-4 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-xl border px-4 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-white"
                 placeholder="عنوان جلسه را وارد کنید"
               />
             </div>
@@ -413,14 +414,14 @@ export default function MeetingForm({
                 onChange={(event) => setMeetingTime(event.target.value)}
                 required
                 disabled={isViewMode}
-                className="h-11 w-full rounded-lg border border-gray-300 px-4 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-xl border px-4 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-white"
               />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 زمان ثبت شده
               </label>
-              <div className="flex h-11 items-center rounded-lg border border-gray-200 bg-gray-50 px-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
+              <div className="liquid-glass-inset flex h-11 items-center rounded-xl px-4 text-sm text-gray-600 dark:text-gray-300">
                 {meetingDate
                   ? `${formatPersianDate(meetingDate)} - ${
                       meetingTime || "--:--"
@@ -443,8 +444,8 @@ export default function MeetingForm({
                   onClick={() => setLocationType(0)}
                   className={`inline-flex h-11 items-center justify-center gap-2 rounded-lg border text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
                     locationType === 0
-                      ? "border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-500/15 dark:text-blue-200"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                      ? "border-brand-300 bg-brand-50/70 text-brand-700 dark:border-brand-500 dark:bg-brand-500/15 dark:text-brand-200"
+                      : "liquid-glass-control text-gray-700 hover:border-brand-200 dark:text-gray-300"
                   }`}
                 >
                   <MapPin className="h-4 w-4" />
@@ -456,8 +457,8 @@ export default function MeetingForm({
                   onClick={() => setLocationType(1)}
                   className={`inline-flex h-11 items-center justify-center gap-2 rounded-lg border text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
                     locationType === 1
-                      ? "border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-500/15 dark:text-blue-200"
-                      : "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                      ? "border-brand-300 bg-brand-50/70 text-brand-700 dark:border-brand-500 dark:bg-brand-500/15 dark:text-brand-200"
+                      : "liquid-glass-control text-gray-700 hover:border-brand-200 dark:text-gray-300"
                   }`}
                 >
                   <Video className="h-4 w-4" />
@@ -479,7 +480,7 @@ export default function MeetingForm({
                 onChange={(event) => setLocationTitle(event.target.value)}
                 required
                 disabled={isViewMode}
-                className="h-11 w-full rounded-lg border border-gray-300 px-4 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-xl border px-4 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-white"
                 placeholder={
                   locationType === 1
                     ? "لینک جلسه یا آدرس سامانه"
@@ -503,7 +504,7 @@ export default function MeetingForm({
               onChange={(event) => setDescription(event.target.value)}
               disabled={isViewMode}
               rows={3}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              className="liquid-glass-control w-full rounded-xl border px-4 py-3 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-white"
               placeholder="توضیحات تکمیلی جلسه"
             />
           </div>
@@ -545,7 +546,7 @@ export default function MeetingForm({
             </label>
             {isViewMode ? (
               <div
-                className="prose min-h-72 max-w-none rounded-lg border border-gray-300 p-4 text-gray-900 dark:prose-invert dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="liquid-glass-inset prose min-h-72 max-w-none rounded-2xl p-4 text-gray-900 dark:prose-invert dark:text-white"
                 dangerouslySetInnerHTML={{
                   __html: minutes || "<p>دستور جلسه ای ثبت نشده است</p>",
                 }}
@@ -563,6 +564,7 @@ export default function MeetingForm({
           referrals={initialMeeting.referrals || []}
         />
       )}
+      </div>
     </>
   );
 }
@@ -587,7 +589,7 @@ function PersonPickerBox({
   showRole?: boolean;
 }) {
   return (
-    <div className="min-w-0 rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+    <div className="liquid-glass-inset min-w-0 rounded-2xl p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
           {title}
@@ -596,19 +598,19 @@ function PersonPickerBox({
           <button
             type="button"
             onClick={onOpen}
-            className="inline-flex h-9 items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-3 text-xs font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+            className="liquid-glass-control inline-flex h-9 items-center gap-2 rounded-xl border px-3 text-xs font-medium text-brand-700 transition hover:border-brand-300 dark:text-brand-300"
           >
             <UserPlus className="h-4 w-4" />
             {actionLabel}
           </button>
         )}
       </div>
-      <div className="flex h-44 flex-col gap-2 overflow-y-auto rounded-lg border border-gray-100 p-2 dark:border-gray-800">
+      <div className="liquid-glass-control flex h-44 flex-col gap-2 overflow-y-auto rounded-xl border p-2">
         {people.length > 0 ? (
           people.map((person) => (
             <div
               key={`${person.id}-${person.user_id}`}
-              className="flex min-h-10 items-center justify-between gap-2 rounded-lg bg-gray-50 px-3 py-2 dark:bg-gray-800"
+              className="liquid-glass-inset flex min-h-10 items-center justify-between gap-2 rounded-xl px-3 py-2"
             >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-gray-900 dark:text-white">

@@ -7,7 +7,8 @@ export const ThemeToggleButton: React.FC = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="relative flex h-11 w-11 items-center justify-center rounded-full border border-app-border bg-white/75 text-gray-500 shadow-theme-xs transition-colors hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+      aria-label="تغییر حالت نمایش"
+      className="relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] transition hover:-translate-y-0.5 hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:text-brand-300"
     >
       <svg
         className="hidden dark:block"

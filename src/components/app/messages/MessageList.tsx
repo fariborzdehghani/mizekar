@@ -71,11 +71,11 @@ export default function MessageList({
   const personColumnLabel = perspective === "incoming" ? "فرستنده" : "گیرندگان";
 
   return (
-    <main className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <main className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
+      <div className="liquid-page-header liquid-page-header-inset sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/new-message"
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           پیام جدید
         </Link>
@@ -94,19 +94,19 @@ export default function MessageList({
           {error}
         </div>
       ) : messages.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 text-center dark:bg-gray-800">
+        <div className="liquid-glass-panel m-4 flex flex-1 flex-col items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
           <p className="mb-4 text-gray-600 dark:text-gray-400">{emptyText}</p>
           <Link
             href="/new-message"
-            className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+            className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white transition hover:bg-brand-600"
           >
             ایجاد پیام
           </Link>
         </div>
       ) : (
-        <div className="overflow-x-auto bg-white shadow-md dark:bg-gray-800">
+        <div className="liquid-glass-panel m-4 overflow-x-auto! rounded-[24px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <table className="w-full min-w-[920px]">
-            <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+            <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                   عنوان
@@ -140,7 +140,7 @@ export default function MessageList({
                 return (
                   <tr
                     key={message.id}
-                    className={`cursor-pointer transition hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                    className={`cursor-pointer transition hover:bg-white/70 dark:hover:bg-white/5 ${
                       isUnreadIncoming
                         ? "bg-blue-100/50 dark:bg-blue-950/25"
                         : ""
@@ -195,7 +195,7 @@ export default function MessageList({
                     <td className="w-px whitespace-nowrap px-6 py-4 text-sm">
                       <Link
                         href={`/message?id=${message.id}`}
-                        className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                        className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
                         title="مشاهده پیام"
                       >
                         <Eye className="h-4 w-4" />

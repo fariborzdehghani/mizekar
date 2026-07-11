@@ -149,7 +149,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-5">
+    <div className="liquid-content-frame liquid-glass-page flex flex-col gap-5 py-4 sm:py-6 lg:py-8">
       <RecipientsModal
         isOpen={isReceiversModalOpen}
         onClose={() => setIsReceiversModalOpen(false)}
@@ -169,7 +169,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         requireUser
       />
 
-      <div className="sticky top-[65px] z-40 flex flex-col gap-3 border-b border-gray-300 bg-white p-4 shadow-sm dark:bg-gray-900 lg:top-[77px] lg:flex-row lg:items-start lg:justify-between">
+      <div className="liquid-page-header sticky top-[92px] z-40 flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             {form.title}
@@ -179,7 +179,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
             {form.creatorName}
           </p>
           {form.activeStep && (
-            <p className="mt-1 text-sm text-blue-600 dark:text-blue-300">
+            <p className="mt-1 text-sm text-brand-600 dark:text-brand-300">
               مرحله فعال {form.activeStep.order}: {form.activeStep.approverName}
             </p>
           )}
@@ -227,7 +227,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-5 px-4 pb-4 md:px-6 md:pb-6">
+      <div className="flex flex-col gap-5">
       {(error || message) && (
         <div
           className={`rounded-lg border px-4 py-3 text-sm ${
@@ -246,7 +246,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
           onChange={(event) => setComments(event.target.value)}
           rows={3}
           placeholder="توضیحات تایید یا رد"
-          className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+          className="liquid-glass-control w-full rounded-xl border px-3 py-2 text-sm text-gray-900 outline-none transition focus:border-brand-500 dark:text-white"
         />
       )}
 
@@ -264,7 +264,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         }`}
       >
         <section
-          className={`w-full rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 ${
+          className={`liquid-glass-panel w-full rounded-3xl border ${
             form.canRefer ? "xl:col-span-2" : ""
           }`}
         >
@@ -280,7 +280,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {step.order}. {step.approverName}
                   </p>
-                  <span className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                  <span className="liquid-glass-inset rounded-full px-2.5 py-1 text-xs text-gray-600 dark:text-gray-300">
                     {step.statusLabel}
                   </span>
                 </div>
@@ -298,7 +298,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         </section>
 
         {form.canRefer && (
-          <section className="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 xl:col-span-2">
+          <section className="liquid-glass-panel rounded-3xl border xl:col-span-2">
             <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
               <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                 ارجاعات فرم
@@ -309,7 +309,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
             </div>
 
             <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-[minmax(300px,380px)_1fr]">
-              <div className="h-[28rem] overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+              <div className="liquid-glass-inset h-[28rem] overflow-hidden rounded-2xl">
                 {form.referrals.length > 0 ? (
                   <div className="h-full overflow-y-auto">
                     {form.referrals.map((referral) => {
@@ -323,7 +323,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
                           className={`flex w-full flex-col gap-1 border-b border-gray-200 px-3 py-2 text-right transition last:border-b-0 dark:border-gray-700 ${
                             isSelected
                               ? "bg-brand-50 dark:bg-brand-500/15"
-                              : "bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-white/5"
+                              : "bg-transparent hover:bg-white/40 dark:hover:bg-white/5"
                           }`}
                         >
                           <span className="min-w-0 truncate text-xs font-semibold text-gray-900 dark:text-white">
@@ -343,7 +343,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
                 )}
               </div>
 
-              <div className="h-[28rem] overflow-hidden rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+              <div className="liquid-glass-inset h-[28rem] overflow-hidden rounded-2xl p-4">
                 {selectedReferral ? (
                   <div className="flex h-full flex-col">
                     <div className="mb-4 border-b border-gray-200 pb-4 dark:border-gray-700">
@@ -374,7 +374,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
 
             <form
               onSubmit={handleReferralSubmit}
-              className="border-t border-gray-200 p-5 dark:border-gray-700"
+              className="border-t border-white/50 p-5 dark:border-white/10"
             >
               <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
                 <div>
@@ -389,7 +389,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
                   <button
                     type="button"
                     onClick={() => setIsReceiversModalOpen(true)}
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+                    className="liquid-glass-control inline-flex h-10 items-center justify-center gap-2 rounded-xl border px-4 text-sm font-medium text-brand-700 transition hover:border-brand-300 dark:text-brand-300"
                   >
                     <UserPlus className="h-4 w-4" />
                     گیرندگان ارجاع
@@ -410,7 +410,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
                   {selectedReceivers.map((receiver) => (
                     <span
                       key={receiver.id}
-                      className="inline-flex h-9 max-w-full items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 text-sm text-gray-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-white"
+                      className="inline-flex h-9 max-w-full items-center gap-2 rounded-xl border border-brand-200/80 bg-brand-50/70 px-3 text-sm text-gray-900 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-white"
                     >
                       <span className="truncate">
                         {[receiver.first_name, receiver.last_name]

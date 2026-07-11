@@ -20,7 +20,7 @@ export default async function MessagePage({ searchParams }: MessagePageProps) {
 
   if (!messageId) {
     return (
-      <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900 lg:min-h-[calc(100vh-77px)]">
+      <div className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900">
         <p className="text-gray-600 dark:text-gray-300">پیام معتبر نیست</p>
         <Link
           href="/incoming-messages"
@@ -36,7 +36,7 @@ export default async function MessagePage({ searchParams }: MessagePageProps) {
 
   if (!result.success || !result.message) {
     return (
-      <div className="flex min-h-[calc(100vh-65px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900 lg:min-h-[calc(100vh-77px)]">
+      <div className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900">
         <p className="text-gray-600 dark:text-gray-300">
           {result.error || "پیام یافت نشد"}
         </p>

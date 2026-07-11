@@ -9,6 +9,7 @@ import {
   Mail,
   MessageSquare,
   Send,
+  Sparkles,
 } from "lucide-react";
 import { getDashboardStats } from "@/src/actions/dashboardActions";
 
@@ -30,7 +31,7 @@ function StatCard({
   accentClass: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="flex items-start justify-between gap-4">
         <div className="text-right">
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -114,7 +115,7 @@ function TrendChart({ data }: { data: Array<{ label: string; value: number }> })
     .join(" ");
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />
         <div className="text-right">
@@ -196,7 +197,7 @@ function PieChart({ data }: { data: ChartDatum[] }) {
       : "#e5e7eb 0% 100%";
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <Archive className="h-5 w-5 text-slate-600 dark:text-slate-300" />
         <div className="text-right">
@@ -215,7 +216,7 @@ function PieChart({ data }: { data: ChartDatum[] }) {
           role="img"
           aria-label="نمودار دایره‌ای سهم فعالیت‌ها"
         >
-          <div className="grid h-24 w-24 place-items-center rounded-full bg-white text-center shadow-sm dark:bg-gray-900">
+          <div className="liquid-glass-inset grid h-24 w-24 place-items-center rounded-full bg-white text-center shadow-sm dark:bg-gray-900">
             <span className="text-xl font-bold text-gray-900 dark:text-white">
               {formatNumber(total)}
             </span>
@@ -264,7 +265,7 @@ function ColumnChart({
   ] as const;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
         <div className="text-right">
@@ -328,6 +329,11 @@ function ColumnChart({
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
+  const todayLabel = new Intl.DateTimeFormat("fa-IR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
 
   const totalWork =
     stats.letters.total +
@@ -368,34 +374,41 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-app-canvas p-4 dark:bg-gray-950 lg:min-h-[calc(100vh-77px)] lg:p-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <div className="flex flex-col gap-4 border-b border-gray-200 pb-5 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              داشبورد
-            </h1>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              نمای کلی آمار حساب کاربری شما
-            </p>
+    <main className="liquid-glass-page liquid-page-frame">
+      <div className="flex w-full flex-col gap-6">
+        <section className="liquid-glass-surface relative overflow-hidden rounded-[28px] border border-white/70 p-5 dark:border-white/10 md:p-6">
+          <div className="pointer-events-none absolute -left-12 -top-16 h-44 w-44 rounded-full bg-brand-400/15 blur-3xl" />
+          <div className="relative flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="text-right">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/35 px-3 py-1.5 text-xs font-medium text-brand-700 dark:border-white/10 dark:bg-white/5 dark:text-brand-300">
+                <Sparkles className="h-3.5 w-3.5" />
+                مرکز اتوماسیون سازمانی
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+                سلام، به میزکار امروز خوش آمدید
+              </h1>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                {todayLabel} · نمای یکپارچه نامه‌ها، پیام‌ها، فرم‌ها و جلسات
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 md:justify-end">
+              <Link
+                href="/letter"
+                className="liquid-glass-control inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-brand-300 hover:text-brand-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
+              >
+                <FileText className="h-4 w-4" />
+                نامه جدید
+              </Link>
+              <Link
+                href="/new-message"
+                className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2.5 text-sm font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
+              >
+                <Send className="h-4 w-4" />
+                پیام جدید
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-2 md:justify-end">
-            <Link
-              href="/letter"
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
-            >
-              <FileText className="h-4 w-4" />
-              نامه جدید
-            </Link>
-            <Link
-              href="/new-message"
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-            >
-              <Send className="h-4 w-4" />
-              پیام جدید
-            </Link>
-          </div>
-        </div>
+        </section>
 
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
@@ -436,7 +449,7 @@ export default async function DashboardPage() {
         <ColumnChart groups={columnGroups} />
 
         <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="mb-5 flex items-center justify-between gap-3">
               <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />
               <div className="text-right">
@@ -465,7 +478,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <FileText className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -500,7 +513,7 @@ export default async function DashboardPage() {
               </dl>
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">

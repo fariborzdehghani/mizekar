@@ -1,5 +1,6 @@
 import { updateGeneralSetting } from "@/src/actions/settingsActions";
 import { prisma } from "@/src/lib/prisma";
+import { SlidersHorizontal } from "lucide-react";
 
 interface GeneralSettingsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -32,26 +33,32 @@ export default async function GeneralSettingsPage({
   });
 
   return (
-    <div className="w-full">
-      <div className="sticky top-16.25 lg:top-19.25 z-30 p-4 flex justify-between items-center border-b border-gray-300 bg-white dark:bg-gray-900">
+    <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8">
+      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="submit"
           form="general-settings-form"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           ذخیره
         </button>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="text-right">
+          <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
+            <SlidersHorizontal className="h-4 w-4" /> مدیریت سامانه
+          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
             تعاریف
           </h1>
+          <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+            مدیریت مقادیر و تنظیمات پایه سامانه
+          </p>
         </div>
       </div>
 
       <form id="general-settings-form" action={updateGeneralSetting}>
-        <div className="overflow-hidden border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+        <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <table className="w-full">
-            <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-700">
+            <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                   عنوان
@@ -73,7 +80,7 @@ export default async function GeneralSettingsPage({
                       name="value"
                       defaultValue={setting.value || ""}
                       rows={2}
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      className="liquid-glass-control w-full rounded-2xl border border-app-border bg-white/70 px-4 py-2 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white"
                     />
                   </td>
                 </tr>

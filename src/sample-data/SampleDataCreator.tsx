@@ -113,8 +113,8 @@ export default function SampleDataCreator({
   const deletedSummary = formatDeletedStats(removeState.deleted);
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="flex flex-col gap-4 border-b border-gray-200 pb-5 dark:border-gray-800 lg:flex-row lg:items-end lg:justify-between">
+    <div className="liquid-glass-page mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
+      <header className="liquid-glass-header flex flex-col gap-4 rounded-[28px] border border-white/70 p-5 dark:border-white/10 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200">
             <Database className="h-4 w-4" />
@@ -129,7 +129,7 @@ export default function SampleDataCreator({
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
+        <div className="liquid-glass-control inline-flex items-center gap-2 rounded-2xl border border-gray-200 bg-white/70 px-3 py-2 text-sm text-gray-600 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
           <Users className="h-4 w-4" />
           کاربران نمونه پس از ایجاد داده قابل ورود هستند.
         </div>
@@ -139,7 +139,7 @@ export default function SampleDataCreator({
         {statLabels.map((stat) => (
           <div
             key={stat.key}
-            className="rounded-lg border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900"
+            className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900"
           >
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
               {stat.label}
@@ -151,7 +151,7 @@ export default function SampleDataCreator({
         ))}
       </section>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
+      <section className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-brand-600 dark:text-brand-300" />
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -170,7 +170,7 @@ export default function SampleDataCreator({
               dir="auto"
               defaultValue={aiState.prompt || ""}
               placeholder="Ask the model something..."
-              className="w-full resize-y rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+              className="liquid-glass-control w-full resize-y rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
             />
           </label>
 
@@ -191,7 +191,7 @@ export default function SampleDataCreator({
         ) : null}
 
         {aiState.response ? (
-          <div className="mt-4 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950">
+          <div className="liquid-glass-inset mt-4 rounded-2xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-950">
             <p className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
               Response
             </p>
@@ -205,7 +205,7 @@ export default function SampleDataCreator({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <form
           action={createFormAction}
-          className="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900"
+          className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900"
         >
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">
             تنظیمات ایجاد داده
@@ -223,7 +223,7 @@ export default function SampleDataCreator({
                   min={limits[field.key].min}
                   max={limits[field.key].max}
                   defaultValue={defaults[field.key]}
-                  className="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                  className="liquid-glass-control h-11 w-full rounded-2xl border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
                 />
               </label>
             ))}
@@ -237,13 +237,13 @@ export default function SampleDataCreator({
                 type="text"
                 dir="ltr"
                 defaultValue={defaults.sampleUserPassword}
-                className="h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-left font-mono text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
+                className="liquid-glass-control h-11 w-full rounded-2xl border border-gray-300 bg-white px-3 text-left font-mono text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-950 dark:text-white"
               />
             </label>
           </div>
 
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <label className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+            <label className="liquid-glass-inset flex items-start gap-3 rounded-2xl border border-gray-200 p-3 dark:border-gray-800">
               <input
                 name="resetExisting"
                 type="checkbox"
@@ -262,7 +262,7 @@ export default function SampleDataCreator({
               </span>
             </label>
 
-            <label className="flex items-start gap-3 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+            <label className="liquid-glass-inset flex items-start gap-3 rounded-2xl border border-gray-200 p-3 dark:border-gray-800">
               <input
                 name="archiveSamples"
                 type="checkbox"
@@ -292,7 +292,7 @@ export default function SampleDataCreator({
         </form>
 
         <aside className="flex flex-col gap-4">
-          <section className="rounded-lg border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
               نتیجه عملیات
             </h2>

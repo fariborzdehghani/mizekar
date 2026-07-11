@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { subscribeToAiActivity } from "@/src/lib/aiActivity";
-import { Settings, Sparkles } from "lucide-react";
+import { logoutAction } from "@/src/actions/authActions";
+import { CircleHelp, LogOut, Settings, Sparkles, X } from "lucide-react";
 import {
   CalenderIcon,
   ChevronDownIcon,
@@ -106,9 +106,9 @@ function getSubItemName(subItem: { name: string; path: string }) {
 }
 
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isMobileOpen, toggleMobileSidebar } = useSidebar();
   const pathname = usePathname();
-  const isSidebarWide = isExpanded || isHovered || isMobileOpen;
+  const isSidebarWide = true;
   const [activeAiTaskCount, setActiveAiTaskCount] = useState(0);
 
   useEffect(() => {
@@ -123,7 +123,7 @@ const AppSidebar: React.FC = () => {
     navItems: NavItem[],
     menuType: "main" | "others",
   ) => (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col gap-1.5">
       {navItems.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
@@ -133,11 +133,7 @@ const AppSidebar: React.FC = () => {
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "lg:justify-start"
-              }`}
+              } cursor-pointer lg:justify-start`}
             >
               <span
                 className={` ${
@@ -166,6 +162,9 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
+                onClick={() => {
+                  if (isMobileOpen) toggleMobileSidebar();
+                }}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                 }`}
@@ -202,7 +201,10 @@ const AppSidebar: React.FC = () => {
                     <li key={subItem.name}>
                       <Link
                         href={subItem.path}
-                        onClick={() => setManualOpenSubmenu(undefined)}
+                        onClick={() => {
+                          setManualOpenSubmenu(undefined);
+                          if (isMobileOpen) toggleMobileSidebar();
+                        }}
                         className={`menu-dropdown-item ${
                           isActive(subItem.path)
                             ? "menu-dropdown-item-active"
@@ -266,59 +268,43 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 right-0 bg-app-sidebar text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] dark:bg-gray-900 dark:border-gray-800 dark:text-white h-screen z-[999999] border-l border-app-border
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-              ? "w-[290px]"
-              : "w-[90px]"
-        }
+      className={`liquid-glass-sidebar fixed right-0 top-0 z-[999999] flex h-screen w-[280px] flex-col border-l border-app-border bg-app-sidebar px-5 text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] transition-transform duration-300 dark:border-gray-800 dark:bg-gray-900 dark:text-white
         ${isMobileOpen ? "translate-x-0" : "translate-x-full"}
         lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-center border-b border-app-border py-7 dark:border-gray-800">
+      <div className="mb-5 flex items-center justify-between px-2 pt-6">
         <Link
           href="/"
-          className={`inline-flex h-14 items-center rounded-lg bg-white dark:ring-0 ${
-            isSidebarWide ? "px-3" : "px-0"
-          }`}
+          onClick={() => {
+            if (isMobileOpen) toggleMobileSidebar();
+          }}
+          className="flex items-center gap-3"
         >
-          {isSidebarWide ? (
-            <>
-              <Image
-                className="h-14 w-auto dark:hidden"
-                src="/images/logo/logo.png"
-                alt="Logo"
-                width={175}
-                height={56}
-                loading="eager"
-              />
-              <Image
-                className="hidden h-14 w-auto dark:block"
-                src="/images/logo/logo-dark.png"
-                alt="Logo"
-                width={175}
-                height={56}
-              />
-            </>
-          ) : (
-            <Image
-              className="h-14 w-14"
-              src="/images/logo/logo-icon.png"
-              alt="Logo"
-              width={56}
-              height={56}
-            />
-          )}
+          <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[16px] bg-gradient-to-br from-[#7168ff] via-[#625cff] to-[#45b9c9] text-white shadow-[0_12px_30px_rgba(98,92,255,.36)]">
+            <span className="absolute inset-px rounded-[15px] border border-white/25" />
+            <Sparkles className="relative h-5 w-5" strokeWidth={2.2} />
+          </span>
+          <span>
+            <span className="block text-xl font-extrabold tracking-tight">میزکار</span>
+            <span className="block text-[10px] font-medium text-gray-500 dark:text-gray-400">اتوماسیون هوشمند سازمانی</span>
+          </span>
         </Link>
+        <button
+          type="button"
+          onClick={toggleMobileSidebar}
+          className="grid h-9 w-9 place-items-center rounded-xl text-gray-500 transition hover:bg-black/5 hover:text-gray-900 dark:hover:bg-white/5 dark:hover:text-white lg:hidden"
+          aria-label="بستن منو"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-y-auto pt-5 duration-300 ease-linear no-scrollbar">
+      <div className="flex flex-1 flex-col overflow-y-auto pt-2 duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
-          <div className="flex flex-col gap-4">
+          <p className="mb-3 px-3 text-[11px] font-semibold tracking-[0.08em] text-gray-400 dark:text-gray-500">
+            فضای کاری
+          </p>
+          <div className="flex flex-col gap-3">
             <div>{renderMenuItems(navItems, "main")}</div>
 
             <div className="">{renderMenuItems(othersItems, "others")}</div>
@@ -326,8 +312,41 @@ const AppSidebar: React.FC = () => {
         </nav>
       </div>
 
+      <div className="mt-auto shrink-0 pb-5">
+        <div className="sidebar-help-card liquid-card mb-4 rounded-[22px] border border-[#635cff]/15 bg-gradient-to-br from-[#635cff]/[0.12] to-[#43c2bc]/[0.08] p-4">
+          <div className="mb-3 grid h-9 w-9 place-items-center rounded-xl bg-white/70 text-[#635cff] shadow-sm dark:bg-white/10">
+            <CircleHelp className="h-[18px] w-[18px]" />
+          </div>
+          <p className="text-sm font-bold text-gray-900 dark:text-white">مرکز راهنمای میزکار</p>
+          <p className="mt-1 text-[11px] leading-5 text-gray-500 dark:text-gray-400">پاسخ پرسش‌ها و آموزش کار با سامانه</p>
+          <button className="mt-3 text-xs font-bold text-[#625cff]" type="button">مشاهده راهنما</button>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-black/5 px-2 pt-4 dark:border-white/5">
+          <Link
+            href="/settings/general"
+            onClick={() => {
+              if (isMobileOpen) toggleMobileSidebar();
+            }}
+            className="flex items-center gap-2 text-xs font-semibold text-gray-500 transition hover:text-brand-500 dark:text-gray-400"
+          >
+            <Settings className="h-4 w-4" /> تنظیمات
+          </Link>
+          <form action={logoutAction}>
+            <button
+              aria-label="خروج"
+              title="خروج"
+              className="grid h-9 w-9 place-items-center rounded-xl text-gray-500 transition hover:bg-red-500/10 hover:text-red-500 dark:text-gray-400"
+              type="submit"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </form>
+        </div>
+      </div>
+
       {activeAiTaskCount > 0 && (
-        <div className="mt-auto flex shrink-0 justify-center border-t border-app-border py-4 dark:border-gray-800">
+        <div className="absolute bottom-20 left-5 flex shrink-0 justify-center">
           <div
             className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-purple-600 bg-purple-600 text-white shadow-theme-xs dark:border-purple-600 dark:bg-purple-600 dark:text-white"
             title="هوش مصنوعی در حال کار است"

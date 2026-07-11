@@ -30,9 +30,11 @@ function ToolbarButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`p-2 rounded transition-colors ${
-        isActive ? "bg-gray-200 text-black" : "text-gray-600 hover:bg-gray-100"
-      } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`rounded-xl p-2 transition-colors ${
+        isActive
+          ? "bg-brand-500 text-white shadow-sm shadow-brand-500/20"
+          : "text-gray-600 hover:bg-white/50 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/[0.07] dark:hover:text-brand-300"
+      } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
     >
       {children}
     </button>
@@ -57,7 +59,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
   };
 
   return (
-    <div className="flex flex-wrap gap-1 border-b pb-3 mb-3">
+    <div className="liquid-glass-control mb-3 flex flex-wrap items-center gap-1 rounded-2xl border p-1.5">
       {/* Text Formatting */}
       <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={editor.isActive("bold")}>
         <Bold size={18} />
@@ -69,7 +71,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         <UnderlineIcon size={18} />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <div className="mx-1 h-6 w-px bg-gray-300/70 dark:bg-white/10" />
 
       {/* Lists */}
       <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={editor.isActive("bulletList")}>
@@ -82,7 +84,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         <CheckSquare size={18} />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <div className="mx-1 h-6 w-px bg-gray-300/70 dark:bg-white/10" />
 
       {/* Alignment */}
       <ToolbarButton onClick={() => editor.chain().focus().setTextAlign("left").run()} isActive={editor.isActive({ textAlign: "left" })}>
@@ -95,7 +97,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         <AlignRight size={18} />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <div className="mx-1 h-6 w-px bg-gray-300/70 dark:bg-white/10" />
 
       {/* Media & Links */}
       <ToolbarButton onClick={addLink} isActive={editor.isActive("link")}>
@@ -108,7 +110,7 @@ const Toolbar = ({ editor }: ToolbarProps) => {
         <Table size={18} />
       </ToolbarButton>
 
-      <div className="w-px h-6 bg-gray-300 mx-1" />
+      <div className="mx-1 h-6 w-px bg-gray-300/70 dark:bg-white/10" />
 
       {/* History */}
       <ToolbarButton onClick={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()}>

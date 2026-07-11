@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { FileUp, Pencil, Trash2, UserPlus } from "lucide-react";
+import { FileUp, PanelsTopLeft, Pencil, Trash2, UserPlus } from "lucide-react";
 import {
   createFormTemplateAction,
   deleteFormTemplateAction,
@@ -118,26 +118,31 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
-    <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-lg border border-gray-300 px-4 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+          className="liquid-glass-control rounded-2xl border border-app-border bg-white/70 px-4 py-2 font-medium text-gray-700 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
         >
           بازگشت
         </button>
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? pendingText : submitText}
         </button>
       </div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        {title}
-      </h1>
+      <div className="text-right">
+        <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
+          <PanelsTopLeft className="h-4 w-4" /> مدیریت سامانه
+        </p>
+        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+          {title}
+        </h1>
+      </div>
     </div>
   );
 }
@@ -201,7 +206,7 @@ function TemplateFields({
           type="text"
           required
           defaultValue={template?.title || ""}
-          className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="liquid-glass-control h-11 w-full rounded-2xl border border-app-border bg-white/70 px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -213,7 +218,7 @@ function TemplateFields({
           name="description"
           rows={4}
           defaultValue={template?.description || ""}
-          className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="liquid-glass-control w-full rounded-2xl border border-app-border bg-white/70 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:text-white"
         />
       </div>
 
@@ -231,12 +236,12 @@ function TemplateFields({
           type="file"
           required={!template}
           accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          className="block h-11 w-full rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:mr-3 file:h-full file:border-0 file:bg-gray-100 file:px-4 file:text-sm file:font-medium dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:file:bg-gray-700 dark:file:text-gray-100"
+          className="liquid-glass-control block h-11 w-full rounded-2xl border border-app-border bg-white/70 text-sm text-gray-700 file:mr-3 file:h-full file:border-0 file:bg-white/45 file:px-4 file:text-sm file:font-medium dark:border-gray-700 dark:text-gray-200 dark:file:bg-white/5 dark:file:text-gray-100"
         />
       </div>
 
       {template && (
-        <label className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+        <label className="liquid-glass-inset flex items-center gap-3 rounded-2xl border border-app-border bg-white/60 px-4 py-3 text-sm text-gray-700 dark:border-gray-700 dark:text-gray-300">
           <input
             name="isActive"
             type="checkbox"
@@ -247,7 +252,7 @@ function TemplateFields({
         </label>
       )}
 
-      <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+      <div className="liquid-glass-inset rounded-2xl border border-app-border p-4 dark:border-gray-700">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -260,7 +265,7 @@ function TemplateFields({
           <button
             type="button"
             onClick={() => setIsApproverModalOpen(true)}
-            className="inline-flex h-10 items-center gap-2 rounded-lg border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
+            className="inline-flex h-10 items-center gap-2 rounded-2xl border border-brand-200 bg-brand-50 px-4 text-sm font-medium text-brand-700 transition hover:bg-brand-100 dark:border-brand-500/30 dark:bg-brand-500/15 dark:text-brand-300"
           >
             <UserPlus className="h-4 w-4" />
             افزودن
@@ -268,7 +273,7 @@ function TemplateFields({
         </div>
 
         {selectedApprovers.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+          <div className="liquid-glass-inset rounded-2xl border border-dashed border-app-border p-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
             هنوز تاییدکننده‌ای انتخاب نشده است.
           </div>
         ) : (
@@ -276,7 +281,7 @@ function TemplateFields({
             {selectedApprovers.map((approver, index) => (
               <div
                 key={`${approver.user_id}-${index}`}
-                className="flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
+                className="liquid-glass-inset flex items-center justify-between gap-3 rounded-2xl border border-app-border bg-white/45 px-3 py-2 dark:border-gray-700"
               >
                 <p className="min-w-0 truncate text-sm font-medium text-gray-900 dark:text-white">
                   {index + 1}. {getPersonName(approver)}
@@ -307,7 +312,7 @@ function CreateTemplateForm({ onCancel }: { onCancel: () => void }) {
   return (
     <form
       action={formAction}
-      className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]"
+      className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
       <FormHeader
         title="قالب فرم جدید"
@@ -317,7 +322,7 @@ function CreateTemplateForm({ onCancel }: { onCancel: () => void }) {
         onCancel={onCancel}
       />
 
-      <div className="bg-white p-6 dark:bg-gray-800">
+      <div className="liquid-glass-panel rounded-[28px] border border-app-border p-6 dark:border-gray-800">
         <TemplateFields
           selectedApprovers={selectedApprovers}
           setSelectedApprovers={setSelectedApprovers}
@@ -348,7 +353,7 @@ function EditTemplateForm({
   return (
     <form
       action={formAction}
-      className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]"
+      className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
       <FormHeader
         title="ویرایش قالب فرم"
@@ -358,7 +363,7 @@ function EditTemplateForm({
         onCancel={onCancel}
       />
 
-      <div className="bg-white p-6 dark:bg-gray-800">
+      <div className="liquid-glass-panel rounded-[28px] border border-app-border p-6 dark:border-gray-800">
         <input type="hidden" name="id" value={template.id} />
         <TemplateFields
           template={template}
@@ -388,34 +393,42 @@ function TemplatesList({
   );
 
   return (
-    <div className="flex min-h-[calc(100vh-65px)] w-full flex-col lg:min-h-[calc(100vh-77px)]">
-      <div className="sticky top-[65px] z-30 flex items-center justify-between border-b border-gray-300 bg-white p-4 dark:bg-gray-900 lg:top-[77px]">
+    <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
+      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="button"
           onClick={onCreate}
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           قالب جدید
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          مدیریت قالب‌های فرم
-        </h1>
+        <div className="text-right">
+          <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
+            <PanelsTopLeft className="h-4 w-4" /> مدیریت سامانه
+          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            مدیریت قالب‌های فرم
+          </h1>
+          <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+            ساخت، ویرایش و مدیریت گردش تأیید فرم‌ها
+          </p>
+        </div>
       </div>
 
-      <div className="border-b border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
+      <div className="liquid-glass-inset rounded-2xl border border-app-border p-4 dark:border-gray-800">
         <input
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
           placeholder="جستجو در قالب‌ها..."
-          className="h-10 w-full max-w-md rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="liquid-glass-control h-10 w-full max-w-md rounded-2xl border border-app-border bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:text-white"
         />
       </div>
 
       {filteredTemplates.length > 0 ? (
-        <div className="bg-white dark:bg-gray-800">
+        <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <div className="w-full overflow-x-auto">
             <table className="w-full min-w-[720px]">
-              <thead className="border-b border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700">
+              <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
                     {"\u0639\u0646\u0648\u0627\u0646"}
@@ -432,7 +445,7 @@ function TemplatesList({
                 {filteredTemplates.map((template) => (
                   <tr
                     key={template.id}
-                    className="transition hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="transition hover:bg-white/70 dark:hover:bg-white/5"
                   >
                     <td className="px-6 py-4">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -460,7 +473,7 @@ function TemplatesList({
                         <button
                           type="button"
                           onClick={() => onEdit(template)}
-                          className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                          className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
                           title="ویرایش قالب فرم"
                           aria-label="ویرایش قالب فرم"
                         >
@@ -477,7 +490,7 @@ function TemplatesList({
                           <input type="hidden" name="id" value={template.id} />
                           <button
                             type="submit"
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-gray-300 text-gray-600 transition hover:border-red-300 hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-red-500 dark:hover:text-red-300"
+                            className="liquid-glass-control inline-flex h-8 w-8 items-center justify-center rounded-xl border border-app-border text-gray-600 transition hover:text-red-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-red-300"
                             title="حذف قالب فرم"
                             aria-label="حذف قالب فرم"
                           >
@@ -493,7 +506,7 @@ function TemplatesList({
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 flex-col items-center justify-center bg-white p-8 text-center dark:bg-gray-800">
+        <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
           <FileUp className="mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
           <p className="mb-4 text-gray-600 dark:text-gray-400">
             قالب فرمی ثبت نشده است.
@@ -501,7 +514,7 @@ function TemplatesList({
           <button
             type="button"
             onClick={onCreate}
-            className="inline-block rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+            className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white transition hover:bg-brand-600"
           >
             ایجاد قالب
           </button>

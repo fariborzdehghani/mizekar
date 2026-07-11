@@ -97,16 +97,17 @@ export default function RelatedLettersModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 backdrop-blur-sm dark:bg-gray-950/35">
-      <div className="mx-4 flex h-[82vh] max-h-180 w-full max-w-3xl flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800">
-        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+    <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-slate-950/25 p-4 backdrop-blur-md dark:bg-slate-950/55">
+      <div className="liquid-modal flex h-[82vh] max-h-180 w-full max-w-3xl flex-col overflow-hidden rounded-[28px]">
+        <div className="flex shrink-0 items-center justify-between border-b border-white/60 px-6 py-4 dark:border-white/10">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             نامه های مرتبط
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 transition hover:text-gray-700 dark:hover:text-gray-300"
+            className="liquid-glass-control inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
+            aria-label="بستن"
           >
             <X className="h-6 w-6" />
           </button>
@@ -123,11 +124,11 @@ export default function RelatedLettersModal({
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="شماره، عنوان یا بخشی از متن نامه را وارد کنید..."
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 outline-none transition focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="liquid-glass-control w-full rounded-2xl border px-4 py-2.5 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
               />
 
               {searchQuery && (
-                <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-44 overflow-y-auto rounded-lg border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700">
+                <div className="liquid-glass-surface absolute left-0 right-0 top-full z-20 mt-2 max-h-44 overflow-y-auto rounded-2xl border border-white/70 py-1 shadow-theme-lg dark:border-white/10">
                   {isSearching ? (
                     <div className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
                       در حال جستجو...
@@ -139,7 +140,7 @@ export default function RelatedLettersModal({
                           <button
                             type="button"
                             onClick={() => handleAddLetter(letter)}
-                            className="group flex w-full items-start justify-between gap-3 px-4 py-3 text-right transition hover:bg-gray-100 dark:hover:bg-gray-600"
+                            className="group flex w-full items-start justify-between gap-3 rounded-xl px-4 py-3 text-right transition hover:bg-brand-500/10 dark:hover:bg-white/5"
                           >
                             <span className="min-w-0">
                               <span className="block text-sm font-medium text-gray-900 dark:text-white">
@@ -152,7 +153,7 @@ export default function RelatedLettersModal({
                                 </span>
                               )}
                             </span>
-                            <Plus className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 transition group-hover:text-blue-500" />
+                            <Plus className="mt-0.5 h-4 w-4 shrink-0 text-gray-400 transition group-hover:text-brand-500" />
                           </button>
                         </li>
                       ))}
@@ -173,11 +174,11 @@ export default function RelatedLettersModal({
             </h3>
 
             {selectedLetters.length > 0 ? (
-              <div className="min-h-0 flex-1 space-y-2 overflow-y-auto rounded-lg border border-gray-200 p-3 dark:border-gray-600">
+              <div className="liquid-glass-inset min-h-0 flex-1 space-y-2 overflow-y-auto rounded-2xl p-3">
                 {selectedLetters.map((letter) => (
                   <div
                     key={letter.id}
-                    className="flex items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-700 dark:bg-blue-900/30"
+                    className="flex items-start justify-between gap-3 rounded-2xl border border-brand-200/70 bg-brand-500/10 px-4 py-3 dark:border-brand-400/20 dark:bg-brand-500/10"
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -201,18 +202,18 @@ export default function RelatedLettersModal({
                 ))}
               </div>
             ) : (
-              <div className="flex min-h-48 flex-1 items-center justify-center rounded-lg border border-dashed border-gray-200 text-center text-gray-500 dark:border-gray-600 dark:text-gray-400">
+              <div className="liquid-glass-inset flex min-h-48 flex-1 items-center justify-center rounded-2xl border-dashed text-center text-gray-500 dark:text-gray-400">
                 <p className="text-sm">هنوز نامه مرتبطی انتخاب نشده</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex shrink-0 justify-end gap-3 border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+        <div className="flex shrink-0 justify-end gap-3 border-t border-white/60 px-6 py-4 dark:border-white/10">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 px-6 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="rounded-2xl bg-brand-500 px-6 py-2.5 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
           >
             بستن
           </button>

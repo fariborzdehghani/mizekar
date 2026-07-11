@@ -46,11 +46,11 @@ type InboxBriefContextValue = {
   closeBrief: () => void;
 };
 const AI_SOLID_BUTTON_CLASS =
-  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+  "inline-flex items-center justify-center gap-2 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 dark:border-brand-400/40 dark:bg-brand-500 dark:hover:bg-brand-600";
 const AI_SOFT_BUTTON_CLASS =
   AI_SOLID_BUTTON_CLASS;
 const AI_ICON_CLASS =
-  "bg-purple-600 text-white dark:bg-purple-600";
+  "bg-brand-500 text-white shadow-lg shadow-brand-500/20 dark:bg-brand-500";
 
 const InboxBriefContext = createContext<InboxBriefContextValue | null>(null);
 
@@ -200,7 +200,7 @@ export function InboxBriefProvider({
 
       {isReadyNotificationOpen && brief && !isOpen && (
         <div
-          className="fixed bottom-4 left-4 z-[1000000] w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-purple-600 bg-app-panel p-3 text-right shadow-2xl dark:border-purple-600 dark:bg-gray-900"
+          className="liquid-glass-surface fixed bottom-4 left-4 z-[1000000] w-[min(22rem,calc(100vw-2rem))] rounded-3xl border p-4 text-right shadow-2xl ring-1 ring-brand-500/15"
           dir="rtl"
           role="status"
         >
@@ -225,7 +225,7 @@ export function InboxBriefProvider({
             <button
               type="button"
               onClick={() => setIsReadyNotificationOpen(false)}
-              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-white"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-gray-400 transition hover:bg-white/45 hover:text-gray-600 dark:hover:bg-white/[0.06] dark:hover:text-white"
               aria-label="بستن اعلان اقدامات پیشنهادی"
             >
               <X className="h-4 w-4" />
@@ -235,15 +235,15 @@ export function InboxBriefProvider({
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-[1000000] flex items-center justify-center bg-black/50 p-4 font-iransans">
+        <div className="fixed inset-0 z-[1000000] flex items-center justify-center bg-slate-950/35 p-4 font-iransans backdrop-blur-sm">
           <section
-            className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-lg border border-app-border bg-app-panel shadow-2xl dark:border-gray-800 dark:bg-gray-900"
+            className="liquid-modal flex max-h-[85vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl shadow-2xl"
             dir="rtl"
           >
-            <header className="flex items-start justify-between gap-4 border-b border-app-border bg-app-header-page/80 px-5 py-4 dark:border-gray-800">
+            <header className="flex items-start justify-between gap-4 border-b border-white/50 bg-white/25 px-5 py-4 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-purple-600 dark:text-purple-600" />
+                  <Sparkles className="h-5 w-5 text-brand-600 dark:text-brand-300" />
                   <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                     اقدامات پیشنهادی هوش مصنوعی
                   </h2>
@@ -258,7 +258,7 @@ export function InboxBriefProvider({
               <button
                 type="button"
                 onClick={closeBrief}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-gray-500 transition hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-gray-500 transition hover:bg-white/45 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/[0.06] dark:hover:text-white"
                 aria-label="بستن اقدامات پیشنهادی هوش مصنوعی"
               >
                 <X className="h-5 w-5" />
@@ -268,19 +268,19 @@ export function InboxBriefProvider({
             <div className="min-h-56 overflow-y-auto p-5">
               {isCreating ? (
                 <div className="flex min-h-48 flex-col items-center justify-center gap-3 text-center text-sm text-gray-600 dark:text-gray-300">
-                  <Loader2 className="h-8 w-8 animate-spin text-purple-600 dark:text-purple-600" />
+                  <Loader2 className="h-8 w-8 animate-spin text-brand-600 dark:text-brand-300" />
                   در حال آماده‌سازی اقدامات پیشنهادی هوش مصنوعی...
                 </div>
               ) : error ? (
                 <div className="space-y-4">
-                  <div className="flex gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-950/30 dark:text-gray-200">
+                  <div className="liquid-glass-inset flex gap-3 rounded-2xl px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
                     <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
                     <p>{error}</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
+                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-xl px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     تلاش دوباره
@@ -297,7 +297,7 @@ export function InboxBriefProvider({
                       {brief.items.map((item, index) => (
                         <article
                           key={item.id}
-                          className="rounded-lg border border-app-border bg-white/65 p-4 dark:border-gray-800 dark:bg-gray-950/40"
+                          className="liquid-glass-inset rounded-2xl p-4"
                         >
                           <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <h3 className="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
@@ -306,7 +306,7 @@ export function InboxBriefProvider({
                             <Link
                               href={item.actionHref}
                               onClick={closeBrief}
-                              className={`${AI_SOLID_BUTTON_CLASS} h-9 shrink-0 rounded-md px-3 text-sm font-medium`}
+                              className={`${AI_SOLID_BUTTON_CLASS} h-9 shrink-0 rounded-xl px-3 text-sm font-medium`}
                             >
                               {item.actionLabel}
                               <ArrowUpRight className="h-4 w-4" />
@@ -323,7 +323,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className={`${AI_SOFT_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
+                    className={`${AI_SOFT_BUTTON_CLASS} h-9 rounded-xl px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     ایجاد اقدامات جدید
@@ -337,7 +337,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-md px-3 text-sm font-medium`}
+                    className={`${AI_SOLID_BUTTON_CLASS} h-9 rounded-xl px-3 text-sm font-medium`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     ایجاد اقدامات پیشنهادی

@@ -72,11 +72,11 @@ interface LetterFormProps {
 
 const AI_RESPONSE_DRAFT_STORAGE_KEY = "mizekar:ai-response-draft";
 const AI_SOLID_BUTTON_CLASS =
-  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+  "inline-flex items-center justify-center gap-2 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60 dark:border-brand-500 dark:bg-brand-500 dark:hover:bg-brand-600";
 const AI_SOFT_BUTTON_CLASS =
   AI_SOLID_BUTTON_CLASS;
 const AI_ICON_CLASS =
-  "bg-purple-600 text-white dark:bg-purple-600";
+  "bg-brand-500 text-white dark:bg-brand-500";
 
 type StoredAiResponseDraft = {
   title: string;
@@ -985,7 +985,7 @@ export default function LetterForm({
         <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
           <div
             dir="rtl"
-            className="flex w-full max-w-2xl flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800"
+            className="liquid-glass-panel flex w-full max-w-2xl flex-col rounded-3xl border shadow-2xl"
           >
             <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <div className="flex min-w-0 items-start gap-3">
@@ -1029,7 +1029,7 @@ export default function LetterForm({
                 rows={7}
                 disabled={isNewDraftLoading}
                 placeholder="مثلا یک نامه رسمی برای درخواست تمدید قرارداد بنویس؛ لحن محترمانه باشد و به پیوست بودن مستندات اشاره کن."
-                className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm leading-7 text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:disabled:bg-gray-900/50"
+                className="liquid-glass-control w-full resize-y rounded-xl border px-4 py-3 text-sm leading-7 text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-60 dark:text-white"
               />
 
               {newDraftError && (
@@ -1039,7 +1039,7 @@ export default function LetterForm({
               )}
 
               {isNewDraftLoading && (
-                <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-800 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-100">
+                <div className="liquid-glass-inset flex items-center gap-3 rounded-xl px-4 py-3 text-sm leading-7 text-gray-800 dark:text-gray-100">
                   <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
                   <span>پیش‌نویس نامه در حال تولید است...</span>
                 </div>
@@ -1051,7 +1051,7 @@ export default function LetterForm({
                 type="button"
                 onClick={handleCloseNewDraftModal}
                 disabled={isNewDraftLoading}
-                className="h-10 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="liquid-glass-control h-10 rounded-xl border px-4 text-sm font-medium text-gray-700 transition hover:border-brand-300 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-300"
               >
                 انصراف
               </button>
@@ -1075,8 +1075,8 @@ export default function LetterForm({
 
       {isViewMode && initialLetter?.id && isAiSummaryModalOpen && (
         <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
-          <div className="flex h-[82vh] max-h-[760px] w-full max-w-6xl flex-col rounded-lg bg-white shadow-lg dark:bg-gray-800">
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+          <div className="liquid-glass-panel flex h-[82vh] max-h-[760px] w-full max-w-6xl flex-col rounded-3xl border shadow-2xl">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-white/50 px-6 py-4 dark:border-white/10">
               <div className="flex min-w-0 items-start gap-3">
                 <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${AI_ICON_CLASS}`}>
                   {isAiSummaryLoading ? (
@@ -1111,7 +1111,7 @@ export default function LetterForm({
             <div className="grid min-h-0 flex-1 grid-cols-1 gap-5 overflow-y-auto p-6 [direction:ltr] md:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
               <section
                 dir="rtl"
-                className="flex min-h-0 flex-col rounded-lg border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
+                className="liquid-glass-inset flex min-h-0 flex-col rounded-2xl p-4"
               >
                 <div className="flex min-h-0 flex-1 flex-col space-y-3">
                   <label
@@ -1127,7 +1127,7 @@ export default function LetterForm({
                     rows={4}
                     disabled={!canCreateResponseDraft || isDraftLoading}
                     placeholder="مثلا پاسخ رسمی تهیه کن، روی تایید موارد مالی تاکید کن و درخواست زمان‌بندی بعدی را هم اضافه کن."
-                    className="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:opacity-70 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:disabled:bg-gray-900/50 dark:disabled:text-gray-500"
+                    className="liquid-glass-control w-full resize-y rounded-xl border px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-70 dark:text-white dark:disabled:text-gray-500"
                   />
                   {draftError && (
                     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
@@ -1135,7 +1135,7 @@ export default function LetterForm({
                     </div>
                   )}
                   {isDraftLoading && (
-                    <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-800 dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-100">
+                    <div className="liquid-glass-inset flex items-center gap-3 rounded-xl px-4 py-3 text-sm leading-7 text-gray-800 dark:text-gray-100">
                       <span>
                         متن پیشنویس در حالت آماده سازی با استفاده از هوش مصنوعی
                         است...
@@ -1165,7 +1165,7 @@ export default function LetterForm({
                         setDraftError(null);
                       }}
                       disabled={!canCreateResponseDraft || isDraftLoading}
-                      className="h-10 rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                      className="liquid-glass-control h-10 rounded-xl border px-4 text-sm font-medium text-gray-700 transition hover:border-brand-300 disabled:cursor-not-allowed disabled:opacity-60 dark:text-gray-300"
                     >
                       انصراف
                     </button>
@@ -1187,7 +1187,7 @@ export default function LetterForm({
                 )}
 
                 {aiSummary && (
-                  <div className="min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-words rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm leading-7 text-gray-800 [overflow-wrap:anywhere] dark:border-gray-700 dark:bg-gray-900/60 dark:text-gray-100">
+                  <div className="liquid-glass-inset min-h-0 w-full flex-1 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm leading-7 text-gray-800 [overflow-wrap:anywhere] dark:text-gray-100">
                     {aiSummary}
                   </div>
                 )}
@@ -1201,11 +1201,11 @@ export default function LetterForm({
               </section>
             </div>
 
-            <div className="flex shrink-0 justify-end border-t border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-800">
+            <div className="flex shrink-0 justify-end border-t border-white/50 px-6 py-4 dark:border-white/10">
               <button
                 type="button"
                 onClick={handleCloseAiSummaryModal}
-                className="rounded-lg border border-gray-300 px-6 py-2 font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="liquid-glass-control rounded-xl border px-6 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
               >
                 بستن
               </button>
@@ -1214,12 +1214,13 @@ export default function LetterForm({
         </div>
       )}
 
-      <form ref={formRef} onSubmit={handleSubmit} className="bg-white dark:bg-gray-900">
-        <div className="sticky top-16.25 lg:top-19.25 z-30 p-4 flex justify-between items-center border-b border-gray-300 bg-white dark:bg-gray-900">
-          <div className="flex items-center gap-3">
+      <div className="liquid-content-frame liquid-glass-page space-y-6 py-4 sm:py-6 lg:py-8">
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition font-medium"
+              className="liquid-glass-control rounded-xl border px-4 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
             >
               بازگشت
             </Link>
@@ -1227,7 +1228,7 @@ export default function LetterForm({
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
+                className="rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading
                   ? initialLetter
@@ -1284,7 +1285,7 @@ export default function LetterForm({
           </div>
         </div>
 
-        <div className="bg-white p-6 dark:bg-gray-900">
+        <div className="liquid-glass-header rounded-3xl border p-5 sm:p-6">
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-md text-sm">
               {error}
@@ -1308,7 +1309,7 @@ export default function LetterForm({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="عنوان نامه را وارد کنید"
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="liquid-glass-control w-full rounded-xl border px-4 py-2 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:text-white"
             />
           </div>
 
@@ -1320,12 +1321,12 @@ export default function LetterForm({
 
             {/* Selected Recipients Display */}
             <div className="flex flex-col">
-              <div className="w-full flex flex-wrap h-30 gap-2 overflow-y-auto mb-3 p-4 space-y-2 rounded-lg border border-gray-300 bg-white dark:bg-gray-900">
+              <div className="liquid-glass-inset mb-3 flex h-30 w-full flex-wrap gap-2 space-y-2 overflow-y-auto rounded-2xl p-4">
                 {selectedRecipients.length > 0 ? (
                   selectedRecipients.map((recipient) => (
                     <div
                       key={recipient.id}
-                      className="flex h-10 max-w-full items-center justify-between gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-700 dark:bg-blue-900/30"
+                      className="flex h-10 max-w-full items-center justify-between gap-2 rounded-xl border border-brand-200/80 bg-brand-50/70 px-4 py-3 dark:border-brand-500/30 dark:bg-brand-500/15"
                     >
                       <span className="me-3 min-w-0 truncate text-gray-900 dark:text-white">
                         {getPersonName(recipient)}
@@ -1353,7 +1354,7 @@ export default function LetterForm({
                 <button
                   type="button"
                   onClick={() => setIsRecipientsModalOpen(true)}
-                  className="w-40 h-10 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                  className="h-10 w-40 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
                 >
                   انتخاب گیرندگان...
                 </button>
@@ -1368,19 +1369,19 @@ export default function LetterForm({
             </label>
 
             <div className="flex flex-col">
-              <div className="w-full min-h-30 max-h-48 overflow-y-auto mb-3 rounded-lg border border-gray-300 bg-white p-4 dark:border-gray-600 dark:bg-gray-900">
+              <div className="liquid-glass-inset mb-3 max-h-48 min-h-30 w-full overflow-y-auto rounded-2xl p-4">
                 {selectedRelatedLetters.length > 0 ? (
                   <div className="flex flex-col gap-2">
                     {selectedRelatedLetters.map((letter) => (
                       <div
                         key={letter.id}
-                        className="flex items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-700 dark:bg-blue-900/30"
+                        className="flex items-start justify-between gap-3 rounded-xl border border-brand-200/80 bg-brand-50/70 px-4 py-3 dark:border-brand-500/30 dark:bg-brand-500/15"
                       >
                         <div className="min-w-0">
                           {isViewMode ? (
                             <Link
                               href={`/letter?id=${letter.id}&viewOnly=true`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                              className="text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
                             >
                               {getLetterNumber(letter)} -{" "}
                               {letter.title || "(بدون عنوان)"}
@@ -1420,7 +1421,7 @@ export default function LetterForm({
                 <button
                   type="button"
                   onClick={() => setIsRelatedLettersModalOpen(true)}
-                  className="h-10 w-44 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+                  className="h-10 w-44 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
                 >
                   انتخاب نامه مرتبط...
                 </button>
@@ -1460,7 +1461,7 @@ export default function LetterForm({
             )}
             {isViewMode ? (
               <div
-                className="prose max-w-none min-h-80 rounded-lg border border-gray-300 bg-white p-4 text-gray-900 dark:prose-invert dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+                className="liquid-glass-inset prose min-h-80 max-w-none rounded-2xl p-4 text-gray-900 dark:prose-invert dark:text-white"
                 dangerouslySetInnerHTML={{
                   __html: content || "<p>محتوایی ثبت نشده است</p>",
                 }}
@@ -1497,18 +1498,18 @@ export default function LetterForm({
                 نامه های مرتبط ({selectedRelatedLetters.length})
               </label>
 
-              <div className="mb-4 flex h-50 w-full flex-col gap-2 overflow-y-auto rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-600 dark:bg-gray-900">
+              <div className="liquid-glass-inset mb-4 flex h-50 w-full flex-col gap-2 overflow-y-auto rounded-2xl p-3">
                 {selectedRelatedLetters.length > 0 ? (
                   selectedRelatedLetters.map((letter) => (
                     <div
                       key={letter.id}
-                      className="flex items-start justify-between gap-3 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 transition dark:border-blue-700 dark:bg-blue-900/30"
+                      className="flex items-start justify-between gap-3 rounded-xl border border-brand-200/80 bg-brand-50/70 px-3 py-2 transition dark:border-brand-500/30 dark:bg-brand-500/15"
                     >
                       <div className="min-w-0">
                         {isViewMode ? (
                           <Link
                             href={`/letter?id=${letter.id}&viewOnly=true`}
-                            className="block truncate text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="block truncate text-sm font-medium text-brand-600 hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
                           >
                             {getLetterNumber(letter)} -{" "}
                             {letter.title || "(بدون عنوان)"}
@@ -1532,7 +1533,7 @@ export default function LetterForm({
                     </div>
                   ))
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center rounded-lg border border-dashed border-gray-200 bg-gray-50 text-center text-sm text-gray-500 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-400">
+                  <div className="liquid-glass-control flex h-full w-full items-center justify-center rounded-xl border border-dashed text-center text-sm text-gray-500 dark:text-gray-400">
                     هنوز نامه مرتبطی انتخاب نشده
                   </div>
                 )}
@@ -1542,7 +1543,7 @@ export default function LetterForm({
                 <button
                   type="button"
                   onClick={() => setIsRelatedLettersModalOpen(true)}
-                  className="h-10 w-44 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
+                  className="h-10 w-44 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
                 >
                   انتخاب نامه مرتبط...
                 </button>
@@ -1562,6 +1563,7 @@ export default function LetterForm({
       )}
 
       {initialLetter && tagsSection}
+      </div>
     </>
   );
 }

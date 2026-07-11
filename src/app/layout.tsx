@@ -7,14 +7,25 @@ export const metadata: Metadata = {
   title: "میز کار",
 };
 
+const themeScript = `
+  try {
+    const saved = localStorage.getItem('theme');
+    const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.classList.toggle('dark', dark);
+  } catch (_) {}
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
-      <body className="bg-app-canvas dark:bg-gray-950" style={{ fontFamily: "'iransans', sans-serif" }}>
+    <html lang="fa" dir="rtl" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body style={{ fontFamily: "'iransans', sans-serif" }}>
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
         </ThemeProvider>

@@ -22,7 +22,7 @@ type Suggestion = Extract<
   { success: true; shouldSuggest: true }
 >;
 const AI_SOLID_BUTTON_CLASS =
-  "inline-flex items-center justify-center gap-2 border border-purple-600 bg-purple-600 text-white transition hover:bg-purple-600 disabled:cursor-default disabled:opacity-60 dark:border-purple-600 dark:bg-purple-600 dark:hover:bg-purple-600";
+  "inline-flex items-center justify-center gap-2 border border-brand-500 bg-brand-500 text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-default disabled:opacity-60 dark:border-brand-400/40 dark:bg-brand-500 dark:hover:bg-brand-600";
 
 export default function LetterArchiveSuggestionToast({
   letterId,
@@ -155,12 +155,12 @@ export default function LetterArchiveSuggestionToast({
 
   return (
     <div
-      className="fixed bottom-5 left-5 z-[1000000] w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-lg border border-purple-600 bg-white text-right shadow-xl dark:border-purple-600 dark:bg-gray-900"
+      className="liquid-glass-surface fixed bottom-5 left-5 z-[1000000] w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-3xl border text-right shadow-2xl ring-1 ring-brand-500/15"
       dir="rtl"
       role="status"
     >
       <div className="flex items-start gap-3 px-4 py-3">
-        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-purple-600 text-white dark:bg-purple-600">
+        <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-lg shadow-brand-500/20 dark:bg-brand-500">
           {isArchiving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : suggestion?.alreadyArchived ? (
@@ -190,7 +190,7 @@ export default function LetterArchiveSuggestionToast({
               type="button"
               onClick={handleArchive}
               disabled={isArchiving || suggestion.alreadyArchived}
-              className={`${AI_SOLID_BUTTON_CLASS} mt-3 h-9 rounded-md px-3 text-xs font-medium`}
+              className={`${AI_SOLID_BUTTON_CLASS} mt-3 h-9 rounded-xl px-3 text-xs font-medium`}
             >
               {isArchiving ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -211,7 +211,7 @@ export default function LetterArchiveSuggestionToast({
       <button
         type="button"
         onClick={handleClose}
-        className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-800 dark:hover:text-white"
+        className="absolute left-2 top-2 flex h-8 w-8 items-center justify-center rounded-xl text-gray-400 transition hover:bg-white/45 hover:text-gray-700 dark:hover:bg-white/[0.06] dark:hover:text-white"
         aria-label="بستن پیشنهاد بایگانی"
       >
         <X className="h-4 w-4" />

@@ -115,12 +115,12 @@ export default function FileAttachmentManager({
         </label>
 
         {/* File List */}
-        <div className="flex h-50 w-full flex-wrap content-start items-start gap-2 overflow-y-auto mb-4 p-3 rounded-lg border border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900">
+        <div className="liquid-glass-inset mb-4 flex h-50 w-full flex-wrap content-start items-start gap-2 overflow-y-auto rounded-2xl p-3">
           {attachments.length > 0 ? (
             attachments.map((attachment) => (
               <div
                 key={attachment.id}
-                className="flex h-12 w-fit max-w-full items-center justify-between gap-3 px-3 py-2 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg group hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                className="liquid-glass-control group flex h-12 w-fit max-w-full items-center justify-between gap-3 rounded-xl border px-3 py-2 transition hover:border-brand-200 dark:hover:border-brand-400/20"
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="text-xl shrink-0">
@@ -136,14 +136,14 @@ export default function FileAttachmentManager({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex shrink-0 items-center gap-2 opacity-70 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
                   {/* View Button - for image files or if onViewFile is provided */}
                   {onViewFile && (
                     <button
                       type="button"
                       onClick={() => handleViewFile(attachment)}
                       title="مشاهده فایل"
-                      className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition"
+                      className="rounded-lg p-2 text-brand-600 transition hover:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/15"
                     >
                       <Eye size={18} />
                     </button>
@@ -155,7 +155,7 @@ export default function FileAttachmentManager({
                       type="button"
                       onClick={() => handleDownloadFile(attachment)}
                       title="دانلود فایل"
-                      className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded transition"
+                      className="rounded-lg p-2 text-emerald-600 transition hover:bg-emerald-500/10 dark:text-emerald-300 dark:hover:bg-emerald-500/15"
                     >
                       <Download size={18} />
                     </button>
@@ -167,7 +167,7 @@ export default function FileAttachmentManager({
                       type="button"
                       onClick={() => onRemoveFile(attachment.id)}
                       title="حذف فایل"
-                      className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition"
+                      className="rounded-lg p-2 text-red-600 transition hover:bg-red-500/10 dark:text-red-300 dark:hover:bg-red-500/15"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -176,7 +176,7 @@ export default function FileAttachmentManager({
               </div>
             ))
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-center bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg border-dashed">
+            <div className="flex h-full w-full items-center justify-center rounded-xl border border-dashed border-white/70 bg-white/20 text-center dark:border-white/10 dark:bg-white/[0.025]">
               <p className="text-gray-500 dark:text-gray-400 text-sm">
                 هنوز فایلی پیوست نشده
               </p>
@@ -198,7 +198,7 @@ export default function FileAttachmentManager({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-40 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 transition font-medium"
+              className="w-40 rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
             >
               + افزودن فایل
             </button>

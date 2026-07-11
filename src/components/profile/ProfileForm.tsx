@@ -32,8 +32,8 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
 
   return (
     <form action={formAction} className="space-y-6">
-      <div className="flex flex-col gap-5 border-b border-gray-200 pb-6 dark:border-gray-800 sm:flex-row sm:items-center">
-        <div className="h-24 w-24 overflow-hidden rounded-full border border-gray-200 bg-gray-100 dark:border-gray-700 dark:bg-gray-800">
+      <div className="liquid-glass-inset flex flex-col gap-5 rounded-3xl p-5 sm:flex-row sm:items-center">
+        <div className="h-24 w-24 overflow-hidden rounded-full border border-white/70 bg-white/35 shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={photoSrc}
@@ -49,7 +49,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
           <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             {profile.userId}
           </p>
-          <label className="mt-4 inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-white/5">
+          <label className="liquid-glass-control mt-4 inline-flex h-10 items-center justify-center rounded-2xl border px-4 text-sm font-medium text-gray-700 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300">
             انتخاب تصویر
             <input
               name="photo"
@@ -82,7 +82,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
             name="firstName"
             type="text"
             defaultValue={profile.firstName}
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
           />
         </div>
 
@@ -98,12 +98,12 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
             name="lastName"
             type="text"
             defaultValue={profile.lastName}
-            className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+            className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
           />
         </div>
       </div>
 
-      <div className="border-t border-gray-200 pt-6 dark:border-gray-800">
+      <div className="liquid-glass-inset rounded-3xl p-5">
         <h3 className="text-base font-semibold text-gray-900 dark:text-white">
           تغییر رمز عبور
         </h3>
@@ -121,7 +121,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
               name="currentPassword"
               type="password"
               autoComplete="current-password"
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
           </div>
 
@@ -138,7 +138,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
               type="password"
               autoComplete="new-password"
               minLength={8}
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
           </div>
 
@@ -155,7 +155,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
               type="password"
               autoComplete="new-password"
               minLength={8}
-              className="h-11 w-full rounded-lg border border-gray-300 bg-white px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
           </div>
         </div>
@@ -177,7 +177,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         <button
           type="submit"
           disabled={pending}
-          className="flex h-11 min-w-32 items-center justify-center rounded-lg bg-brand-500 px-5 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
+          className="flex h-11 min-w-32 items-center justify-center rounded-2xl bg-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
         >
           {pending ? "در حال ذخیره..." : "ذخیره تغییرات"}
         </button>

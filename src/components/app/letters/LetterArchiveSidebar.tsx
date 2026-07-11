@@ -9,16 +9,16 @@ import {
 import {
   ChevronDown,
   ChevronLeft,
-  ChevronRight,
   Folder,
   FolderOpen,
   Inbox,
   Pencil,
   Plus,
+  Send,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   FormEvent,
   MouseEvent,
@@ -34,6 +34,8 @@ interface LetterArchiveSidebarProps {
   folders: ArchiveFolderNode[];
   selectedFolderId?: number | null;
   defaultOpen?: boolean;
+  isOpen?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 type FolderContextMenu = {
@@ -105,8 +107,11 @@ export default function LetterArchiveSidebar({
   folders,
   selectedFolderId = null,
   defaultOpen = false,
+  isOpen,
+  onOpenChange,
 }: LetterArchiveSidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const archiveSelection = useArchiveSelection();
   const dialogInputRef = useRef<HTMLInputElement>(null);
@@ -119,7 +124,8 @@ export default function LetterArchiveSidebar({
     () => new Set(getFolderAncestorIds(folders, selectedFolderId)),
   );
   const [isRootExpanded, setIsRootExpanded] = useState(true);
-  const [isArchiveSidebarOpen, setIsArchiveSidebarOpen] = useState(defaultOpen);
+  const [internalIsOpen, setInternalIsOpen] = useState(defaultOpen);
+  const isArchiveSidebarOpen = isOpen ?? internalIsOpen;
   const [contextMenu, setContextMenu] = useState<FolderContextMenu>(null);
   const [isPending, startTransition] = useTransition();
   const isArchiveTargetMode = Boolean(archiveSelection?.pendingItem);
@@ -136,6 +142,11 @@ export default function LetterArchiveSidebar({
   const getInboxHref = () => {
     const query = searchQuery.trim();
     return query ? `/incoming-letters?q=${encodeURIComponent(query)}` : "/incoming-letters";
+  };
+
+  const getOutgoingHref = () => {
+    const query = searchQuery.trim();
+    return query ? `/outgoing-letters?q=${encodeURIComponent(query)}` : "/outgoing-letters";
   };
 
   const selectedExists = useMemo(
@@ -349,7 +360,11 @@ export default function LetterArchiveSidebar({
 
   const setArchiveSidebarOpen = (isOpen: boolean) => {
     setContextMenu(null);
-    setIsArchiveSidebarOpen(isOpen);
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    } else {
+      setInternalIsOpen(isOpen);
+    }
   };
 
   const toggleExpanded = (folderId: number) => {
@@ -443,25 +458,11 @@ export default function LetterArchiveSidebar({
   };
 
   if (!isArchiveSidebarVisible) {
-    return (
-      <aside className="w-full shrink-0 border-t border-app-border bg-app-archive-panel p-2 dark:border-gray-800 dark:bg-gray-900 lg:w-12 lg:border-r lg:border-t-0">
-        <button
-          type="button"
-          onClick={() => setArchiveSidebarOpen(true)}
-          className="flex h-10 w-full items-center justify-center gap-2 rounded-md text-gray-500 transition hover:bg-white/70 hover:text-blue-light-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
-          title="نمایش بایگانی"
-          aria-label="نمایش بایگانی"
-          aria-expanded={false}
-        >
-          <ChevronRight className="h-4 w-4" />
-          <span className="text-sm font-medium lg:sr-only">بایگانی</span>
-        </button>
-      </aside>
-    );
+    return null;
   }
 
   return (
-    <aside className="flex max-h-full w-full shrink-0 flex-col overflow-hidden border-t border-app-border bg-app-archive-panel p-4 dark:border-gray-800 dark:bg-gray-900 lg:w-80 lg:border-r lg:border-t-0 xl:w-80 2xl:w-80 3xl:w-80">
+    <aside className="liquid-glass-surface flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-[28px] border border-white/70 bg-app-archive-panel p-4 dark:border-white/10 dark:bg-gray-900 lg:w-[280px]">
       <div className="mb-4 flex shrink-0 items-center gap-3">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-gray-900 dark:text-white">
           بایگانی
@@ -479,6 +480,33 @@ export default function LetterArchiveSidebar({
           </button>
         )}
       </div>
+
+      <nav aria-label="کارتابل‌ها" className="mb-4 shrink-0 space-y-1 border-b border-black/5 pb-4 dark:border-white/5">
+        <Link
+          href={getInboxHref()}
+          aria-current={pathname === "/incoming-letters" ? "page" : undefined}
+          className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-semibold transition ${
+            pathname === "/incoming-letters"
+              ? "bg-brand-500/10 text-brand-600 dark:text-brand-300"
+              : "text-gray-600 hover:bg-white/60 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/5"
+          }`}
+        >
+          <Inbox className="h-4 w-4" />
+          <span className="flex-1">دریافتی</span>
+        </Link>
+        <Link
+          href={getOutgoingHref()}
+          aria-current={pathname === "/outgoing-letters" ? "page" : undefined}
+          className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-semibold transition ${
+            pathname === "/outgoing-letters"
+              ? "bg-brand-500/10 text-brand-600 dark:text-brand-300"
+              : "text-gray-600 hover:bg-white/60 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/5"
+          }`}
+        >
+          <Send className="h-4 w-4" />
+          <span className="flex-1">ارسال‌شده</span>
+        </Link>
+      </nav>
 
       {archiveSelection?.pendingItem && (
         <div className="mb-3 shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs leading-5 text-blue-700 dark:border-blue-800 dark:bg-blue-500/15 dark:text-blue-200">
@@ -532,7 +560,7 @@ export default function LetterArchiveSidebar({
 
       {contextMenu && (
         <div
-          className="fixed z-50 min-w-44 overflow-hidden rounded-md border border-app-border bg-app-panel py-1 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-800"
+          className="liquid-glass-surface fixed z-50 min-w-44 overflow-hidden rounded-2xl border border-app-border bg-app-panel py-1 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-800"
           style={{
             left: contextMenu.x,
             top: contextMenu.y,
@@ -611,7 +639,7 @@ export default function LetterArchiveSidebar({
           <form
             onSubmit={submitFolderDialog}
             onMouseDown={(event) => event.stopPropagation()}
-            className="w-full max-w-sm rounded-lg border border-app-border bg-app-panel p-4 text-right shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+            className="liquid-modal w-full max-w-sm rounded-[24px] border border-app-border bg-app-panel p-4 text-right shadow-2xl dark:border-gray-700 dark:bg-gray-900"
           >
             <div className="mb-4">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -653,7 +681,7 @@ export default function LetterArchiveSidebar({
               <button
                 type="submit"
                 disabled={isPending}
-                className="rounded-md bg-blue-light-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-light-700 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-xl bg-brand-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? "در حال انجام..." : folderDialog.submitText}
               </button>
