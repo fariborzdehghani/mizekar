@@ -244,8 +244,8 @@ const AppSidebar: React.FC = () => {
                     <li key={subItem.name} className="w-full">
                       <Link
                         href={subItem.path}
-                        onClick={() => {
-                          setManualOpenSubmenu(undefined);
+                        onNavigate={() => {
+                          setManualOpenSubmenu({ type: menuType, index });
                           if (isMobileOpen) toggleMobileSidebar();
                         }}
                         aria-current={
@@ -301,6 +301,10 @@ const AppSidebar: React.FC = () => {
 
   const openSubmenu =
     manualOpenSubmenu === undefined ? activeSubmenu : manualOpenSubmenu;
+
+  useEffect(() => {
+    setManualOpenSubmenu(undefined);
+  }, [pathname]);
 
   const handleSubmenuToggle = (index: number, menuType: "main" | "others") => {
     setManualOpenSubmenu(() => {

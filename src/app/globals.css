@@ -1088,6 +1088,24 @@ html:not(.dark) .liquid-glass-app :where(
   line-height: 1.35;
 }
 
+/* Keep every page-header action bar on the same control-size standard. */
+.liquid-page-header > :where(a, button),
+.liquid-page-header > div > :where(a, button) {
+  height: 2.5rem;
+  min-height: 2.5rem;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .liquid-glass-panel {
   position: relative;
   overflow: hidden;
@@ -1931,6 +1949,12 @@ html:not(.dark) .liquid-glass-sidebar .menu-item-inactive:hover {
 
 .liquid-glass-sidebar
   .sidebar-menu-item-collapsed.menu-item-active {
+  box-shadow: none !important;
+}
+
+/* Selected navigation stays distinct without the reflective highlight/shadow. */
+.liquid-glass-sidebar .menu-item-active,
+.liquid-glass-sidebar .sidebar-submenu-item.menu-dropdown-item-active {
   box-shadow: none !important;
 }
 

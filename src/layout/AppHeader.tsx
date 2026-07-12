@@ -570,7 +570,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
               <Dropdown
                 isOpen={isAdvancedSearchOpen}
                 onClose={() => setIsAdvancedSearchOpen(false)}
-                className="top-full mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-[22px] p-4 text-right"
+                className="profile-dropdown-panel top-full mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-[22px] p-4 text-right"
               >
                 <div className="mb-4 flex items-center justify-between gap-3 border-b border-app-border pb-3 dark:border-gray-800">
                   <button

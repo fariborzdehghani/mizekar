@@ -341,6 +341,12 @@ export default function LetterReferralList({
       <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] overflow-x-clip pt-4 pb-4 sm:pb-5 lg:pb-6">
         <section className="flex min-w-0 flex-col gap-4">
           <div className="liquid-page-header sticky top-[108px] z-40 flex shrink-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <Link
+              href="/letter"
+              className="flex h-11 items-center justify-center gap-2 rounded-[15px] bg-brand-500 px-5 text-xs font-bold text-white shadow-[0_12px_28px_rgba(98,92,255,.3)] transition hover:bg-brand-600"
+            >
+              <PenLine className="h-4 w-4" /> ایجاد نامه جدید
+            </Link>
             <div className="text-right">
               <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
                 <Mail className="h-4 w-4" /> مرکز مکاتبات
@@ -352,12 +358,6 @@ export default function LetterReferralList({
                 نامه‌ها، ارجاعات و مکاتبات سازمانی شما در یک جا
               </p>
             </div>
-            <Link
-              href="/letter"
-              className="flex h-11 items-center justify-center gap-2 rounded-[15px] bg-brand-500 px-5 text-xs font-bold text-white shadow-[0_12px_28px_rgba(98,92,255,.3)] transition hover:bg-brand-600"
-            >
-              <PenLine className="h-4 w-4" /> ایجاد نامه جدید
-            </Link>
           </div>
           <InboxArchiveLayout folders={archiveFolders}>
         <main className="liquid-glass-surface flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-[28px] border border-white/70 dark:border-white/10">

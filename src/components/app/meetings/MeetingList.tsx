@@ -185,11 +185,6 @@ export default function MeetingList({
                         {meeting.location_type === 1 ? "آنلاین" : "حضوری"}
                       </span>
                     </span>
-                    {meeting.location_title && (
-                      <span className="whitespace-normal text-gray-500 dark:text-gray-400">
-                        {meeting.location_title}
-                      </span>
-                    )}
                   </td>
                   <td className="w-80 px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                     <span className="block max-w-80 truncate">
