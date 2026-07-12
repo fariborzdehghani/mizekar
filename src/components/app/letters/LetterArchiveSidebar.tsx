@@ -36,6 +36,7 @@ interface LetterArchiveSidebarProps {
   defaultOpen?: boolean;
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
+  compactStickyOffset?: boolean;
 }
 
 type FolderContextMenu = {
@@ -109,6 +110,7 @@ export default function LetterArchiveSidebar({
   defaultOpen = false,
   isOpen,
   onOpenChange,
+  compactStickyOffset = false,
 }: LetterArchiveSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -462,7 +464,7 @@ export default function LetterArchiveSidebar({
   }
 
   return (
-    <aside className="liquid-glass-surface flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-[28px] border border-white/70 bg-app-archive-panel p-4 dark:border-white/10 dark:bg-gray-900 lg:w-[280px]">
+    <aside className={`liquid-glass-surface flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-[28px] border border-white/70 bg-app-archive-panel p-4 dark:border-white/10 dark:bg-gray-900 lg:sticky lg:z-30 lg:w-[280px] ${compactStickyOffset ? "lg:top-[214px] lg:max-h-[calc(100dvh-230px)]" : "lg:top-[246px] lg:max-h-[calc(100dvh-262px)]"}`}>
       <div className="mb-4 flex shrink-0 items-center gap-3">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-gray-900 dark:text-white">
           بایگانی

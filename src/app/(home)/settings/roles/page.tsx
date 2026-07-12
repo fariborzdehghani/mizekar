@@ -15,6 +15,9 @@ export default async function RolesSettingsPage({
   searchParams,
 }: RolesSettingsPageProps) {
   const params = await searchParams;
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   await requireUser();
 
   const [roles, permissions] = await Promise.all([
@@ -59,6 +62,7 @@ export default async function RolesSettingsPage({
         title: permission.title || permission.code || `دسترسی ${permission.id}`,
       }))}
       searchQuery={getSearchQuery(params)}
+      currentPage={currentPage}
     />
   );
 }

@@ -14,6 +14,9 @@ function getSearchQuery(params: { [key: string]: string | string[] | undefined }
 export default async function MeetingsPage({ searchParams }: MeetingsPageProps) {
   const params = await searchParams;
   const searchQuery = getSearchQuery(params);
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const [result, archiveResult] = await Promise.all([
     getCreatedMeetings(searchQuery),
     getLetterArchiveFolders(),
@@ -24,6 +27,7 @@ export default async function MeetingsPage({ searchParams }: MeetingsPageProps) 
       meetings={result.meetings}
       archiveFolders={archiveResult.folders}
       searchQuery={searchQuery}
+      currentPage={currentPage}
       error={result.success ? undefined : result.error}
     />
   );

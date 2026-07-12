@@ -8,7 +8,7 @@ export const ThemeToggleButton: React.FC = () => {
     <button
       onClick={toggleTheme}
       aria-label="تغییر حالت نمایش"
-      className="relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] transition hover:-translate-y-0.5 hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:text-brand-300"
+      className="liquid-glass-keyline relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
     >
       <svg
         className="hidden dark:block"

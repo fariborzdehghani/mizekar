@@ -1,6 +1,10 @@
 import { updateGeneralSetting } from "@/src/actions/settingsActions";
 import { prisma } from "@/src/lib/prisma";
 import { SlidersHorizontal } from "lucide-react";
+import ListPagination, {
+  DEFAULT_PAGE_SIZE,
+} from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 interface GeneralSettingsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -20,6 +24,9 @@ export default async function GeneralSettingsPage({
 }: GeneralSettingsPageProps) {
   const params = await searchParams;
   const searchQuery = getSearchQuery(params);
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const settings = await prisma.general_settings.findMany({
     orderBy: { id: "asc" },
   });
@@ -31,10 +38,23 @@ export default async function GeneralSettingsPage({
       normalizeSearchValue(field).includes(query)
     );
   });
+  const totalPages = Math.max(1, Math.ceil(filteredSettings.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const paginatedSettings = filteredSettings.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
+  );
+  const getPageHref = (page: number) => {
+    const nextParams = new URLSearchParams();
+    if (searchQuery) nextParams.set("q", searchQuery);
+    if (page > 1) nextParams.set("page", String(page));
+    const query = nextParams.toString();
+    return query ? `/settings/general?${query}` : "/settings/general";
+  };
 
   return (
     <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] space-y-5 py-4 sm:py-6 lg:py-8">
-      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="submit"
           form="general-settings-form"
@@ -57,7 +77,8 @@ export default async function GeneralSettingsPage({
 
       <form id="general-settings-form" action={updateGeneralSetting}>
         <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
-          <table className="w-full">
+          <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در تعاریف..." />
+          <table className="inbox-card-table inbox-card-table--settings w-full">
             <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -69,7 +90,7 @@ export default async function GeneralSettingsPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredSettings.map((setting) => (
+              {paginatedSettings.map((setting) => (
                 <tr key={setting.id} className="align-top">
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
                     {setting.title || "-"}
@@ -93,6 +114,11 @@ export default async function GeneralSettingsPage({
               تنظیمی ثبت نشده است
             </div>
           )}
+          <ListPagination
+            currentPage={activePage}
+            totalItems={filteredSettings.length}
+            hrefForPage={getPageHref}
+          />
         </div>
       </form>
     </div>

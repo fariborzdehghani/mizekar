@@ -6,6 +6,10 @@ import type {
 import LetterArchiveSidebar from "./LetterArchiveSidebar";
 import RemoveArchivedLetterButton from "./RemoveArchivedLetterButton";
 import { CalendarCheck, Eye, FileText, Mail } from "lucide-react";
+import ListPagination, {
+  DEFAULT_PAGE_SIZE,
+} from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 interface ArchivedLettersListProps {
   folders: ArchiveFolderNode[];
@@ -13,6 +17,7 @@ interface ArchivedLettersListProps {
   selectedFolderTitle?: string | null;
   items: ArchivedItemListItem[];
   searchQuery?: string;
+  currentPage?: number;
   error?: string;
 }
 
@@ -90,16 +95,31 @@ export default function ArchivedLettersList({
   selectedFolderTitle,
   items,
   searchQuery = "",
+  currentPage = 1,
   error,
 }: ArchivedLettersListProps) {
   const filteredItems = items.filter((item) =>
     archivedItemMatchesSearch(item, searchQuery)
   );
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const paginatedItems = filteredItems.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
+  );
+  const getPageHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (selectedFolderId) params.set("folderId", String(selectedFolderId));
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `/archive?${query}` : "/archive";
+  };
 
   return (
-    <div className="liquid-content-frame liquid-glass-page flex h-[calc(100vh-92px)] min-h-0 flex-col gap-6 overflow-hidden py-4 sm:py-6 lg:flex-row lg:py-8">
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="liquid-page-header liquid-page-header-inset sticky top-0 z-30 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="liquid-content-frame liquid-glass-page grid min-h-[calc(100vh-92px)] grid-cols-1 content-start items-start gap-4 py-4 sm:py-6 xl:grid-cols-[minmax(0,1fr)_280px]">
+      <main className="contents">
+        <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between xl:col-span-2">
           <Link
             href="/letter"
             className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
@@ -117,20 +137,22 @@ export default function ArchivedLettersList({
         </div>
 
         {error ? (
-          <div className="m-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
             {error}
           </div>
         ) : !selectedFolderId ? (
-          <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+          <div className="liquid-glass-panel flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
             برای مشاهده موارد بایگانی‌شده، یک پوشه را از سمت چپ انتخاب کنید
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+          <div className="liquid-glass-panel flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
             این پوشه هنوز موردی ندارد
           </div>
         ) : (
-          <div className="liquid-glass-panel m-4 flex-1 overflow-auto! rounded-[24px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
-            <table className="w-full min-w-[820px]">
+          <div className="liquid-glass-surface flex-1 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+            <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در بایگانی..." />
+            <div className="overflow-x-auto">
+            <table className="inbox-card-table inbox-card-table--archive w-full">
               <thead className="sticky top-0 z-20 border-b border-app-border bg-app-table-head shadow-[0_1px_0_rgba(16,24,40,0.08)] backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="w-28 px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -151,7 +173,7 @@ export default function ArchivedLettersList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredItems.map((item) => {
+                {paginatedItems.map((item) => {
                   const href =
                     item.type === "meeting"
                       ? `/meeting?id=${item.meeting.id}&viewOnly=true`
@@ -224,6 +246,12 @@ export default function ArchivedLettersList({
                 })}
               </tbody>
             </table>
+            </div>
+            <ListPagination
+              currentPage={activePage}
+              totalItems={filteredItems.length}
+              hrefForPage={getPageHref}
+            />
           </div>
         )}
       </main>
@@ -232,6 +260,7 @@ export default function ArchivedLettersList({
         folders={folders}
         selectedFolderId={selectedFolderId}
         defaultOpen
+        compactStickyOffset
       />
     </div>
   );

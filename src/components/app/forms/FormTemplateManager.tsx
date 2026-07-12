@@ -9,6 +9,9 @@ import {
   type FormTemplateFormState,
 } from "@/src/actions/formActions";
 import RecipientsModal from "@/src/components/app/letters/RecipientsModal";
+import ClientListPagination from "@/src/components/common/ClientListPagination";
+import { DEFAULT_PAGE_SIZE } from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 type Person = {
   id: number;
@@ -118,7 +121,7 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -388,13 +391,20 @@ function TemplatesList({
   onEdit: (template: FormTemplate) => void;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const filteredTemplates = templates.filter((template) =>
     templateMatchesSearch(template, searchQuery)
+  );
+  const totalPages = Math.max(1, Math.ceil(filteredTemplates.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(currentPage, totalPages);
+  const paginatedTemplates = filteredTemplates.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
   );
 
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
-      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="button"
           onClick={onCreate}
@@ -415,10 +425,13 @@ function TemplatesList({
         </div>
       </div>
 
-      <div className="liquid-glass-inset rounded-2xl border border-app-border p-4 dark:border-gray-800">
+      <div className="hidden">
         <input
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={(event) => {
+            setSearchQuery(event.target.value);
+            setCurrentPage(1);
+          }}
           placeholder="جستجو در قالب‌ها..."
           className="liquid-glass-control h-10 w-full max-w-md rounded-2xl border border-app-border bg-white/70 px-3 text-sm text-gray-900 outline-none transition focus:border-brand-500 dark:border-gray-700 dark:text-white"
         />
@@ -426,8 +439,16 @@ function TemplatesList({
 
       {filteredTemplates.length > 0 ? (
         <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+          <InboxListToolbar
+            searchQuery={searchQuery}
+            searchPlaceholder="جستجو در قالب‌ها..."
+            onSearchChange={(value) => {
+              setSearchQuery(value);
+              setCurrentPage(1);
+            }}
+          />
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[720px]">
+            <table className="inbox-card-table inbox-card-table--templates w-full">
               <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -442,7 +463,7 @@ function TemplatesList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredTemplates.map((template) => (
+                {paginatedTemplates.map((template) => (
                   <tr
                     key={template.id}
                     className="transition hover:bg-white/70 dark:hover:bg-white/5"
@@ -504,6 +525,11 @@ function TemplatesList({
               </tbody>
             </table>
           </div>
+          <ClientListPagination
+            currentPage={activePage}
+            totalItems={filteredTemplates.length}
+            onPageChange={setCurrentPage}
+          />
         </div>
       ) : (
         <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">

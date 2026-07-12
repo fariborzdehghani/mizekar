@@ -10,11 +10,15 @@ import {
   type LetterKeywordTag,
 } from "@/src/lib/letterTags";
 import type { CurrentUser } from "@/src/lib/auth-types";
+import Link from "next/link";
 import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  Inbox,
   Loader2,
+  Menu,
+  MessageSquare,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -40,7 +44,7 @@ const PERSIAN_MONTHS = [
 const PERSIAN_WEEK_DAYS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
 
 const AI_HEADER_BUTTON_CLASS =
-  "border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:text-brand-300";
+  "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300";
 
 const persianPartsFormatter = new Intl.DateTimeFormat(
   "fa-IR-u-ca-persian",
@@ -179,29 +183,6 @@ function getPersianMonthDays(persianYear: number, persianMonth: number) {
 function formatPersianDate(value: string) {
   const date = parseDateInputValue(value);
   return date ? persianDisplayFormatter.format(date) : "";
-}
-
-function getHeaderTitle(pathname: string, hasRecordId: boolean) {
-  if (pathname === "/" || pathname === "/incoming-letters") return "کارتابل ورودی";
-  if (pathname === "/dashboard") return "داشبورد";
-  if (pathname === "/outgoing-letters") return "کارتابل خروجی";
-  if (pathname === "/archive") return "بایگانی";
-  if (pathname === "/letter") return hasRecordId ? "مشاهده نامه" : "نامه جدید";
-  if (pathname === "/incoming-messages") return "پیام‌های ورودی";
-  if (pathname === "/outgoing-messages") return "پیام‌های خروجی";
-  if (pathname === "/new-message") return "پیام جدید";
-  if (pathname === "/message") return "مشاهده پیام";
-  if (pathname === "/meetings") return "جلسات";
-  if (pathname === "/meeting") return hasRecordId ? "مشاهده جلسه" : "جلسه جدید";
-  if (pathname === "/new-form") return "فرم جدید";
-  if (pathname === "/form") return "مشاهده فرم";
-  if (pathname === "/form-templates") return "مدیریت فرم‌ها";
-  if (pathname === "/letter-search") return "جستجوی نامه‌ها";
-  if (pathname === "/profile") return "پروفایل";
-  if (pathname === "/settings/general") return "تعاریف";
-  if (pathname === "/settings/users") return "مدیریت کاربران";
-  if (pathname === "/settings/roles") return "مدیریت نقش‌ها";
-  return "میزکار";
 }
 
 function ShamsiDatePicker({
@@ -354,7 +335,6 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchValue = searchParams.get("q") || "";
-  const pageTitle = getHeaderTitle(pathname, Boolean(searchParams.get("id")));
   const advancedTitle = searchParams.get("title") || "";
   const advancedContent = searchParams.get("content") || "";
   const advancedCreateDate = searchParams.get("createDate") || "";
@@ -365,7 +345,12 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
     LetterKeywordTag[]
   >(() => getLetterTagsFromParam(advancedTags));
 
-  const { isMobileOpen, toggleMobileSidebar } = useSidebar();
+  const {
+    isExpanded,
+    isMobileOpen,
+    toggleSidebar,
+    toggleMobileSidebar,
+  } = useSidebar();
   const { brief, isCreating, openBrief } = useInboxBrief();
   const aiButtonLabel = isCreating
     ? "هوش مصنوعی در حال آماده‌سازی اقدامات پیشنهادی است"
@@ -530,14 +515,19 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             </svg>
           </button>
 
-          <div className="hidden min-w-32 text-right md:block">
-            <p className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
-              فضای کاری /
-            </p>
-            <h1 className="mt-0.5 text-[17px] font-extrabold text-gray-900 dark:text-white">
-              {pageTitle}
-            </h1>
-          </div>
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            className="liquid-glass-keyline hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300 lg:grid"
+            title={isExpanded ? "جمع کردن نوار کناری" : "باز کردن نوار کناری"}
+            aria-label={
+              isExpanded ? "جمع کردن نوار کناری" : "باز کردن نوار کناری"
+            }
+            aria-controls="app-sidebar"
+            aria-expanded={isExpanded}
+          >
+            <Menu className="h-5 w-5" />
+          </button>
 
           <div
             ref={advancedSearchRef}
@@ -555,17 +545,17 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                   defaultValue={searchValue}
                   aria-label="جستجو در سامانه"
                   placeholder="جستجوی نامه، همکار یا واحد..."
-                  className="h-11 w-full rounded-[15px] border border-black/[0.045] bg-black/[0.035] pr-11 pl-4 text-sm font-medium text-[var(--liquid-ink)] outline-none transition placeholder:text-[var(--liquid-muted)] focus:border-brand-500/30 focus:bg-white/65 focus:ring-4 focus:ring-brand-500/10 dark:border-white/[0.06] dark:bg-white/[0.045] dark:focus:bg-white/[0.07]"
+                  className="liquid-glass-keyline h-11 w-full rounded-[15px] border bg-black/[0.035] pr-11 pl-4 text-sm font-medium text-[var(--liquid-ink)] outline-none transition placeholder:text-[var(--liquid-muted)] focus:bg-white/65 dark:bg-white/[0.045] dark:focus:bg-white/[0.07]"
                 />
               </div>
             </form>
             <button
               type="button"
               onClick={() => setIsAdvancedSearchOpen((current) => !current)}
-              className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition hover:-translate-y-0.5 sm:grid ${
+              className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
                 isAdvancedSearchOpen
                   ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
-                  : "border-black/[0.045] bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:border-white/[0.07] dark:bg-white/[0.045]"
+                  : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045]"
               }`}
               title="جستجوی پیشرفته نامه‌ها"
               aria-label="جستجوی پیشرفته نامه‌ها"
@@ -673,14 +663,40 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                 </form>
               </div>
             )}
-          </div>
-        <div className="mr-auto flex shrink-0 items-center gap-2">
+        </div>
+        <div className="mr-auto flex self-stretch shrink-0 items-center gap-2">
+          <Link
+            href="/incoming-letters"
+            title="کارتابل ورودی"
+            aria-label="کارتابل ورودی"
+            aria-current={pathname === "/" || pathname === "/incoming-letters" ? "page" : undefined}
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+              pathname === "/" || pathname === "/incoming-letters"
+                ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
+                : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
+            }`}
+          >
+            <Inbox className="h-[18px] w-[18px]" />
+          </Link>
+          <Link
+            href="/incoming-messages"
+            title="پیام‌های ورودی"
+            aria-label="پیام‌های ورودی"
+            aria-current={pathname === "/incoming-messages" ? "page" : undefined}
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+              pathname === "/incoming-messages"
+                ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
+                : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
+            }`}
+          >
+            <MessageSquare className="h-[18px] w-[18px]" />
+          </Link>
           <button
             type="button"
             onClick={openBrief}
             title={aiButtonLabel}
             aria-label={aiButtonLabel}
-            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition hover:-translate-y-0.5 sm:grid ${AI_HEADER_BUTTON_CLASS}`}
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${AI_HEADER_BUTTON_CLASS}`}
           >
             {isCreating ? (
               <Loader2 className="h-[18px] w-[18px] animate-spin" />

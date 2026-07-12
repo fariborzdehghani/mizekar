@@ -7,6 +7,8 @@ import InboxArchiveLayout, { ArchivePanelToggleButton } from "./InboxArchiveLayo
 import {
   ArrowDownUp,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Eye,
   Filter,
@@ -90,8 +92,11 @@ interface LetterReferralListProps {
   searchQuery?: string;
   itemType?: "all" | "letter" | "meeting" | "form";
   sortOrder?: "asc" | "desc";
+  currentPage?: number;
   error?: string;
 }
+
+const ITEMS_PER_PAGE = 30;
 
 const persianDatePartsFormatter = new Intl.DateTimeFormat(
   "fa-IR-u-ca-persian",
@@ -268,6 +273,7 @@ export default function LetterReferralList({
   searchQuery = "",
   itemType = "all",
   sortOrder = "desc",
+  currentPage = 1,
   error,
 }: LetterReferralListProps) {
   const filteredReferrals = referrals.filter((referral) =>
@@ -305,6 +311,13 @@ export default function LetterReferralList({
       const difference = getItemTime(secondItem.date) - getItemTime(firstItem.date);
       return sortOrder === "desc" ? difference : -difference;
     });
+  const totalPages = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const firstItemIndex = (activePage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = items.slice(
+    firstItemIndex,
+    firstItemIndex + ITEMS_PER_PAGE,
+  );
   const basePath = perspective === "incoming" ? "/incoming-letters" : "/outgoing-letters";
   const getListHref = (nextType: typeof itemType, nextSort = sortOrder) => {
     const params = new URLSearchParams();
@@ -314,11 +327,20 @@ export default function LetterReferralList({
     const query = params.toString();
     return query ? `${basePath}?${query}` : basePath;
   };
+  const getPageHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
+    if (itemType !== "all") params.set("type", itemType);
+    if (sortOrder !== "desc") params.set("sort", sortOrder);
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `${basePath}?${query}` : basePath;
+  };
   return (
     <ArchiveSelectionProvider>
-      <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] overflow-x-hidden py-4 sm:py-5 lg:py-6">
-        <section className="flex min-w-0 flex-col gap-6">
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] overflow-x-clip pt-4 pb-4 sm:pb-5 lg:pb-6">
+        <section className="flex min-w-0 flex-col gap-4">
+          <div className="liquid-page-header sticky top-[108px] z-40 flex shrink-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div className="text-right">
               <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
                 <Mail className="h-4 w-4" /> مرکز مکاتبات
@@ -332,7 +354,7 @@ export default function LetterReferralList({
             </div>
             <Link
               href="/letter"
-              className="flex h-11 items-center justify-center gap-2 rounded-[15px] bg-brand-500 px-5 text-xs font-bold text-white shadow-[0_12px_28px_rgba(98,92,255,.3)] transition hover:-translate-y-0.5 hover:bg-brand-600"
+              className="flex h-11 items-center justify-center gap-2 rounded-[15px] bg-brand-500 px-5 text-xs font-bold text-white shadow-[0_12px_28px_rgba(98,92,255,.3)] transition hover:bg-brand-600"
             >
               <PenLine className="h-4 w-4" /> ایجاد نامه جدید
             </Link>
@@ -428,8 +450,8 @@ export default function LetterReferralList({
               </div>
             </div>
           ) : (
-            <div className="flex-1 divide-y divide-black/5 overflow-auto bg-white/25 dark:divide-white/5 dark:bg-white/[0.015]">
-                  {items.map((item) => {
+            <div className="flex-1 divide-y divide-black/5 bg-white/25 dark:divide-white/5 dark:bg-white/[0.015]">
+                  {paginatedItems.map((item) => {
                     if (item.type === "meeting") {
                       const meetingReferral = item.meeting;
                       const meeting = meetingReferral.meeting;
@@ -584,9 +606,52 @@ export default function LetterReferralList({
                   })}
             </div>
           )}
-          <div className="flex items-center justify-between border-t border-black/5 px-5 py-4 text-[10px] font-medium text-gray-500 dark:border-white/5 dark:text-gray-400">
-            <span>نمایش {items.length.toLocaleString("fa-IR")} مورد</span>
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-500 font-bold text-white">۱</span>
+          <div className="flex flex-col gap-3 border-t border-black/5 px-5 py-4 text-xs font-medium text-gray-500 dark:border-white/5 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              {items.length === 0
+                ? "موردی برای نمایش وجود ندارد"
+                : `نمایش ${(firstItemIndex + 1).toLocaleString("fa-IR")} تا ${Math.min(firstItemIndex + ITEMS_PER_PAGE, items.length).toLocaleString("fa-IR")} از ${items.length.toLocaleString("fa-IR")} مورد`}
+            </span>
+            {totalPages > 1 && (
+              <nav
+                aria-label="صفحه‌بندی کارتابل"
+                className="flex items-center gap-2"
+              >
+                {activePage > 1 ? (
+                  <Link
+                    href={getPageHref(activePage - 1)}
+                    scroll
+                    className="liquid-glass-control inline-flex h-9 items-center gap-1 rounded-xl border px-3 transition hover:text-brand-600"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                    قبلی
+                  </Link>
+                ) : (
+                  <span className="inline-flex h-9 items-center gap-1 rounded-xl border border-black/5 px-3 opacity-40 dark:border-white/5">
+                    <ChevronRight className="h-4 w-4" />
+                    قبلی
+                  </span>
+                )}
+                <span className="min-w-24 text-center font-bold text-gray-700 dark:text-gray-200">
+                  صفحه {activePage.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}
+                </span>
+                {activePage < totalPages ? (
+                  <Link
+                    href={getPageHref(activePage + 1)}
+                    scroll
+                    className="liquid-glass-control inline-flex h-9 items-center gap-1 rounded-xl border px-3 transition hover:text-brand-600"
+                  >
+                    بعدی
+                    <ChevronLeft className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <span className="inline-flex h-9 items-center gap-1 rounded-xl border border-black/5 px-3 opacity-40 dark:border-white/5">
+                    بعدی
+                    <ChevronLeft className="h-4 w-4" />
+                  </span>
+                )}
+              </nav>
+            )}
           </div>
         </main>
           </InboxArchiveLayout>

@@ -4,7 +4,7 @@ import { logoutAction } from "@/src/actions/authActions";
 import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/src/components/ui/dropdown/DropdownItem";
 import type { CurrentUser } from "@/src/lib/auth-types";
-import { UserRound } from "lucide-react";
+import { ChevronLeft, LogOut, UserPen, UserRound } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
 export default function UserDropdown({ user }: { user: CurrentUser }) {
@@ -32,24 +32,24 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex self-stretch items-center">
       <button
         onClick={toggleDropdown}
         aria-label="منوی پروفایل"
         aria-expanded={isOpen}
-        className="dropdown-toggle flex shrink-0 items-center gap-2 rounded-[16px] border border-black/[0.045] bg-white/55 p-1.5 pl-2.5 text-right text-[var(--liquid-ink)] transition hover:bg-white/80 dark:border-white/[0.07] dark:bg-white/[0.045] dark:hover:bg-white/[0.08]"
+        className="dropdown-toggle liquid-glass-keyline flex shrink-0 items-center gap-2 rounded-[16px] border bg-white/55 p-1.5 pl-2.5 text-right text-[var(--liquid-ink)] transition hover:bg-white/80 dark:bg-white/[0.045] dark:hover:bg-white/[0.08]"
       >
-        <span className="relative h-[34px] w-[34px] overflow-hidden rounded-xl">
+        <span className="relative isolate block h-[34px] w-[34px] shrink-0 overflow-hidden rounded-xl">
           {avatarSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={avatarSrc}
-              alt="User"
-              className="h-full w-full object-cover"
+              alt={user.displayName}
+              className="absolute inset-0 block h-full w-full object-cover object-top"
               onError={handleAvatarError}
             />
           ) : (
-            <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-400 to-cyan-500 text-white shadow-sm">
+            <span className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-400 to-cyan-500 text-white shadow-sm">
               <UserRound className="h-5 w-5" aria-hidden="true" />
             </span>
           )}
@@ -87,36 +87,68 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="mt-[17px] flex w-[260px] flex-col rounded-2xl border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+        className="profile-dropdown-panel top-full flex w-[280px] flex-col rounded-[20px] border border-app-border bg-app-panel p-2.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
       >
-        <div>
-          <span className="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-            {user.displayName}
+        <div className="flex items-center gap-3 rounded-[15px] border border-white/70 bg-white/45 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.7)] dark:border-white/10 dark:bg-white/[0.055] dark:shadow-none">
+          <span className="relative isolate block h-11 w-11 shrink-0 overflow-hidden rounded-[13px] shadow-sm">
+            {avatarSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={avatarSrc}
+                alt={user.displayName}
+                className="absolute inset-0 block h-full w-full object-cover object-top"
+                onError={handleAvatarError}
+              />
+            ) : (
+              <span className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-400 to-cyan-500 text-white">
+                <UserRound className="h-5 w-5" aria-hidden="true" />
+              </span>
+            )}
           </span>
-          <span className="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-            {user.userId}
+
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-bold text-gray-800 dark:text-white">
+              {user.displayName}
+            </span>
+            <span className="mt-0.5 block truncate text-[11px] text-gray-500 dark:text-gray-400">
+              {user.userId}
+            </span>
           </span>
         </div>
 
-        <ul className="flex flex-col gap-1 border-b border-gray-200 pb-3 pt-4 dark:border-gray-800">
+        <ul className="mt-2 flex flex-col gap-1.5">
           <li>
             <DropdownItem
               onItemClick={closeDropdown}
               tag="a"
               href="/profile"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 group text-theme-sm hover:bg-blue-light-50 hover:text-blue-light-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+              baseClassName=""
+              className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-2 py-2 text-right text-sm font-semibold text-gray-700 transition hover:border-white/70 hover:bg-white/55 hover:text-brand-600 dark:text-gray-300 dark:hover:border-white/10 dark:hover:bg-white/[0.07] dark:hover:text-brand-300"
             >
-              ویرایش پروفایل
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-brand-500/10 text-brand-600 transition group-hover:bg-brand-500/15 dark:text-brand-300">
+                <UserPen className="h-[17px] w-[17px]" aria-hidden="true" />
+              </span>
+              <span>ویرایش پروفایل</span>
+              <ChevronLeft
+                className="ms-auto h-4 w-4 text-gray-400 transition-transform group-hover:-translate-x-0.5 group-hover:text-brand-500"
+                aria-hidden="true"
+              />
             </DropdownItem>
           </li>
         </ul>
 
-        <form action={logoutAction}>
+        <form
+          action={logoutAction}
+          className="mt-2 border-t border-black/[0.06] pt-2 dark:border-white/[0.08]"
+        >
           <button
             type="submit"
-            className="mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-700 group text-theme-sm hover:bg-blue-light-50 hover:text-blue-light-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-2 py-2 text-right text-sm font-semibold text-gray-600 transition hover:border-red-500/10 hover:bg-red-500/[0.08] hover:text-red-600 dark:text-gray-300 dark:hover:border-red-400/10 dark:hover:bg-red-400/[0.08] dark:hover:text-red-300"
           >
-            خروج
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-red-500/[0.08] text-red-500 transition group-hover:bg-red-500/[0.12]">
+              <LogOut className="h-[17px] w-[17px]" aria-hidden="true" />
+            </span>
+            <span>خروج</span>
           </button>
         </form>
       </Dropdown>

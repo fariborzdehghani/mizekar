@@ -368,9 +368,9 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <main className="min-h-[calc(100vh-65px)] bg-app-canvas p-4 dark:bg-gray-950 lg:min-h-[calc(100vh-77px)] lg:p-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <div className="flex flex-col gap-4 border-b border-gray-200 pb-5 dark:border-gray-800 md:flex-row md:items-center md:justify-between">
+    <main className="min-h-[calc(100vh-65px)] bg-app-canvas dark:bg-gray-950 lg:min-h-[calc(100vh-77px)]">
+      <div className="liquid-content-frame flex w-full flex-col gap-6 py-4 lg:pb-6">
+        <div className="liquid-page-header flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="text-right">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               داشبورد

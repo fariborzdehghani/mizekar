@@ -1,13 +1,17 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { Pencil, Trash2, Users } from "lucide-react";
+import { AtSign, BriefcaseBusiness, Pencil, Trash2, Users } from "lucide-react";
 import {
   createUserAction,
   deleteUserAction,
   updateUserAction,
   type UserFormState,
 } from "@/src/actions/settingsActions";
+import ListPagination, {
+  DEFAULT_PAGE_SIZE,
+} from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 type PermissionOption = {
   id: number;
@@ -37,6 +41,7 @@ type UserManagementProps = {
   roles: RoleOption[];
   permissions: PermissionOption[];
   searchQuery?: string;
+  currentPage?: number;
 };
 
 type ViewMode = "list" | "create" | "edit";
@@ -316,7 +321,7 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -443,20 +448,35 @@ function UsersList({
   onCreate,
   onEdit,
   searchQuery = "",
+  currentPage = 1,
 }: {
   users: ManagedUser[];
   permissions: PermissionOption[];
   onCreate: () => void;
   onEdit: (user: ManagedUser) => void;
   searchQuery?: string;
+  currentPage?: number;
 }) {
   const filteredUsers = users.filter((user) =>
     userMatchesSearch(user, permissions, searchQuery)
   );
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const paginatedUsers = filteredUsers.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
+  );
+  const getPageHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `/settings/users?${query}` : "/settings/users";
+  };
 
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
-      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="button"
           onClick={onCreate}
@@ -479,8 +499,9 @@ function UsersList({
 
       {filteredUsers.length > 0 ? (
         <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+          <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در کاربران..." />
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[760px]">
+            <table className="inbox-card-table inbox-card-table--users w-full">
               <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -501,22 +522,37 @@ function UsersList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <tr
                     key={user.id}
                     className="transition hover:bg-white/70 dark:hover:bg-white/5"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                      {getDisplayName(user)}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>{getDisplayName(user)}</span>
+                        <span className="rounded-full bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
+                          {user.roleTitle || "بدون نقش"}
+                        </span>
+                        {user.isCurrentUser && (
+                          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                            حساب شما
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {user.job || "-"}
+                      {user.job ? (
+                        <span className="inline-flex items-center gap-1.5 whitespace-normal">
+                          <BriefcaseBusiness className="h-3.5 w-3.5 shrink-0 text-gray-400" />
+                          {user.job}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {user.userId}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {user.roleTitle || "بدون نقش"}
+                      <span className="inline-flex items-center gap-1 text-gray-500 dark:text-gray-400" dir="ltr">
+                        <AtSign className="h-3.5 w-3.5 shrink-0" />
+                        {user.userId}
+                      </span>
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div className="flex items-center gap-2">
@@ -563,6 +599,11 @@ function UsersList({
               </tbody>
             </table>
           </div>
+          <ListPagination
+            currentPage={activePage}
+            totalItems={filteredUsers.length}
+            hrefForPage={getPageHref}
+          />
         </div>
       ) : (
         <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
@@ -587,6 +628,7 @@ export default function UserManagement({
   roles,
   permissions,
   searchQuery = "",
+  currentPage = 1,
 }: UserManagementProps) {
   const [mode, setMode] = useState<ViewMode>("list");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
@@ -626,6 +668,7 @@ export default function UserManagement({
       users={users}
       permissions={permissions}
       searchQuery={searchQuery}
+      currentPage={currentPage}
       onCreate={() => {
         setMode("create");
         setSelectedUserId(null);

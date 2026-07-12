@@ -8,6 +8,10 @@ import {
   updateRoleAction,
   type RoleFormState,
 } from "@/src/actions/settingsActions";
+import ListPagination, {
+  DEFAULT_PAGE_SIZE,
+} from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 type PermissionOption = {
   id: number;
@@ -26,6 +30,7 @@ type RoleManagementProps = {
   roles: ManagedRole[];
   permissions: PermissionOption[];
   searchQuery?: string;
+  currentPage?: number;
 };
 
 type ViewMode = "list" | "create" | "edit";
@@ -189,7 +194,7 @@ function FormHeader({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
         <button
           type="button"
@@ -297,20 +302,35 @@ function RolesList({
   onCreate,
   onEdit,
   searchQuery = "",
+  currentPage = 1,
 }: {
   roles: ManagedRole[];
   permissions: PermissionOption[];
   onCreate: () => void;
   onEdit: (role: ManagedRole) => void;
   searchQuery?: string;
+  currentPage?: number;
 }) {
   const filteredRoles = roles.filter((role) =>
     roleMatchesSearch(role, permissions, searchQuery)
   );
+  const totalPages = Math.max(1, Math.ceil(filteredRoles.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const paginatedRoles = filteredRoles.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
+  );
+  const getPageHref = (page: number) => {
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    return query ? `/settings/roles?${query}` : "/settings/roles";
+  };
 
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
-      <div className="flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
         <button
           type="button"
           onClick={onCreate}
@@ -333,8 +353,9 @@ function RolesList({
 
       {filteredRoles.length > 0 ? (
         <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+          <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در نقش‌ها..." />
           <div className="w-full overflow-x-auto">
-            <table className="w-full min-w-[620px]">
+            <table className="inbox-card-table inbox-card-table--roles w-full">
               <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
                 <tr>
                   <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -349,16 +370,27 @@ function RolesList({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {filteredRoles.map((role) => (
+                {paginatedRoles.map((role) => (
                   <tr
                     key={role.id}
                     className="transition hover:bg-white/70 dark:hover:bg-white/5"
                   >
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                      {role.title}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span>{role.title}</span>
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                            role.userCount > 0
+                              ? "bg-indigo-500/10 text-indigo-700 dark:text-indigo-300"
+                              : "bg-gray-500/10 text-gray-600 dark:text-gray-300"
+                          }`}
+                        >
+                          {role.userCount > 0 ? "در حال استفاده" : "بدون کاربر"}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {role.userCount}
+                      {role.userCount.toLocaleString("fa-IR")} کاربر
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <div className="flex items-center gap-2">
@@ -405,6 +437,11 @@ function RolesList({
               </tbody>
             </table>
           </div>
+          <ListPagination
+            currentPage={activePage}
+            totalItems={filteredRoles.length}
+            hrefForPage={getPageHref}
+          />
         </div>
       ) : (
         <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
@@ -428,6 +465,7 @@ export default function RoleManagement({
   roles,
   permissions,
   searchQuery = "",
+  currentPage = 1,
 }: RoleManagementProps) {
   const [mode, setMode] = useState<ViewMode>("list");
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null);
@@ -460,6 +498,7 @@ export default function RoleManagement({
       roles={roles}
       permissions={permissions}
       searchQuery={searchQuery}
+      currentPage={currentPage}
       onCreate={() => {
         setMode("create");
         setSelectedRoleId(null);

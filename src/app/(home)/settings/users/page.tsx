@@ -15,6 +15,9 @@ export default async function UsersSettingsPage({
   searchParams,
 }: UsersSettingsPageProps) {
   const params = await searchParams;
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const currentUser = await requireUser();
 
   const [users, roles, permissions] = await Promise.all([
@@ -86,6 +89,7 @@ export default async function UsersSettingsPage({
         };
       })}
       searchQuery={getSearchQuery(params)}
+      currentPage={currentPage}
     />
   );
 }

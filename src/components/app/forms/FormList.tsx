@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Eye, FileText } from "lucide-react";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 type FormListItem = {
   id: number;
@@ -40,7 +41,7 @@ export default function FormList({
 }: FormListProps) {
   return (
     <div className="liquid-page-frame flex w-full flex-col gap-5 bg-transparent">
-      <div className="liquid-glass-surface sticky top-[92px] z-30 flex items-center justify-between rounded-3xl border p-5">
+      <div className="liquid-page-header flex items-center justify-between">
         <Link
           href="/new-form"
           className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
@@ -69,8 +70,10 @@ export default function FormList({
           </Link>
         </div>
       ) : (
-        <div className="liquid-table-shell overflow-x-auto rounded-3xl">
-          <table className="w-full min-w-[860px]">
+        <div className="liquid-table-shell overflow-hidden rounded-[28px]">
+          <InboxListToolbar searchPlaceholder="جستجو در فرم‌ها..." />
+          <div className="overflow-x-auto">
+          <table className="inbox-card-table inbox-card-table--forms w-full">
             <thead className="border-b border-white/50 bg-white/25 backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.035]">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -121,10 +124,12 @@ export default function FormList({
                   <td className="px-6 py-4 text-sm">
                     <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
                       {form.statusLabel}
-                      {form.activeStepOrder
-                        ? ` / مرحله ${form.activeStepOrder}`
-                        : ""}
                     </span>
+                    {form.activeStepOrder ? (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        مرحله {form.activeStepOrder}
+                      </span>
+                    ) : null}
                   </td>
                   <td className="w-px whitespace-nowrap px-6 py-4 text-sm">
                     <Link
@@ -139,6 +144,7 @@ export default function FormList({
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </div>

@@ -3,6 +3,10 @@ import { Eye } from "lucide-react";
 import { searchAccessibleLetters } from "@/src/actions/letterActions";
 import InboxListRow from "@/src/components/app/letters/InboxListRow";
 import { uniqueLetterTagNames } from "@/src/lib/letterTags";
+import ListPagination, {
+  DEFAULT_PAGE_SIZE,
+} from "@/src/components/common/ListPagination";
+import InboxListToolbar from "@/src/components/common/InboxListToolbar";
 
 interface LetterSearchPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -60,11 +64,28 @@ export default async function LetterSearchPage({
   const content = getParam(params, "content");
   const createDate = getParam(params, "createDate");
   const tags = getTagsParam(params);
+  const parsedPage = Number(getParam(params, "page"));
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const result = await searchAccessibleLetters({ title, content, createDate, tags });
+  const totalPages = Math.max(1, Math.ceil(result.letters.length / DEFAULT_PAGE_SIZE));
+  const activePage = Math.min(Math.max(currentPage, 1), totalPages);
+  const paginatedLetters = result.letters.slice(
+    (activePage - 1) * DEFAULT_PAGE_SIZE,
+    activePage * DEFAULT_PAGE_SIZE,
+  );
+  const getPageHref = (page: number) => {
+    const nextParams = new URLSearchParams();
+    if (title) nextParams.set("title", title);
+    if (content) nextParams.set("content", content);
+    if (createDate) nextParams.set("createDate", createDate);
+    if (tags.length > 0) nextParams.set("tags", tags.join(","));
+    if (page > 1) nextParams.set("page", String(page));
+    return `/letter-search?${nextParams.toString()}`;
+  };
 
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
-      <div className="liquid-page-header liquid-page-header-inset sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/letter"
           className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
@@ -82,20 +103,22 @@ export default async function LetterSearchPage({
       </div>
 
       {!result.success ? (
-        <div className="m-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
           {result.error}
         </div>
       ) : !result.hasSearchCriteria ? (
-        <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
           از دکمه جستجوی پیشرفته در سربرگ، عنوان، متن یا تاریخ ایجاد نامه را وارد کنید.
         </div>
       ) : result.letters.length === 0 ? (
-        <div className="liquid-glass-panel m-4 flex flex-1 items-center justify-center rounded-[24px] border border-app-border bg-app-panel p-8 text-center text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
           نامه‌ای با این معیارها پیدا نشد.
         </div>
       ) : (
-        <div className="liquid-glass-panel m-4 overflow-x-auto! rounded-[24px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
-          <table className="w-full min-w-[920px]">
+        <div className="liquid-glass-surface mt-4 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+          <InboxListToolbar searchQuery={title} searchPlaceholder="جستجو در نامه‌ها..." queryParam="title" />
+          <div className="overflow-x-auto">
+          <table className="inbox-card-table inbox-card-table--letters w-full">
             <thead className="border-b border-app-border bg-app-table-head backdrop-blur dark:border-gray-700 dark:bg-gray-800/90">
               <tr>
                 <th className="px-6 py-3 text-right text-sm font-semibold text-gray-900 dark:text-white">
@@ -119,7 +142,7 @@ export default async function LetterSearchPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {result.letters.map((letter) => (
+              {paginatedLetters.map((letter) => (
                 <InboxListRow
                   key={letter.id}
                   href={`/letter?id=${letter.id}&viewOnly=true`}
@@ -157,6 +180,12 @@ export default async function LetterSearchPage({
               ))}
             </tbody>
           </table>
+          </div>
+          <ListPagination
+            currentPage={activePage}
+            totalItems={result.letters.length}
+            hrefForPage={getPageHref}
+          />
         </div>
       )}
     </div>

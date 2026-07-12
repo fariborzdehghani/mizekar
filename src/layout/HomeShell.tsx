@@ -18,7 +18,7 @@ export default function HomeShell({
   user: CurrentUser;
   initialInboxBrief: InboxBrief | null;
 }) {
-  const { isMobileOpen, toggleMobileSidebar } = useSidebar();
+  const { isExpanded, isMobileOpen, toggleMobileSidebar } = useSidebar();
 
   const handleMainContentClick = () => {
     if (isMobileOpen) {
@@ -32,7 +32,9 @@ export default function HomeShell({
         <AppSidebar />
         <Backdrop />
         <div
-          className="liquid-glass-main mr-0 min-h-screen min-w-0 flex-1 transition-[margin] duration-300 ease-in-out lg:mr-[280px]"
+          className={`liquid-glass-main mr-0 min-h-screen min-w-0 flex-1 transition-[margin] duration-300 ease-in-out ${
+            isExpanded ? "lg:mr-[280px]" : "lg:mr-[88px]"
+          }`}
           onClick={handleMainContentClick}
         >
           <AppHeader user={user} />

@@ -20,6 +20,9 @@ export default async function IncomingLettersPage({
   const searchQuery = getSearchQuery(params);
   const itemType = Array.isArray(params.type) ? params.type[0] : params.type;
   const sortOrder = Array.isArray(params.sort) ? params.sort[0] : params.sort;
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const [result, forms, meetings, archiveResult] = await Promise.all([
     getIncomingLetterReferrals(searchQuery),
     getIncomingForms(),
@@ -39,6 +42,7 @@ export default async function IncomingLettersPage({
       searchQuery={searchQuery}
       itemType={itemType === "letter" || itemType === "meeting" || itemType === "form" ? itemType : "all"}
       sortOrder={sortOrder === "asc" ? "asc" : "desc"}
+      currentPage={currentPage}
       error={
         result.success && meetings.success
           ? undefined

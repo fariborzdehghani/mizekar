@@ -15,6 +15,9 @@ export default async function OutgoingMessagesPage({
 }: OutgoingMessagesPageProps) {
   const params = await searchParams;
   const searchQuery = getSearchQuery(params);
+  const rawPage = Array.isArray(params.page) ? params.page[0] : params.page;
+  const parsedPage = Number(rawPage);
+  const currentPage = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const result = await getOutgoingMessages(searchQuery);
 
   return (
@@ -24,6 +27,7 @@ export default async function OutgoingMessagesPage({
       messages={result.messages}
       perspective="outgoing"
       searchQuery={searchQuery}
+      currentPage={currentPage}
       error={result.success ? undefined : result.error}
     />
   );

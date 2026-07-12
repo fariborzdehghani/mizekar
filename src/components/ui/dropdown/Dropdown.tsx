@@ -40,7 +40,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <div
       ref={dropdownRef}
-      className={`liquid-glass-panel absolute left-0 z-40 mt-2 rounded-2xl border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
+      className={`liquid-glass-panel liquid-glass-dropdown absolute left-0 z-40 mt-2 rounded-2xl border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
     >
       {children}
     </div>

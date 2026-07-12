@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { subscribeToAiActivity } from "@/src/lib/aiActivity";
 import { logoutAction } from "@/src/actions/authActions";
-import { CircleHelp, LogOut, Settings, Sparkles, X } from "lucide-react";
+import { Feather, LogOut, Settings, Sparkles, X } from "lucide-react";
 import {
   CalenderIcon,
   ChevronDownIcon,
@@ -106,9 +106,10 @@ function getSubItemName(subItem: { name: string; path: string }) {
 }
 
 const AppSidebar: React.FC = () => {
-  const { isMobileOpen, toggleMobileSidebar } = useSidebar();
+  const { isExpanded, isMobileOpen, toggleSidebar, toggleMobileSidebar } =
+    useSidebar();
   const pathname = usePathname();
-  const isSidebarWide = true;
+  const isSidebarWide = isExpanded || isMobileOpen;
   const [activeAiTaskCount, setActiveAiTaskCount] = useState(0);
 
   useEffect(() => {
@@ -128,12 +129,28 @@ const AppSidebar: React.FC = () => {
         <li key={nav.name}>
           {nav.subItems ? (
             <button
-              onClick={() => handleSubmenuToggle(index, menuType)}
-              className={`menu-item group  ${
+              type="button"
+              onClick={() => {
+                if (!isSidebarWide) {
+                  toggleSidebar();
+                  setManualOpenSubmenu({ type: menuType, index });
+                  return;
+                }
+                handleSubmenuToggle(index, menuType);
+              }}
+              aria-label={nav.name}
+              title={isSidebarWide ? undefined : nav.name}
+              aria-expanded={
+                openSubmenu?.type === menuType && openSubmenu?.index === index
+              }
+              aria-controls={`sidebar-${menuType}-submenu-${index}`}
+              className={`menu-item group ${
                 openSubmenu?.type === menuType && openSubmenu?.index === index
                   ? "menu-item-active"
                   : "menu-item-inactive"
-              } cursor-pointer lg:justify-start`}
+              } cursor-pointer ${
+                isSidebarWide ? "justify-start" : "sidebar-menu-item-collapsed"
+              }`}
             >
               <span
                 className={` ${
@@ -145,7 +162,9 @@ const AppSidebar: React.FC = () => {
                 {nav.icon}
               </span>
               {isSidebarWide && (
-                <span className={`menu-item-text`}>{nav.name}</span>
+                <span className="menu-item-text min-w-0 overflow-hidden whitespace-nowrap text-ellipsis">
+                  {nav.name}
+                </span>
               )}
               {isSidebarWide && (
                 <ChevronDownIcon
@@ -162,11 +181,17 @@ const AppSidebar: React.FC = () => {
             nav.path && (
               <Link
                 href={nav.path}
+                aria-label={nav.name}
+                title={isSidebarWide ? undefined : nav.name}
                 onClick={() => {
                   if (isMobileOpen) toggleMobileSidebar();
                 }}
                 className={`menu-item group ${
                   isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                } ${
+                  isSidebarWide
+                    ? "justify-start"
+                    : "sidebar-menu-item-collapsed"
                 }`}
               >
                 <span
@@ -179,14 +204,32 @@ const AppSidebar: React.FC = () => {
                   {nav.icon}
                 </span>
                 {isSidebarWide && (
-                  <span className={`menu-item-text`}>{nav.name}</span>
+                  <span className="menu-item-text min-w-0 overflow-hidden whitespace-nowrap text-ellipsis">
+                    {nav.name}
+                  </span>
                 )}
               </Link>
             )
           )}
           {nav.subItems && isSidebarWide && (
             <div
-              className="overflow-hidden transition-[max-height] duration-300"
+              id={`sidebar-${menuType}-submenu-${index}`}
+              aria-hidden={
+                !(
+                  openSubmenu?.type === menuType &&
+                  openSubmenu?.index === index
+                )
+              }
+              inert={
+                openSubmenu?.type === menuType && openSubmenu?.index === index
+                  ? undefined
+                  : true
+              }
+              className={`overflow-hidden transition-[max-height,opacity] duration-300 ease-out motion-reduce:transition-none ${
+                openSubmenu?.type === menuType && openSubmenu?.index === index
+                  ? "opacity-100"
+                  : "pointer-events-none opacity-0"
+              }`}
               style={{
                 maxHeight:
                   openSubmenu?.type === menuType && openSubmenu?.index === index
@@ -194,18 +237,21 @@ const AppSidebar: React.FC = () => {
                     : "0",
               }}
             >
-              <ul className="mt-2 space-y-1 mr-9">
+              <ul className="sidebar-submenu mt-2 w-full space-y-1">
                 {nav.subItems
                   .filter((subItem) => !isHiddenSubItem(subItem.path))
                   .map((subItem) => (
-                    <li key={subItem.name}>
+                    <li key={subItem.name} className="w-full">
                       <Link
                         href={subItem.path}
                         onClick={() => {
                           setManualOpenSubmenu(undefined);
                           if (isMobileOpen) toggleMobileSidebar();
                         }}
-                        className={`menu-dropdown-item ${
+                        aria-current={
+                          isActive(subItem.path) ? "page" : undefined
+                        }
+                        className={`sidebar-submenu-item menu-dropdown-item group w-full ${
                           isActive(subItem.path)
                             ? "menu-dropdown-item-active"
                             : "menu-dropdown-item-inactive"
@@ -268,25 +314,43 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`liquid-glass-sidebar fixed right-0 top-0 z-[999999] flex h-screen w-[280px] flex-col border-l border-app-border bg-app-sidebar px-5 text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] transition-transform duration-300 dark:border-gray-800 dark:bg-gray-900 dark:text-white
+      id="app-sidebar"
+      aria-label="نوار کناری برنامه"
+      className={`liquid-glass-sidebar fixed right-0 top-0 z-[999999] flex h-screen w-[280px] flex-col border-l border-app-border bg-app-sidebar px-5 text-gray-900 shadow-[0_20px_45px_rgba(16,24,40,0.08)] transition-[width,transform,padding] duration-300 dark:border-gray-800 dark:bg-gray-900 dark:text-white
         ${isMobileOpen ? "translate-x-0" : "translate-x-full"}
+        ${isExpanded ? "lg:w-[280px] lg:px-5" : "lg:w-[88px] lg:px-3"}
         lg:translate-x-0`}
     >
-      <div className="mb-5 flex items-center justify-between px-2 pt-6">
+      <div
+        className={`mb-5 flex items-center pt-6 ${
+          isSidebarWide ? "justify-between px-2" : "justify-center px-0"
+        }`}
+      >
         <Link
           href="/"
           onClick={() => {
             if (isMobileOpen) toggleMobileSidebar();
           }}
-          className="flex items-center gap-3"
+          className={`flex items-center overflow-hidden ${
+            isSidebarWide
+              ? "gap-3 justify-start"
+              : "gap-0 justify-center"
+          }`}
         >
-          <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[16px] bg-gradient-to-br from-[#7168ff] via-[#625cff] to-[#45b9c9] text-white shadow-[0_12px_30px_rgba(98,92,255,.36)]">
+          <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[16px] bg-gradient-to-br from-[#7168ff] via-[#625cff] to-[#45b9c9] text-white">
             <span className="absolute inset-px rounded-[15px] border border-white/25" />
-            <Sparkles className="relative h-5 w-5" strokeWidth={2.2} />
+            <Feather className="relative h-5 w-5" strokeWidth={2.2} />
           </span>
-          <span>
-            <span className="block text-xl font-extrabold tracking-tight">میزکار</span>
-            <span className="block text-[10px] font-medium text-gray-500 dark:text-gray-400">اتوماسیون هوشمند سازمانی</span>
+          <span
+            aria-hidden={!isSidebarWide}
+            className={`min-w-0 overflow-hidden whitespace-nowrap transition-[max-width,opacity,transform] duration-200 motion-reduce:transition-none ${
+              isSidebarWide
+                ? "max-w-[180px] translate-x-0 opacity-100 delay-150"
+                : "pointer-events-none max-w-0 translate-x-2 opacity-0 delay-0"
+            }`}
+          >
+            <span className="block whitespace-nowrap text-xl font-extrabold tracking-tight">میزکار</span>
+            <span className="block whitespace-nowrap text-[10px] font-medium text-gray-500 dark:text-gray-400">اتوماسیون هوشمند سازمانی</span>
           </span>
         </Link>
         <button
@@ -299,11 +363,8 @@ const AppSidebar: React.FC = () => {
         </button>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-y-auto pt-2 duration-300 ease-linear no-scrollbar">
+      <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto pt-2 duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
-          <p className="mb-3 px-3 text-[11px] font-semibold tracking-[0.08em] text-gray-400 dark:text-gray-500">
-            فضای کاری
-          </p>
           <div className="flex flex-col gap-3">
             <div>{renderMenuItems(navItems, "main")}</div>
 
@@ -313,25 +374,11 @@ const AppSidebar: React.FC = () => {
       </div>
 
       <div className="mt-auto shrink-0 pb-5">
-        <div className="sidebar-help-card liquid-card mb-4 rounded-[22px] border border-[#635cff]/15 bg-gradient-to-br from-[#635cff]/[0.12] to-[#43c2bc]/[0.08] p-4">
-          <div className="mb-3 grid h-9 w-9 place-items-center rounded-xl bg-white/70 text-[#635cff] shadow-sm dark:bg-white/10">
-            <CircleHelp className="h-[18px] w-[18px]" />
-          </div>
-          <p className="text-sm font-bold text-gray-900 dark:text-white">مرکز راهنمای میزکار</p>
-          <p className="mt-1 text-[11px] leading-5 text-gray-500 dark:text-gray-400">پاسخ پرسش‌ها و آموزش کار با سامانه</p>
-          <button className="mt-3 text-xs font-bold text-[#625cff]" type="button">مشاهده راهنما</button>
-        </div>
-
-        <div className="flex items-center justify-between border-t border-black/5 px-2 pt-4 dark:border-white/5">
-          <Link
-            href="/settings/general"
-            onClick={() => {
-              if (isMobileOpen) toggleMobileSidebar();
-            }}
-            className="flex items-center gap-2 text-xs font-semibold text-gray-500 transition hover:text-brand-500 dark:text-gray-400"
-          >
-            <Settings className="h-4 w-4" /> تنظیمات
-          </Link>
+        <div
+          className={`flex items-center border-t border-black/5 px-2 pt-4 dark:border-white/5 ${
+            isSidebarWide ? "justify-end" : "justify-center"
+          }`}
+        >
           <form action={logoutAction}>
             <button
               aria-label="خروج"
@@ -346,7 +393,7 @@ const AppSidebar: React.FC = () => {
       </div>
 
       {activeAiTaskCount > 0 && (
-        <div className="absolute bottom-20 left-5 flex shrink-0 justify-center">
+        <div className="absolute bottom-20 left-1/2 flex -translate-x-1/2 shrink-0 justify-center">
           <div
             className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-purple-600 bg-purple-600 text-white shadow-theme-xs dark:border-purple-600 dark:bg-purple-600 dark:text-white"
             title="هوش مصنوعی در حال کار است"
