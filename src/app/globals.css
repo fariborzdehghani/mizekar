@@ -1099,7 +1099,8 @@ html:not(.dark) .liquid-glass-app :where(
   position: absolute;
 }
 
-html:not(.dark) .liquid-glass-panel.profile-dropdown-panel {
+html:not(.dark) .liquid-glass-panel.profile-dropdown-panel,
+html:not(.dark) .liquid-glass-surface.profile-dropdown-panel {
   border-color: rgba(255, 255, 255, 0.82) !important;
   background: linear-gradient(
     135deg,
@@ -1110,7 +1111,8 @@ html:not(.dark) .liquid-glass-panel.profile-dropdown-panel {
   backdrop-filter: blur(64px) saturate(175%) contrast(108%);
 }
 
-.dark .liquid-glass-panel.profile-dropdown-panel {
+.dark .liquid-glass-panel.profile-dropdown-panel,
+.dark .liquid-glass-surface.profile-dropdown-panel {
   border-color: rgba(255, 255, 255, 0.16) !important;
   background: linear-gradient(
     135deg,

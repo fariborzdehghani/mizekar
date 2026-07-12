@@ -162,14 +162,14 @@ export default function MessageForm({
           <div className="flex items-center gap-3">
             <Link
               href="/incoming-messages"
-              className="liquid-glass-control rounded-xl border px-4 py-2 text-sm font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
+              className="liquid-glass-control inline-flex h-10 leading-none items-center justify-center rounded-xl border px-4 py-0 text-sm font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
             >
               بازگشت
             </Link>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 leading-none items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-0 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <SendHorizontal className="h-4 w-4" />
               {isSubmitting ? "در حال ارسال..." : "ارسال پیام"}

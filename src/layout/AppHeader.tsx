@@ -11,6 +11,7 @@ import {
 } from "@/src/lib/letterTags";
 import type { CurrentUser } from "@/src/lib/auth-types";
 import Link from "next/link";
+import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import {
   CalendarDays,
   ChevronLeft,
@@ -552,7 +553,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             <button
               type="button"
               onClick={() => setIsAdvancedSearchOpen((current) => !current)}
-              className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+              className={`dropdown-toggle hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
                 isAdvancedSearchOpen
                   ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
                   : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045]"
@@ -566,7 +567,11 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             </div>
 
             {isAdvancedSearchOpen && (
-              <div className="liquid-glass-surface absolute left-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] rounded-[22px] border border-app-border bg-app-panel p-4 text-right shadow-xl dark:border-gray-800 dark:bg-gray-900">
+              <Dropdown
+                isOpen={isAdvancedSearchOpen}
+                onClose={() => setIsAdvancedSearchOpen(false)}
+                className="top-full mt-2 w-[min(24rem,calc(100vw-2rem))] rounded-[22px] p-4 text-right"
+              >
                 <div className="mb-4 flex items-center justify-between gap-3 border-b border-app-border pb-3 dark:border-gray-800">
                   <button
                     type="button"
@@ -661,7 +666,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                     </button>
                   </div>
                 </form>
-              </div>
+              </Dropdown>
             )}
         </div>
         <div className="mr-auto flex self-stretch shrink-0 items-center gap-2">
