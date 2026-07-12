@@ -116,10 +116,10 @@ export default function RecipientsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-slate-950/25 p-4 backdrop-blur-md dark:bg-slate-950/55">
-      <div className="liquid-modal flex h-[82vh] max-h-[720px] w-full max-w-3xl flex-col overflow-hidden rounded-[28px]">
+    <div className="liquid-modal-backdrop fixed inset-0 z-[1000001] flex items-center justify-center p-4">
+      <div className="liquid-modal liquid-modal-dialog flex h-[82vh] max-h-[720px] w-full max-w-3xl flex-col overflow-hidden rounded-[28px]">
         {/* Header */}
-        <div className="flex shrink-0 items-center justify-between border-b border-white/60 px-6 py-4 dark:border-white/10">
+        <div className="liquid-modal-header flex shrink-0 items-center justify-between px-6 py-4">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
             {title}
           </h2>
@@ -218,7 +218,7 @@ export default function RecipientsModal({
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 justify-end gap-3 border-t border-white/60 px-6 py-4 dark:border-white/10">
+        <div className="liquid-modal-footer flex shrink-0 justify-end gap-3 px-6 py-4">
           <button
             type="button"
             onClick={onClose}

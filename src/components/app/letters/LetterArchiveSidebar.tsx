@@ -635,13 +635,13 @@ export default function LetterArchiveSidebar({
 
       {folderDialog && (
         <div
-          className="fixed inset-0 z-[70] flex items-center justify-center px-4"
+          className="liquid-modal-backdrop fixed inset-0 z-[70] flex items-center justify-center px-4"
           onMouseDown={closeFolderDialog}
         >
           <form
             onSubmit={submitFolderDialog}
             onMouseDown={(event) => event.stopPropagation()}
-            className="liquid-modal w-full max-w-sm rounded-[24px] border border-app-border bg-app-panel p-4 text-right shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+            className="liquid-modal liquid-modal-dialog w-full max-w-sm rounded-[24px] p-4 text-right"
           >
             <div className="mb-4">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white">

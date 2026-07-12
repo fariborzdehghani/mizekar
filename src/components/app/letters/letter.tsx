@@ -982,10 +982,10 @@ export default function LetterForm({
       />
 
       {!isViewMode && !initialLetter && isNewDraftModalOpen && (
-        <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
+        <div className="liquid-modal-backdrop fixed inset-0 z-[1000001] flex items-center justify-center px-4">
           <div
             dir="rtl"
-            className="liquid-glass-panel flex w-full max-w-2xl flex-col rounded-3xl border shadow-2xl"
+            className="liquid-modal liquid-modal-dialog flex w-full max-w-2xl flex-col overflow-hidden rounded-3xl"
           >
             <div className="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4 dark:border-gray-700">
               <div className="flex min-w-0 items-start gap-3">
@@ -1074,8 +1074,8 @@ export default function LetterForm({
       )}
 
       {isViewMode && initialLetter?.id && isAiSummaryModalOpen && (
-        <div className="fixed inset-0 z-[1000001] flex items-center justify-center bg-gray-900/20 px-4 backdrop-blur-sm dark:bg-gray-950/35">
-          <div className="liquid-glass-panel flex h-[82vh] max-h-[760px] w-full max-w-6xl flex-col rounded-3xl border shadow-2xl">
+        <div className="liquid-modal-backdrop fixed inset-0 z-[1000001] flex items-center justify-center px-4">
+          <div className="liquid-modal liquid-modal-dialog flex h-[82vh] max-h-[760px] w-full max-w-6xl flex-col overflow-hidden rounded-3xl">
             <div className="flex shrink-0 items-start justify-between gap-4 border-b border-white/50 px-6 py-4 dark:border-white/10">
               <div className="flex min-w-0 items-start gap-3">
                 <div className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${AI_ICON_CLASS}`}>
