@@ -9,6 +9,7 @@ import { Archive, Eye, MailOpen, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import type { MouseEvent, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useArchiveSelection } from "./ArchiveSelectionProvider";
 
 interface InboxListRowProps {
@@ -54,12 +55,14 @@ export default function InboxListRow({
     };
 
     window.addEventListener("click", closeMenu);
+    window.addEventListener("contextmenu", closeMenu, true);
     window.addEventListener("scroll", closeMenu, true);
     window.addEventListener("resize", closeMenu);
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("click", closeMenu);
+      window.removeEventListener("contextmenu", closeMenu, true);
       window.removeEventListener("scroll", closeMenu, true);
       window.removeEventListener("resize", closeMenu);
       window.removeEventListener("keydown", handleKeyDown);
@@ -89,8 +92,8 @@ export default function InboxListRow({
     event.preventDefault();
     setMenuError(null);
     setMenuPosition({
-      x: Math.min(event.clientX, window.innerWidth - 220),
-      y: Math.min(event.clientY, window.innerHeight - 210),
+      x: Math.max(8, Math.min(event.clientX, window.innerWidth - 220)),
+      y: Math.max(8, Math.min(event.clientY, window.innerHeight - 210)),
     });
   };
 
@@ -154,15 +157,13 @@ export default function InboxListRow({
         {children}
       </tr>
 
-      {menuPosition && (
-        <tr className="contents">
-          <td className="contents" colSpan={99}>
-            <div
-              className="liquid-glass-surface fixed z-[1000001] min-w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
-              style={{ left: menuPosition.x, top: menuPosition.y }}
-              dir="rtl"
-              onClick={(event) => event.stopPropagation()}
-            >
+      {menuPosition && createPortal(
+        <div
+          className="liquid-glass-surface fixed z-[1000001] min-w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
+          style={{ left: menuPosition.x, top: menuPosition.y }}
+          dir="rtl"
+          onClick={(event) => event.stopPropagation()}
+        >
               {href && (
                 <button
                   type="button"
@@ -212,9 +213,8 @@ export default function InboxListRow({
                 <X className="h-4 w-4" />
                 بستن
               </button>
-            </div>
-          </td>
-        </tr>
+        </div>,
+        document.body,
       )}
     </>
   );

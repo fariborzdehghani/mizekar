@@ -5,11 +5,12 @@ import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/src/components/ui/dropdown/DropdownItem";
 import type { CurrentUser } from "@/src/lib/auth-types";
 import { ChevronLeft, LogOut, UserPen, UserRound } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 
 export default function UserDropdown({ user }: { user: CurrentUser }) {
   const [isOpen, setIsOpen] = useState(false);
   const [failedAvatarSrc, setFailedAvatarSrc] = useState<string | null>(null);
+  const dropdownAnchorRef = useRef<HTMLDivElement>(null);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
@@ -32,7 +33,7 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
   };
 
   return (
-    <div className="relative flex self-stretch items-center">
+    <div ref={dropdownAnchorRef} className="relative flex self-stretch items-center">
       <button
         onClick={toggleDropdown}
         aria-label="منوی پروفایل"
@@ -87,7 +88,10 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="profile-dropdown-panel top-full flex w-[280px] flex-col rounded-[20px] border border-app-border bg-app-panel p-2.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+        glassVariant="surface"
+        portal
+        anchorRef={dropdownAnchorRef}
+        className="flex w-[280px] flex-col rounded-[20px] p-2.5"
       >
         <div className="flex items-center gap-3 rounded-[15px] border border-white/70 bg-white/45 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.7)] dark:border-white/10 dark:bg-white/[0.055] dark:shadow-none">
           <span className="relative isolate block h-11 w-11 shrink-0 overflow-hidden rounded-[13px] shadow-sm">

@@ -1146,6 +1146,26 @@ html:not(.dark) .liquid-glass-surface.profile-dropdown-panel {
   outline-offset: -2px;
 }
 
+html:not(.dark) .liquid-glass-surface.liquid-glass-popup {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.84),
+    rgba(247, 249, 255, 0.68)
+  ) !important;
+  -webkit-backdrop-filter: blur(34px) saturate(185%);
+  backdrop-filter: blur(34px) saturate(185%);
+}
+
+.dark .liquid-glass-surface.liquid-glass-popup {
+  background: linear-gradient(
+    135deg,
+    rgba(19, 27, 49, 0.9),
+    rgba(13, 20, 38, 0.84)
+  ) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(165%);
+  backdrop-filter: blur(30px) saturate(165%);
+}
+
 html:not(.dark) .liquid-glass-header,
 html:not(.dark) .liquid-glass-sidebar {
   outline: 1px solid rgba(102, 92, 255, 0.035);

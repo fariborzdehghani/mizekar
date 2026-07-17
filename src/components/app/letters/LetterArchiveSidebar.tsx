@@ -177,13 +177,13 @@ export default function LetterArchiveSidebar({
     };
 
     window.addEventListener("click", closeMenu);
-    window.addEventListener("contextmenu", closeMenu);
+    window.addEventListener("contextmenu", closeMenu, true);
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("scroll", closeMenu, true);
 
     return () => {
       window.removeEventListener("click", closeMenu);
-      window.removeEventListener("contextmenu", closeMenu);
+      window.removeEventListener("contextmenu", closeMenu, true);
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("scroll", closeMenu, true);
     };

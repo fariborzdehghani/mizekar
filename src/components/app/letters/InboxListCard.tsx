@@ -6,6 +6,7 @@ import { Archive, Eye, MailOpen, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import type { MouseEvent, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { useArchiveSelection } from "./ArchiveSelectionProvider";
 
 interface InboxListCardProps {
@@ -39,11 +40,13 @@ export default function InboxListCard({
     const closeMenu = () => setMenuPosition(null);
     const handleKeyDown = (event: KeyboardEvent) => event.key === "Escape" && closeMenu();
     window.addEventListener("click", closeMenu);
+    window.addEventListener("contextmenu", closeMenu, true);
     window.addEventListener("scroll", closeMenu, true);
     window.addEventListener("resize", closeMenu);
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.removeEventListener("click", closeMenu);
+      window.removeEventListener("contextmenu", closeMenu, true);
       window.removeEventListener("scroll", closeMenu, true);
       window.removeEventListener("resize", closeMenu);
       window.removeEventListener("keydown", handleKeyDown);
@@ -96,7 +99,7 @@ export default function InboxListCard({
       >
         {children}
       </div>
-      {menuPosition && (
+      {menuPosition && createPortal(
         <div
           className="liquid-glass-surface fixed z-[1000001] min-w-52 overflow-hidden rounded-2xl border border-gray-200 bg-white py-1 text-right shadow-lg dark:border-gray-700 dark:bg-gray-900"
           style={{ left: menuPosition.x, top: menuPosition.y }}
@@ -108,7 +111,8 @@ export default function InboxListCard({
           {markUnreadReferralId && <button type="button" onClick={markUnread} disabled={isPending} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-60 dark:text-gray-200 dark:hover:bg-gray-800"><MailOpen className="h-4 w-4 text-brand-500" />{isPending ? "در حال ثبت..." : "علامت‌گذاری به‌عنوان خوانده‌نشده"}</button>}
           {menuError && <div className="border-t border-gray-100 px-3 py-2 text-xs text-red-600 dark:border-gray-800 dark:text-red-300">{menuError}</div>}
           <button type="button" onClick={() => setMenuPosition(null)} className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800"><X className="h-4 w-4" />بستن</button>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
