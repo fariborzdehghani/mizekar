@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 function formatDate(value: string | null) {
   if (!value) return "-";
@@ -81,6 +81,7 @@ function getNotificationLabel(type: HeaderNotificationItem["type"]) {
 
 export default function NotificationDropdown() {
   const router = useRouter();
+  const dropdownAnchorRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<HeaderNotificationItem[]>(
     []
@@ -168,7 +169,7 @@ export default function NotificationDropdown() {
   }
 
   return (
-    <div className="relative hidden sm:block">
+    <div ref={dropdownAnchorRef} className="relative hidden sm:block">
       <button
         className="dropdown-toggle liquid-glass-keyline relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
         onClick={toggleDropdown}
@@ -187,7 +188,10 @@ export default function NotificationDropdown() {
       <Dropdown
         isOpen={isOpen}
         onClose={closeDropdown}
-        className="mt-[17px] flex h-[430px] w-[350px] flex-col rounded-lg border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:w-[380px]"
+        glassVariant="surface"
+        portal
+        anchorRef={dropdownAnchorRef}
+        className="flex h-[430px] w-[350px] flex-col rounded-[22px] p-3 sm:w-[380px]"
       >
         <div className="mb-3 flex items-center justify-between border-b border-app-border pb-3 dark:border-gray-700">
           <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
