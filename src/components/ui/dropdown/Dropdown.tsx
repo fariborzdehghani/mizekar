@@ -29,21 +29,40 @@ export const Dropdown: React.FC<DropdownProps> = ({
   } | null>(null);
 
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+
+      const clickedInsideDropdown = dropdownRef.current?.contains(target);
+      const clickedInsideAnchor = anchorRef?.current?.contains(target);
+      const clickedFallbackToggle =
+        !anchorRef &&
+        target instanceof Element &&
+        target.closest(".dropdown-toggle");
+
       if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node) &&
-        !(event.target as HTMLElement).closest(".dropdown-toggle")
+        !clickedInsideDropdown &&
+        !clickedInsideAnchor &&
+        !clickedFallbackToggle
       ) {
         onClose();
       }
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [anchorRef, isOpen, onClose]);
 
   useLayoutEffect(() => {
     if (!isOpen || !portal || !anchorRef?.current) {

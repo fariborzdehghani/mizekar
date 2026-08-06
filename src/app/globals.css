@@ -1113,7 +1113,7 @@ html:not(.dark) .liquid-glass-app :where(
   outline-offset: -2px;
 }
 
-.liquid-glass-panel.liquid-glass-dropdown {
+.liquid-glass-panel.liquid-glass-dropdown:not(.liquid-glass-popup) {
   position: absolute;
 }
 
@@ -1146,13 +1146,17 @@ html:not(.dark) .liquid-glass-surface.profile-dropdown-panel {
   outline-offset: -2px;
 }
 
-html:not(.dark) .liquid-glass-surface.liquid-glass-popup {
+.liquid-glass-popup {
+  position: fixed;
+}
+
+html:not(.dark) .liquid-glass-popup {
   background: var(--liquid-glass-strong) !important;
   -webkit-backdrop-filter: blur(34px) saturate(185%);
   backdrop-filter: blur(34px) saturate(185%);
 }
 
-.dark .liquid-glass-surface.liquid-glass-popup {
+.dark .liquid-glass-popup {
   background: var(--liquid-glass-strong) !important;
   -webkit-backdrop-filter: blur(26px) saturate(160%);
   backdrop-filter: blur(26px) saturate(160%);

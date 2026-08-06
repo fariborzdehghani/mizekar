@@ -427,31 +427,6 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
     setAdvancedSearchTags(getLetterTagsFromParam(advancedTags));
   }, [advancedTags]);
 
-  useEffect(() => {
-    if (!isAdvancedSearchOpen) return;
-
-    const handlePointerDown = (event: PointerEvent) => {
-      if (
-        advancedSearchRef.current &&
-        !advancedSearchRef.current.contains(event.target as Node)
-      ) {
-        setIsAdvancedSearchOpen(false);
-      }
-    };
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setIsAdvancedSearchOpen(false);
-    };
-
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isAdvancedSearchOpen]);
-
   return (
     <header className="sticky top-0 z-[99999] h-[92px] w-full bg-transparent px-4 pt-4 sm:px-6 lg:px-8">
       <div className="liquid-glass-header relative mx-auto flex h-[76px] max-w-[1540px] items-center gap-3 rounded-[24px] border border-white/60 px-3 dark:border-white/10 sm:px-5">
