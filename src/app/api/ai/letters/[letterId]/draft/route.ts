@@ -6,15 +6,13 @@ import {
   parseLetterResponseDraft,
   prepareLetterResponseDraft,
 } from "@/src/ai/features/letterRelationSummary";
-import { requireUser } from "@/src/lib/auth";
+import { getCurrentUser } from "@/src/lib/auth";
+import { reportError } from "@/src/lib/errors";
+import { parsePositiveInteger, readJsonObject } from "@/src/lib/input";
+import { createNdjsonStreamResponse } from "@/src/lib/ndjson";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type DraftRequestBody = {
-  summary?: unknown;
-  userInstruction?: unknown;
-};
 
 type StreamEvent =
   | {
@@ -31,56 +29,22 @@ type StreamEvent =
       error: string;
     };
 
-function createStreamResponse(
-  handler: (write: (event: StreamEvent) => void) => Promise<void>
-) {
-  const encoder = new TextEncoder();
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const write = (event: StreamEvent) => {
-        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-      };
-
-      try {
-        await handler(write);
-      } catch (error) {
-        write({
-          type: "error",
-          error: error instanceof Error ? error.message : "AI stream failed.",
-        });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Cache-Control": "no-cache, no-transform",
-      "Content-Type": "application/x-ndjson; charset=utf-8",
-      "X-Accel-Buffering": "no",
-    },
-  });
-}
-
 export async function POST(
   request: Request,
-  context: { params: Promise<{ letterId: string }> }
+  context: RouteContext<"/api/ai/letters/[letterId]/draft">,
 ) {
-  try {
-    await requireUser();
-  } catch {
+  if (!(await getCurrentUser())) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { letterId } = await context.params;
-  const parsedLetterId = Number(letterId);
-  let body: DraftRequestBody;
+  const parsedLetterId = parsePositiveInteger(letterId);
+  if (!parsedLetterId) {
+    return Response.json({ error: "Invalid letter id." }, { status: 400 });
+  }
 
-  try {
-    body = (await request.json()) as DraftRequestBody;
-  } catch {
+  const body = await readJsonObject(request);
+  if (!body) {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
 
@@ -88,12 +52,13 @@ export async function POST(
   const userInstruction =
     typeof body.userInstruction === "string" ? body.userInstruction : "";
 
-  return createStreamResponse(async (write) => {
-    const preparedDraft = await prepareLetterResponseDraft(
-      parsedLetterId,
-      summary,
-      userInstruction
-    );
+  return createNdjsonStreamResponse<StreamEvent>(
+    async (write) => {
+      const preparedDraft = await prepareLetterResponseDraft(
+        parsedLetterId,
+        summary,
+        userInstruction,
+      );
 
     if (!preparedDraft.success) {
       write({ type: "error", error: preparedDraft.error });
@@ -137,10 +102,15 @@ export async function POST(
       return;
     }
 
-    write({
-      type: "draft",
-      title: draft.title,
-      content: draft.content,
-    });
-  });
+      write({
+        type: "draft",
+        title: draft.title,
+        content: draft.content,
+      });
+    },
+    (error) => {
+      reportError("api.ai.letter-response-draft", error);
+      return { type: "error", error: "سرویس هوشمند پاسخ نداد. دوباره تلاش کنید." };
+    },
+  );
 }

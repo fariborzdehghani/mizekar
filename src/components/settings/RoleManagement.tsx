@@ -12,6 +12,8 @@ import ListPagination, {
   DEFAULT_PAGE_SIZE,
 } from "@/src/components/common/ListPagination";
 import InboxListToolbar from "@/src/components/common/InboxListToolbar";
+import { Alert, Button, PageTitle } from "@/src/components/ui";
+import { normalizeSearchValue } from "@/src/lib/text";
 
 type PermissionOption = {
   id: number;
@@ -53,10 +55,6 @@ function getPermissionSummary(
     .join("، ");
 }
 
-function normalizeSearchValue(value: unknown) {
-  return String(value ?? "").toLocaleLowerCase("fa-IR");
-}
-
 function roleMatchesSearch(
   role: ManagedRole,
   permissions: PermissionOption[],
@@ -77,17 +75,13 @@ function roleMatchesSearch(
 function StateMessage({ state }: { state: RoleFormState }) {
   if (state.error) {
     return (
-      <p className="rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-sm text-error-700 dark:border-error-900 dark:bg-error-950 dark:text-error-200">
-        {state.error}
-      </p>
+      <Alert tone="error">{state.error}</Alert>
     );
   }
 
   if (state.success) {
     return (
-      <p className="rounded-lg border border-success-200 bg-success-50 px-3 py-2 text-sm text-success-700 dark:border-success-900 dark:bg-success-950 dark:text-success-200">
-        {state.success}
-      </p>
+      <Alert tone="success">{state.success}</Alert>
     );
   }
 
@@ -196,29 +190,22 @@ function FormHeader({
   return (
     <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex items-center gap-3">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
-          className="liquid-glass-control rounded-2xl border border-app-border bg-white/70 px-4 py-2 font-medium text-gray-700 transition hover:text-brand-600 dark:border-gray-700 dark:text-gray-300 dark:hover:text-brand-300"
+          variant="secondary"
         >
           بازگشت
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
-          disabled={pending}
-          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+          loading={pending}
+          loadingLabel={pendingText}
         >
-          {pending ? pendingText : submitText}
-        </button>
+          {submitText}
+        </Button>
       </div>
-      <div className="text-right">
-        <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
-          <ShieldCheck className="h-4 w-4" /> مدیریت سامانه
-        </p>
-        <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-          {title}
-        </h1>
-      </div>
+      <PageTitle eyebrow="مدیریت سامانه" icon={<ShieldCheck className="h-4 w-4" />} title={title} />
     </div>
   );
 }
@@ -248,7 +235,7 @@ function CreateRoleForm({
         onCancel={onCancel}
       />
 
-      <div className="liquid-glass-panel rounded-[28px] border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="liquid-glass-panel rounded-panel border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="w-full max-w-3xl space-y-5">
           <RoleFields permissions={permissions} />
           <StateMessage state={state} />
@@ -285,7 +272,7 @@ function EditRoleForm({
         onCancel={onCancel}
       />
 
-      <div className="liquid-glass-panel rounded-[28px] border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
+      <div className="liquid-glass-panel rounded-panel border border-app-border bg-app-panel p-6 dark:border-gray-800 dark:bg-gray-900">
         <div className="w-full max-w-3xl space-y-5">
           <input type="hidden" name="id" value={role.id} />
           <RoleFields permissions={permissions} role={role} />
@@ -331,28 +318,22 @@ function RolesList({
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8">
       <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <button
+        <Button
           type="button"
           onClick={onCreate}
-          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
         >
           نقش جدید
-        </button>
-        <div className="text-right">
-          <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
-            <ShieldCheck className="h-4 w-4" /> مدیریت سامانه
-          </p>
-          <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            مدیریت نقش‌ها
-          </h1>
-          <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-            تعریف نقش‌ها و کنترل دسترسی‌های سازمانی
-          </p>
-        </div>
+        </Button>
+        <PageTitle
+          eyebrow="مدیریت سامانه"
+          icon={<ShieldCheck className="h-4 w-4" />}
+          title="مدیریت نقش‌ها"
+          description="تعریف نقش‌ها و کنترل دسترسی‌های سازمانی"
+        />
       </div>
 
       {filteredRoles.length > 0 ? (
-        <div className="liquid-glass-panel overflow-hidden rounded-[28px] border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
+        <div className="liquid-glass-panel overflow-hidden rounded-panel border border-app-border bg-app-panel shadow-theme-lg dark:border-gray-800 dark:bg-gray-900">
           <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در نقش‌ها..." />
           <div className="w-full overflow-x-auto">
             <table className="inbox-card-table inbox-card-table--roles w-full">
@@ -444,7 +425,7 @@ function RolesList({
           />
         </div>
       ) : (
-        <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-[28px] border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
+        <div className="liquid-glass-panel flex min-h-72 flex-1 flex-col items-center justify-center rounded-panel border border-app-border bg-app-panel p-8 text-center dark:border-gray-800 dark:bg-gray-900">
           <p className="mb-4 text-gray-600 dark:text-gray-400">
             هیچ نقشی ثبت نشده است.
           </p>

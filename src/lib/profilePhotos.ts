@@ -1,18 +1,13 @@
 import "server-only";
 
-import path from "path";
+import { readOptionalEnv } from "@/src/lib/env";
 
 const PROFILE_PHOTO_URL_PREFIX = "/uploads/profiles";
 
 export function getProfilePhotoStorageDir() {
-  return (
-    process.env.PROFILE_UPLOAD_DIR ||
-    path.join(
-      /* turbopackIgnore: true */ process.cwd(),
-      "public",
-      "uploads",
-      "profiles"
-    )
+  return (readOptionalEnv("PROFILE_UPLOAD_DIR") || "public/uploads/profiles").replace(
+    /[\\/]+$/,
+    "",
   );
 }
 
@@ -21,12 +16,12 @@ export function getProfilePhotoPublicPath(fileName: string) {
 }
 
 export function getProfilePhotoFilePath(fileName: string) {
-  return path.join(getProfilePhotoStorageDir(), fileName);
+  return `${getProfilePhotoStorageDir()}/${fileName}`;
 }
 
 export function isSafeProfilePhotoFileName(fileName: string) {
   return (
     /^[A-Za-z0-9_.-]+\.(jpe?g|png|webp)$/i.test(fileName) &&
-    path.basename(fileName) === fileName
+    !fileName.includes("..")
   );
 }

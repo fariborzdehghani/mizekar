@@ -3,48 +3,11 @@
 import { prisma } from "@/src/lib/prisma";
 import { requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getPlainTextSnippet } from "@/src/lib/richText";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
 
 const REFERRAL_STATUS_IN_PROGRESS = 0;
 const FORM_REFERRAL_OPEN = 0;
-
-type UserForDisplay =
-  | {
-      id: number;
-      user_id: string | null;
-      persons_persons_user_idTousers?: Array<{
-        first_name: string | null;
-        last_name: string | null;
-        job?: string | null;
-      }>;
-    }
-  | null
-  | undefined;
-
-function getPlainTextSnippet(value: string | null | undefined) {
-  return (value || "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 120);
-}
-
-function getUserDisplayName(user: UserForDisplay) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-
-  if (fullName) {
-    return job ? `${fullName} - ${job}` : fullName;
-  }
-
-  const fallbackName = user?.user_id || (user?.id ? `User #${user.id}` : "-");
-
-  return job && fallbackName !== "-" ? `${fallbackName} - ${job}` : fallbackName;
-}
 
 function toIsoString(value: Date | null | undefined) {
   return value ? value.toISOString() : null;
@@ -288,13 +251,12 @@ export async function getHeaderNotifications() {
       ]);
 
     const items: HeaderNotificationItem[] = [
-      ...letterReferrals
-        .filter((referral) => referral.letters)
-        .map((referral) => {
-          const letter = referral.letters!;
+      ...letterReferrals.flatMap((referral) => {
+          const letter = referral.letters;
+          if (!letter) return [];
           const letterNumber = getLetterNumber(letter);
 
-          return {
+          return [{
             id: `letter-${referral.id}`,
             type: "letter" as const,
             sourceId: referral.id,
@@ -308,7 +270,7 @@ export async function getHeaderNotifications() {
             }`,
             href: `/letter?id=${letter.id}&viewOnly=true`,
             createdAt: toIsoString(referral.date_time || letter.create_date),
-          };
+          }];
         }),
       ...formReferrals.map((referral) => ({
         id: `form-${referral.id}`,

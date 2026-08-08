@@ -2,6 +2,7 @@ import { getMessage } from "@/src/actions/messageActions";
 import MessageReadMarker from "@/src/components/app/messages/MessageReadMarker";
 import MessageView from "@/src/components/app/messages/MessageView";
 import Link from "next/link";
+import { EmptyState, buttonStyles } from "@/src/components/ui";
 
 interface MessagePageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -20,15 +21,11 @@ export default async function MessagePage({ searchParams }: MessagePageProps) {
 
   if (!messageId) {
     return (
-      <div className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-300">پیام معتبر نیست</p>
-        <Link
-          href="/incoming-messages"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-        >
-          بازگشت به پیام‌ها
-        </Link>
-      </div>
+      <EmptyState
+        className="m-4 min-h-[calc(100vh-124px)]"
+        title="پیام معتبر نیست"
+        action={<Link href="/incoming-messages" className={buttonStyles()}>بازگشت به پیام‌ها</Link>}
+      />
     );
   }
 
@@ -36,17 +33,11 @@ export default async function MessagePage({ searchParams }: MessagePageProps) {
 
   if (!result.success || !result.message) {
     return (
-      <div className="flex min-h-[calc(100vh-92px)] flex-col items-center justify-center gap-4 p-8 text-center dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-300">
-          {result.error || "پیام یافت نشد"}
-        </p>
-        <Link
-          href="/incoming-messages"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
-        >
-          بازگشت به پیام‌ها
-        </Link>
-      </div>
+      <EmptyState
+        className="m-4 min-h-[calc(100vh-124px)]"
+        title={result.error || "پیام یافت نشد"}
+        action={<Link href="/incoming-messages" className={buttonStyles()}>بازگشت به پیام‌ها</Link>}
+      />
     );
   }
 

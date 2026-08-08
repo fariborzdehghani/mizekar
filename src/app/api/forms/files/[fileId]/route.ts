@@ -3,6 +3,7 @@ import path from "path";
 import type { NextRequest } from "next/server";
 import { prisma } from "@/src/lib/prisma";
 import { verifySignedResourceToken } from "@/src/lib/onlyoffice";
+import { parsePositiveInteger } from "@/src/lib/input";
 
 export const runtime = "nodejs";
 
@@ -18,13 +19,13 @@ function getMimeType(fileName: string | null | undefined) {
 
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ fileId: string }> }
+  context: RouteContext<"/api/forms/files/[fileId]">,
 ) {
   const { fileId } = await context.params;
-  const id = Number(fileId);
+  const id = parsePositiveInteger(fileId);
   const token = request.nextUrl.searchParams.get("token");
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     return new Response("Invalid file id", { status: 400 });
   }
 

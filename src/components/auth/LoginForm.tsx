@@ -2,10 +2,11 @@
 
 import { useActionState } from "react";
 import { loginAction, type LoginState } from "@/src/actions/authActions";
+import { Alert, Button, Field, Input } from "@/src/components/ui";
 
 const initialState: LoginState = {};
 
-export default function LoginForm() {
+export default function LoginForm({ redirectTo }: { redirectTo: string }) {
   const [state, formAction, pending] = useActionState(
     loginAction,
     initialState
@@ -13,55 +14,43 @@ export default function LoginForm() {
 
   return (
     <form action={formAction} className="space-y-5">
-      <div>
-        <label
-          htmlFor="username"
-          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          نام کاربری
-        </label>
-        <input
+      <input type="hidden" name="redirectTo" value={redirectTo} />
+      <Field label="نام کاربری" htmlFor="username" required>
+        <Input
           id="username"
           name="username"
           type="text"
           autoComplete="username"
           required
           dir="ltr"
-          className="liquid-glass-control h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 text-left text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="text-left"
         />
-      </div>
+      </Field>
 
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-        >
-          رمز عبور
-        </label>
-        <input
+      <Field label="رمز عبور" htmlFor="password" required>
+        <Input
           id="password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
           dir="ltr"
-          className="liquid-glass-control h-11 w-full rounded-2xl border border-gray-300 bg-white px-4 text-left text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="text-left"
         />
-      </div>
+      </Field>
 
       {state.error ? (
-        <p className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700 dark:border-error-900 dark:bg-error-950 dark:text-error-200">
-          {state.error}
-        </p>
+        <Alert tone="error">{state.error}</Alert>
       ) : null}
 
-      <button
+      <Button
         type="submit"
-        disabled={pending}
-        className="flex h-11 w-full items-center justify-center rounded-lg bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
+        block
+        loading={pending}
+        loadingLabel="در حال ورود..."
       >
-        {pending ? "در حال ورود..." : "ورود"}
-      </button>
+        ورود
+      </Button>
     </form>
   );
 }

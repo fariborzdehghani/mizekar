@@ -1,14 +1,16 @@
 import React from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { IconButton } from "@/src/components/ui";
 
 export const ThemeToggleButton: React.FC = () => {
   const { toggleTheme } = useTheme();
 
   return (
-    <button
+    <IconButton
+      type="button"
       onClick={toggleTheme}
       aria-label="تغییر حالت نمایش"
-      className="liquid-glass-keyline relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
+      variant="secondary"
     >
       <svg
         className="hidden dark:block"
@@ -38,6 +40,6 @@ export const ThemeToggleButton: React.FC = () => {
           fill="currentColor"
         />
       </svg>
-    </button>
+    </IconButton>
   );
 };

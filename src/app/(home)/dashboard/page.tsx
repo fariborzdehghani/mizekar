@@ -11,6 +11,7 @@ import {
   Send,
 } from "lucide-react";
 import { getDashboardStats } from "@/src/actions/dashboardActions";
+import { PageTitle, buttonStyles } from "@/src/components/ui";
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat("fa-IR").format(value);
@@ -30,7 +31,7 @@ function StatCard({
   accentClass: string;
 }) {
   return (
-    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="flex items-start justify-between gap-4">
         <div className="text-right">
           <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -114,7 +115,7 @@ function TrendChart({ data }: { data: Array<{ label: string; value: number }> })
     .join(" ");
 
   return (
-    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />
         <div className="text-right">
@@ -196,7 +197,7 @@ function PieChart({ data }: { data: ChartDatum[] }) {
       : "#e5e7eb 0% 100%";
 
   return (
-    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <Archive className="h-5 w-5 text-slate-600 dark:text-slate-300" />
         <div className="text-right">
@@ -264,7 +265,7 @@ function ColumnChart({
   ] as const;
 
   return (
-    <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+    <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div className="mb-4 flex items-center justify-between gap-3">
         <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
         <div className="text-right">
@@ -371,25 +372,18 @@ export default async function DashboardPage() {
     <main className="min-h-[calc(100vh-65px)] bg-app-canvas dark:bg-gray-950 lg:min-h-[calc(100vh-77px)]">
       <div className="liquid-content-frame flex w-full flex-col gap-6 py-4 lg:pb-6">
         <div className="liquid-page-header flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              داشبورد
-            </h1>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              نمای کلی آمار حساب کاربری شما
-            </p>
-          </div>
+          <PageTitle title="داشبورد" description="نمای کلی آمار حساب کاربری شما" />
           <div className="flex flex-wrap items-center gap-2 md:justify-end">
             <Link
               href="/letter"
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:border-blue-300 hover:text-blue-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
+              className={buttonStyles({ variant: "secondary" })}
             >
               <FileText className="h-4 w-4" />
               نامه جدید
             </Link>
             <Link
               href="/new-message"
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+              className={buttonStyles()}
             >
               <Send className="h-4 w-4" />
               پیام جدید
@@ -436,7 +430,7 @@ export default async function DashboardPage() {
         <ColumnChart groups={columnGroups} />
 
         <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
             <div className="mb-5 flex items-center justify-between gap-3">
               <BarChart3 className="h-5 w-5 text-blue-600 dark:text-blue-300" />
               <div className="text-right">
@@ -465,7 +459,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <FileText className="h-5 w-5 text-blue-600 dark:text-blue-300" />
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -500,7 +494,7 @@ export default async function DashboardPage() {
               </dl>
             </div>
 
-            <div className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900">
               <div className="mb-4 flex items-center justify-between">
                 <CalendarDays className="h-5 w-5 text-emerald-600 dark:text-emerald-300" />
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">

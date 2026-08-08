@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mizekar
 
-## Getting Started
+Mizekar is a Persian RTL office-workflow application built with Next.js 16, React 19, Prisma, and Microsoft SQL Server. It covers letters, forms, referrals, meetings, messages, archives, notifications, and AI-assisted workflows.
 
-First, run the development server:
+## Requirements
+
+- Node.js 22.6 or newer
+- Microsoft SQL Server
+- Environment variables copied from `.env.example`
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application is available at `http://localhost:3000` by default.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Validation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Run the complete local quality gate before merging:
 
-## Learn More
+```bash
+npm run verify
+```
 
-To learn more about Next.js, take a look at the following resources:
+Individual checks are also available:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run test
+npm run lint
+npm run typecheck
+npm run ui:check
+npm run quality:check
+npm run build
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+See `CODE_QUALITY.md` for architecture and boundary conventions, and `UI_SYSTEM.md` for the visual implementation contract.
 
-## Deploy on Vercel
+## Production notes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `AUTH_SECRET` or `NEXTAUTH_SECRET` is required in production.
+- Database variables are validated when the server data layer initializes.
+- Uploaded files live under `public/uploads` unless a feature-specific storage directory is configured.
+- Configure the OnlyOffice and AI provider variables only when those integrations are enabled.

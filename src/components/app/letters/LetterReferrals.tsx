@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import RecipientsModal from "./RecipientsModal";
+import { toLatinDigits } from "@/src/lib/text";
 
 interface Person {
   id: number;
@@ -75,33 +76,6 @@ const persianDisplayFormatter = new Intl.DateTimeFormat(
     day: "numeric",
   }
 );
-
-function toLatinDigits(value: string) {
-  const digitMap: Record<string, string> = {
-    "۰": "0",
-    "۱": "1",
-    "۲": "2",
-    "۳": "3",
-    "۴": "4",
-    "۵": "5",
-    "۶": "6",
-    "۷": "7",
-    "۸": "8",
-    "۹": "9",
-    "٠": "0",
-    "١": "1",
-    "٢": "2",
-    "٣": "3",
-    "٤": "4",
-    "٥": "5",
-    "٦": "6",
-    "٧": "7",
-    "٨": "8",
-    "٩": "9",
-  };
-
-  return value.replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
-}
 
 function getPersianDateParts(date: Date) {
   const parts = persianPartsFormatter.formatToParts(date);
@@ -453,7 +427,7 @@ export default function LetterReferrals({
   };
 
   return (
-    <section className="liquid-glass-surface mx-4 mb-6 rounded-[28px] border border-white/60 px-6 py-6 dark:border-white/10 sm:mx-6">
+    <section className="liquid-glass-surface mx-4 mb-6 rounded-panel border border-white/60 px-6 py-6 dark:border-white/10 sm:mx-6">
       <RecipientsModal
         isOpen={isReceiversModalOpen}
         onClose={() => setIsReceiversModalOpen(false)}

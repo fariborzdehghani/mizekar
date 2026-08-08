@@ -3,6 +3,19 @@
 import { prisma } from "@/src/lib/prisma";
 import { requireUser, requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
+import { getPlainTextSnippet, hasRichTextContent } from "@/src/lib/richText";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
+import type { DisplayUser as UserForDisplay } from "@/src/lib/userDisplay";
+import {
+  getUniqueUserIds,
+  parsePersonSelections,
+} from "@/src/lib/selection";
+import {
+  parsePositiveInteger,
+  readFormText,
+  readInteger,
+  readPositiveInteger,
+} from "@/src/lib/input";
 
 const REFERRAL_STATUS_IN_PROGRESS = 0;
 const REFERRAL_STATUS_DONE = 1;
@@ -11,68 +24,6 @@ const MEETING_APPROVAL_APPROVED = 1;
 const ATTENDEE_ROLE_MEMBER = 0;
 const ATTENDEE_ROLE_CHAIR = 1;
 const ATTENDEE_ROLE_SECRETARY = 2;
-
-interface PersonInput {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-  job: string | null;
-  user_id: number | null;
-}
-
-interface ReferralReceiverInput {
-  user_id: number | null;
-}
-
-type UserForDisplay =
-  | {
-      id: number;
-      user_id: string | null;
-      persons_persons_user_idTousers?: Array<{
-        first_name: string | null;
-        last_name: string | null;
-        job: string | null;
-      }>;
-    }
-  | null
-  | undefined;
-
-function getPlainTextSnippet(value: string | null | undefined) {
-  return (value || "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 140);
-}
-
-function hasRichTextContent(value: string | null | undefined) {
-  const content = value || "";
-  const plainText = content
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  return plainText.length > 0 || /<(img|table|ul|ol)\b/i.test(content);
-}
-
-function getUserDisplayName(user: UserForDisplay) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-
-  if (fullName) {
-    return job ? `${fullName} - ${job}` : fullName;
-  }
-
-  const fallbackName = user?.user_id || (user?.id ? `User #${user.id}` : "-");
-
-  return job && fallbackName !== "-" ? `${fallbackName} - ${job}` : fallbackName;
-}
 
 function parseDateTime(dateValue: string | null, timeValue: string | null) {
   if (!dateValue || !timeValue) return null;
@@ -101,23 +52,8 @@ function parseDateTime(dateValue: string | null, timeValue: string | null) {
   return date;
 }
 
-function parsePeopleJson(value: string | null) {
-  if (!value) return [] as PersonInput[];
-
-  const people = JSON.parse(value) as PersonInput[];
-  if (!Array.isArray(people)) return [];
-
-  return people;
-}
-
-function getValidUserIds(people: Array<{ user_id: number | null }>) {
-  return [
-    ...new Set(
-      people
-        .map((person) => Number(person.user_id))
-        .filter((id) => Number.isInteger(id) && id > 0)
-    ),
-  ];
+function parsePeopleJson(value: FormDataEntryValue | null) {
+  return typeof value === "string" ? parsePersonSelections(value) : null;
 }
 
 async function validateExistingUsers(userIds: number[]) {
@@ -160,14 +96,14 @@ async function getArchivedMeetingIdsForUser(userId: number) {
 export async function createMeeting(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const title = String(formData.get("title") || "").trim();
-    const description = String(formData.get("description") || "").trim();
-    const locationType = Number(formData.get("locationType"));
-    const locationTitle = String(formData.get("locationTitle") || "").trim();
-    const minutes = String(formData.get("minutes") || "");
+    const title = readFormText(formData, "title");
+    const description = readFormText(formData, "description");
+    const locationType = readInteger(formData, "locationType");
+    const locationTitle = readFormText(formData, "locationTitle");
+    const minutes = readFormText(formData, "minutes", { trim: false });
     const meetingAt = parseDateTime(
-      formData.get("meetingDate") as string | null,
-      formData.get("meetingTime") as string | null
+      readFormText(formData, "meetingDate"),
+      readFormText(formData, "meetingTime"),
     );
 
     if (!title || !meetingAt || !hasRichTextContent(minutes)) {
@@ -177,7 +113,7 @@ export async function createMeeting(formData: FormData) {
       };
     }
 
-    if (![0, 1].includes(locationType)) {
+    if (locationType === null || ![0, 1].includes(locationType)) {
       return {
         success: false,
         error: "نوع جلسه معتبر نیست",
@@ -194,33 +130,29 @@ export async function createMeeting(formData: FormData) {
       };
     }
 
-    let attendees: PersonInput[] = [];
-    let chair: PersonInput[] = [];
-    let secretary: PersonInput[] = [];
+    const attendees = parsePeopleJson(formData.get("attendees"));
+    const chair = parsePeopleJson(formData.get("chair"));
+    const secretary = parsePeopleJson(formData.get("secretary"));
 
-    try {
-      attendees = parsePeopleJson(formData.get("attendees") as string | null);
-      chair = parsePeopleJson(formData.get("chair") as string | null);
-      secretary = parsePeopleJson(formData.get("secretary") as string | null);
-    } catch {
+    if (!attendees || !chair || !secretary) {
       return {
         success: false,
         error: "داده کاربران جلسه نامعتبر است",
       };
     }
 
-    const chairUserId = Number(chair[0]?.user_id);
-    const secretaryUserId = Number(secretary[0]?.user_id);
-    const attendeeUserIds = getValidUserIds(attendees);
+    const chairUserId = parsePositiveInteger(chair[0]?.user_id);
+    const secretaryUserId = parsePositiveInteger(secretary[0]?.user_id);
+    const attendeeUserIds = getUniqueUserIds(attendees);
 
-    if (!Number.isInteger(chairUserId) || chairUserId <= 0) {
+    if (!chairUserId) {
       return {
         success: false,
         error: "رئیس جلسه باید کاربر سیستم باشد",
       };
     }
 
-    if (!Number.isInteger(secretaryUserId) || secretaryUserId <= 0) {
+    if (!secretaryUserId) {
       return {
         success: false,
         error: "دبیر جلسه باید کاربر سیستم باشد",
@@ -358,11 +290,11 @@ export async function approveMeeting(meetingId: number) {
 export async function createMeetingReferral(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const meetingId = Number(formData.get("meetingId"));
-    const content = formData.get("content") as string | null;
-    const receiversJson = formData.get("receivers") as string | null;
+    const meetingId = readPositiveInteger(formData, "meetingId");
+    const content = readFormText(formData, "content", { trim: false });
+    const receiversJson = readFormText(formData, "receivers");
 
-    if (!Number.isInteger(meetingId) || meetingId <= 0) {
+    if (!meetingId) {
       return {
         success: false,
         error: "جلسه معتبر نیست",
@@ -383,23 +315,15 @@ export async function createMeetingReferral(formData: FormData) {
       };
     }
 
-    let receivers: ReferralReceiverInput[] = [];
-    try {
-      receivers = JSON.parse(receiversJson) as ReferralReceiverInput[];
-    } catch {
+    const receivers = parsePersonSelections(receiversJson);
+    if (!receivers) {
       return {
         success: false,
         error: "داده گیرندگان ارجاع نامعتبر است",
       };
     }
 
-    const receiverIds = [
-      ...new Set(
-        receivers
-          .map((receiver) => Number(receiver.user_id))
-          .filter((id) => Number.isInteger(id) && id > 0)
-      ),
-    ];
+    const receiverIds = getUniqueUserIds(receivers);
 
     if (receiverIds.length === 0) {
       return {

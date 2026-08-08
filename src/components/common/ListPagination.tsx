@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { buttonStyles } from "@/src/components/ui";
 
 interface ListPaginationProps {
   currentPage: number;
@@ -20,10 +21,8 @@ export default function ListPagination({
   const activePage = Math.min(Math.max(currentPage, 1), totalPages);
   const firstItem = totalItems === 0 ? 0 : (activePage - 1) * pageSize + 1;
   const lastItem = Math.min(activePage * pageSize, totalItems);
-  const disabledClass =
-    "inline-flex h-9 items-center gap-1 rounded-xl border border-black/5 px-3 opacity-40 dark:border-white/5";
-  const linkClass =
-    "liquid-glass-control inline-flex h-9 items-center gap-1 rounded-xl border px-3 transition hover:text-brand-600";
+  const disabledClass = `${buttonStyles({ variant: "secondary", size: "sm" })} pointer-events-none opacity-40`;
+  const linkClass = buttonStyles({ variant: "secondary", size: "sm" });
 
   return (
     <div className="flex flex-col gap-3 border-t border-black/5 px-5 py-4 text-xs font-medium text-gray-500 dark:border-white/5 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
@@ -40,7 +39,7 @@ export default function ListPagination({
               قبلی
             </Link>
           ) : (
-            <span className={disabledClass}>
+            <span className={disabledClass} aria-disabled="true">
               <ChevronRight className="h-4 w-4" />
               قبلی
             </span>
@@ -54,7 +53,7 @@ export default function ListPagination({
               <ChevronLeft className="h-4 w-4" />
             </Link>
           ) : (
-            <span className={disabledClass}>
+            <span className={disabledClass} aria-disabled="true">
               بعدی
               <ChevronLeft className="h-4 w-4" />
             </span>

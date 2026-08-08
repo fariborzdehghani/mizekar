@@ -6,14 +6,9 @@ import {
   verifyOnlyOfficeJwt,
   verifySignedResourceToken,
 } from "@/src/lib/onlyoffice";
+import { parsePositiveInteger, readJsonObject } from "@/src/lib/input";
 
 export const runtime = "nodejs";
-
-type OnlyOfficeCallbackBody = {
-  status?: number;
-  url?: string;
-  token?: string;
-};
 
 function onlyOfficeResponse(error = 0) {
   return Response.json({ error });
@@ -21,13 +16,13 @@ function onlyOfficeResponse(error = 0) {
 
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ instanceId: string }> }
+  context: RouteContext<"/api/forms/onlyoffice/callback/[instanceId]">,
 ) {
   const { instanceId } = await context.params;
-  const id = Number(instanceId);
+  const id = parsePositiveInteger(instanceId);
   const callbackToken = request.nextUrl.searchParams.get("token");
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     return onlyOfficeResponse(1);
   }
 
@@ -35,22 +30,24 @@ export async function POST(
     return onlyOfficeResponse(1);
   }
 
-  let body: OnlyOfficeCallbackBody;
-  try {
-    body = (await request.json()) as OnlyOfficeCallbackBody;
-  } catch {
+  const body = await readJsonObject(request);
+  if (!body) {
     return onlyOfficeResponse(1);
   }
 
-  if (!verifyOnlyOfficeJwt(body.token)) {
+  const token = typeof body.token === "string" ? body.token : null;
+  const status = typeof body.status === "number" ? body.status : null;
+  const documentUrl = typeof body.url === "string" ? body.url : null;
+
+  if (!verifyOnlyOfficeJwt(token)) {
     return onlyOfficeResponse(1);
   }
 
-  if (body.status !== 2 && body.status !== 6) {
+  if (status !== 2 && status !== 6) {
     return onlyOfficeResponse(0);
   }
 
-  if (!body.url) {
+  if (!documentUrl) {
     return onlyOfficeResponse(1);
   }
 
@@ -64,7 +61,10 @@ export async function POST(
   }
 
   try {
-    const response = await fetch(body.url);
+    const response = await fetch(documentUrl, {
+      cache: "no-store",
+      signal: AbortSignal.timeout(60_000),
+    });
     if (!response.ok) return onlyOfficeResponse(1);
 
     const bytes = new Uint8Array(await response.arrayBuffer());

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Eye, FileText } from "lucide-react";
 import InboxListToolbar from "@/src/components/common/InboxListToolbar";
+import { EmptyState, PageTitle, buttonStyles } from "@/src/components/ui";
 
 type FormListItem = {
   id: number;
@@ -44,33 +45,29 @@ export default function FormList({
       <div className="liquid-page-header flex items-center justify-between">
         <Link
           href="/new-form"
-          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
+          className={buttonStyles()}
         >
           فرم جدید
         </Link>
-        <div className="text-right">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {title}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {forms.length} فرم
-          </p>
-        </div>
+        <PageTitle title={title} description={`${forms.length} فرم`} />
       </div>
 
       {forms.length === 0 ? (
-        <div className="liquid-glass-surface flex flex-1 flex-col items-center justify-center rounded-3xl border p-8 text-center">
-          <FileText className="mb-3 h-10 w-10 text-gray-300 dark:text-gray-600" />
-          <p className="mb-4 text-gray-600 dark:text-gray-400">{emptyText}</p>
+        <EmptyState
+          className="flex-1"
+          icon={<FileText className="h-6 w-6" />}
+          title={emptyText}
+          action={
           <Link
             href="/new-form"
-            className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
+            className={buttonStyles()}
           >
             ایجاد فرم
           </Link>
-        </div>
+          }
+        />
       ) : (
-        <div className="liquid-table-shell overflow-hidden rounded-[28px]">
+        <div className="liquid-table-shell overflow-hidden rounded-panel">
           <InboxListToolbar searchPlaceholder="جستجو در فرم‌ها..." />
           <div className="overflow-x-auto">
           <table className="inbox-card-table inbox-card-table--forms w-full">

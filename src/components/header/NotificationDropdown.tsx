@@ -171,14 +171,14 @@ export default function NotificationDropdown() {
   return (
     <div ref={dropdownAnchorRef} className="relative hidden sm:block">
       <button
-        className="dropdown-toggle liquid-glass-keyline relative grid h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
+        className="dropdown-toggle liquid-glass-keyline relative grid h-10 w-10 shrink-0 place-items-center rounded-control border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
         onClick={toggleDropdown}
         aria-label="اعلان‌ها"
         aria-expanded={isOpen}
         type="button"
       >
         {unreadCount > 0 && (
-          <span className="absolute -left-1 -top-1 z-10 inline-flex min-w-5 items-center justify-center rounded-full bg-blue-light-600 px-1.5 text-[10px] font-semibold leading-5 text-white">
+          <span className="absolute -left-1 -top-1 z-10 inline-flex min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[10px] font-semibold leading-5 text-white">
             {unreadCount > 9 ? "+9" : unreadCount}
           </span>
         )}
@@ -191,7 +191,7 @@ export default function NotificationDropdown() {
         glassVariant="surface"
         portal
         anchorRef={dropdownAnchorRef}
-        className="flex h-[430px] w-[350px] flex-col rounded-[22px] p-3 sm:w-[380px]"
+        className="flex h-[430px] w-[350px] flex-col rounded-card p-3 sm:w-[380px]"
       >
         <div className="mb-3 flex items-center justify-between border-b border-app-border pb-3 dark:border-gray-700">
           <h5 className="text-lg font-semibold text-gray-800 dark:text-gray-200">

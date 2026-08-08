@@ -1,6 +1,7 @@
 import LetterForm from "@/src/components/app/letters/letter";
 import { getLetter } from "@/src/actions/letterActions";
 import LetterArchiveSuggestionToast from "@/src/components/app/letters/LetterArchiveSuggestionToast";
+import { parsePositiveInteger } from "@/src/lib/input";
 
 interface LetterPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -8,7 +9,9 @@ interface LetterPageProps {
 
 export default async function LetterPage({ searchParams }: LetterPageProps) {
   const params = await searchParams;
-  const letterId = params.id ? parseInt(params.id as string) : null;
+  const letterId = parsePositiveInteger(
+    Array.isArray(params.id) ? params.id[0] : params.id,
+  );
   const isViewMode = params.viewOnly === "true";
 
   let letterData = null;

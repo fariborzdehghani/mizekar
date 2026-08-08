@@ -3,6 +3,7 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { X, Plus } from "lucide-react";
 import { searchPersons } from "@/src/actions/letterActions";
+import { Button, Dialog, IconButton, Input } from "@/src/components/ui";
 
 interface Person {
   id: number;
@@ -116,37 +117,30 @@ export default function RecipientsModal({
   if (!isOpen) return null;
 
   return (
-    <div className="liquid-modal-backdrop fixed inset-0 z-[1000001] flex items-center justify-center p-4">
-      <div className="liquid-modal liquid-modal-dialog flex h-[82vh] max-h-[720px] w-full max-w-3xl flex-col overflow-hidden rounded-[28px]">
-        {/* Header */}
-        <div className="liquid-modal-header flex shrink-0 items-center justify-between px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {title}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="liquid-glass-control inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
-            aria-label={closeLabel}
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden p-6">
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      closeLabel={closeLabel}
+      className="h-[82vh]"
+      contentClassName="flex flex-col gap-6 overflow-hidden"
+      footer={
+        <Button type="button" onClick={onClose}>
+          {closeLabel}
+        </Button>
+      }
+    >
           {/* Search Section */}
           <div className="shrink-0">
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               {searchLabel}
             </label>
             <div className="relative">
-              <input
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder={searchPlaceholder}
-                className="liquid-glass-control w-full rounded-2xl border px-4 py-2.5 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
               />
 
               {/* Search Results Dropdown */}
@@ -199,13 +193,16 @@ export default function RecipientsModal({
                     <span className="min-w-0 truncate text-sm font-medium text-gray-900 dark:text-white">
                       {getPersonName(recipient)}
                     </span>
-                    <button
+                    <IconButton
                       type="button"
                       onClick={() => onRemoveRecipient(recipient.id)}
-                      className="shrink-0 text-red-500 transition hover:text-red-700 dark:hover:text-red-400"
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                      aria-label={`حذف ${getPersonName(recipient)}`}
                     >
                       <X className="h-5 w-5" />
-                    </button>
+                    </IconButton>
                   </div>
                 ))}
               </div>
@@ -215,19 +212,6 @@ export default function RecipientsModal({
               </div>
             )}
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="liquid-modal-footer flex shrink-0 justify-end gap-3 px-6 py-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl bg-brand-500 px-6 py-2.5 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
-          >
-            {closeLabel}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

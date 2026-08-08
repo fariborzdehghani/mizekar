@@ -4,10 +4,15 @@ import { redirect } from "next/navigation";
 import {
   createSession,
   deleteSession,
-  getCalculatedUserPermissions,
 } from "@/src/lib/auth";
-import { verifyPassword } from "@/src/lib/password";
+import {
+  hashPassword,
+  needsPasswordRehash,
+  verifyPassword,
+} from "@/src/lib/password";
 import { prisma } from "@/src/lib/prisma";
+import { readFormText } from "@/src/lib/input";
+import { getSafeInternalPath, setInternalPathQuery } from "@/src/lib/navigation";
 
 export type LoginState = {
   error?: string;
@@ -17,8 +22,9 @@ export async function loginAction(
   _previousState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  const username = String(formData.get("username") || "").trim();
-  const password = String(formData.get("password") || "");
+  const username = readFormText(formData, "username");
+  const password = readFormText(formData, "password", { trim: false });
+  const redirectTo = getSafeInternalPath(readFormText(formData, "redirectTo"));
 
   if (!username || !password) {
     return { error: "نام کاربری و رمز عبور را وارد کنید." };
@@ -28,7 +34,6 @@ export async function loginAction(
     where: { user_id: username },
     select: {
       id: true,
-      role_id: true,
       password: true,
     },
   });
@@ -37,10 +42,15 @@ export async function loginAction(
     return { error: "نام کاربری یا رمز عبور درست نیست." };
   }
 
-  const permissions = await getCalculatedUserPermissions(user.id, user.role_id);
+  if (needsPasswordRehash(user.password)) {
+    await prisma.users.update({
+      where: { id: user.id },
+      data: { password: hashPassword(password) },
+    });
+  }
 
-  await createSession(user, permissions);
-  redirect("/?brief=login");
+  await createSession(user);
+  redirect(setInternalPathQuery(redirectTo, "brief", "login"));
 }
 
 export async function logoutAction() {

@@ -2,12 +2,21 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import LoginForm from "@/src/components/auth/LoginForm";
 import { getCurrentUser } from "@/src/lib/auth";
+import { getSafeInternalPath } from "@/src/lib/navigation";
 
-export default async function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const redirectTo = getSafeInternalPath(
+    Array.isArray(params.next) ? params.next[0] : params.next,
+  );
   const user = await getCurrentUser();
 
   if (user) {
-    redirect("/");
+    redirect(redirectTo);
   }
 
   return (
@@ -44,7 +53,7 @@ export default async function SignInPage() {
             </p>
           </div>
 
-          <LoginForm />
+          <LoginForm redirectTo={redirectTo} />
         </div>
       </section>
 
@@ -59,7 +68,7 @@ export default async function SignInPage() {
         />
         <div className="absolute inset-0 bg-gray-950/35" />
 
-        <div className="liquid-glass-panel relative mx-5 flex w-full max-w-[680px] flex-col items-center rounded-[28px] border border-white/25 bg-white/45 px-8 py-12 text-center shadow-theme-xl backdrop-blur-sm dark:border-white/15 dark:bg-gray-950/35 sm:px-16 sm:py-16">
+        <div className="liquid-glass-panel relative mx-5 flex w-full max-w-[680px] flex-col items-center rounded-panel border border-white/25 bg-white/45 px-8 py-12 text-center shadow-theme-xl backdrop-blur-sm dark:border-white/15 dark:bg-gray-950/35 sm:px-16 sm:py-16">
           <Image
             src="/images/logo/logo-icon.png"
             alt="Mizekar"

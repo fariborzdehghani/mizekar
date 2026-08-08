@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { createFormInstance } from "@/src/actions/formActions";
 import FormInstanceView, { type FormInstance } from "./FormInstanceView";
+import { Alert, Button, PageTitle } from "@/src/components/ui";
 
 type Template = {
   id: number;
@@ -88,25 +89,22 @@ export default function NewFormLauncher({
       onSubmit={handleCreate}
       className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col gap-5 py-4 sm:py-6 lg:py-8"
     >
-      <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <button
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button
           type="submit"
-          disabled={isSubmitting || !selectedTemplate}
-          className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!selectedTemplate}
+          loading={isSubmitting}
+          loadingLabel="در حال ایجاد..."
+          leadingIcon={<SendHorizontal className="h-4 w-4" />}
         >
-          <SendHorizontal className="h-4 w-4" />
-          {isSubmitting ? "در حال ایجاد..." : "ایجاد فرم"}
-        </button>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          فرم جدید
-        </h1>
+          ایجاد فرم
+        </Button>
+        <PageTitle title="فرم جدید" description="انتخاب قالب و ایجاد گردش کار جدید" />
       </div>
 
       <div className="liquid-glass-panel flex flex-1 flex-col rounded-3xl border lg:flex-row">
         {error && (
-          <div className="mx-4 mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200 lg:hidden">
-            {error}
-          </div>
+          <Alert tone="error" className="mx-4 mt-4 lg:hidden">{error}</Alert>
         )}
 
         <aside className="liquid-glass-inset flex h-full min-h-[220px] border-0 border-b lg:min-h-[calc(100vh-142px)] lg:w-96 lg:shrink-0 lg:border-b-0 lg:border-l">

@@ -10,8 +10,10 @@ import {
   type LetterKeywordTag,
 } from "@/src/lib/letterTags";
 import type { CurrentUser } from "@/src/lib/auth-types";
+import { toLatinDigits } from "@/src/lib/text";
 import Link from "next/link";
 import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
+import { Button, Field, Input, buttonStyles } from "@/src/components/ui";
 import {
   CalendarDays,
   ChevronLeft,
@@ -64,33 +66,6 @@ const persianDisplayFormatter = new Intl.DateTimeFormat(
     day: "numeric",
   }
 );
-
-function toLatinDigits(value: string) {
-  const digitMap: Record<string, string> = {
-    "۰": "0",
-    "۱": "1",
-    "۲": "2",
-    "۳": "3",
-    "۴": "4",
-    "۵": "5",
-    "۶": "6",
-    "۷": "7",
-    "۸": "8",
-    "۹": "9",
-    "٠": "0",
-    "١": "1",
-    "٢": "2",
-    "٣": "3",
-    "٤": "4",
-    "٥": "5",
-    "٦": "6",
-    "٧": "7",
-    "٨": "8",
-    "٩": "9",
-  };
-
-  return value.replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
-}
 
 function getPersianDateParts(date: Date) {
   const parts = persianPartsFormatter.formatToParts(date);
@@ -229,7 +204,7 @@ function ShamsiDatePicker({
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
-        className="inline-flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-app-border bg-white/80 px-4 text-sm text-gray-700 transition hover:bg-blue-light-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-white/5"
+        className={buttonStyles({ variant: "secondary", size: "lg", block: true, className: "justify-between" })}
       >
         <span className="inline-flex min-w-0 items-center gap-2">
           <CalendarDays className="h-4 w-4 shrink-0 text-gray-500" />
@@ -240,7 +215,7 @@ function ShamsiDatePicker({
       </button>
 
       {isOpen && (
-        <div className="liquid-glass-surface absolute left-0 top-12 z-[60] w-72 rounded-[20px] border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
+        <div className="liquid-glass-surface absolute left-0 top-12 z-[60] w-72 rounded-card border border-app-border bg-app-panel p-3 shadow-theme-lg dark:border-gray-700 dark:bg-gray-900">
           <div className="mb-3 flex items-center justify-between">
             <button
               type="button"
@@ -429,7 +404,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
 
   return (
     <header className="sticky top-0 z-[99999] h-[92px] w-full bg-transparent px-4 pt-4 sm:px-6 lg:px-8">
-      <div className="liquid-glass-header relative mx-auto flex h-[76px] max-w-[1540px] items-center gap-3 rounded-[24px] border border-white/60 px-3 dark:border-white/10 sm:px-5">
+      <div className="liquid-glass-header relative mx-auto flex h-[76px] max-w-[1540px] items-center gap-3 rounded-card border border-white/60 px-3 dark:border-white/10 sm:px-5">
           <button
             className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-gray-500 transition hover:bg-black/5 hover:text-brand-600 dark:text-gray-400 dark:hover:bg-white/5 lg:hidden"
             onClick={handleToggle}
@@ -472,29 +447,9 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
           </button>
 
           <button
-            onClick={() => setIsAdvancedSearchOpen((current) => !current)}
-            className="hidden"
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M5.99902 10.4951C6.82745 10.4951 7.49902 11.1667 7.49902 11.9951V12.0051C7.49902 12.8335 6.82745 13.5051 5.99902 13.5051C5.1706 13.5051 4.49902 12.8335 4.49902 12.0051V11.9951C4.49902 11.1667 5.1706 10.4951 5.99902 10.4951ZM17.999 10.4951C18.8275 10.4951 19.499 11.1667 19.499 11.9951V12.0051C19.499 12.8335 18.8275 13.5051 17.999 13.5051C17.1706 13.5051 16.499 12.8335 16.499 12.0051V11.9951C16.499 11.1667 17.1706 10.4951 17.999 10.4951ZM13.499 11.9951C13.499 11.1667 12.8275 10.4951 11.999 10.4951C11.1706 10.4951 10.499 11.1667 10.499 11.9951V12.0051C10.499 12.8335 11.1706 13.5051 11.999 13.5051C12.8275 13.5051 13.499 12.8335 13.499 12.0051V11.9951Z"
-                fill="currentColor"
-              />
-            </svg>
-          </button>
-
-          <button
             type="button"
             onClick={toggleSidebar}
-            className="liquid-glass-keyline hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300 lg:grid"
+            className="liquid-glass-keyline hidden h-10 w-10 shrink-0 place-items-center rounded-control border bg-white/50 text-[var(--liquid-muted)] transition hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300 lg:grid"
             title={isExpanded ? "جمع کردن نوار کناری" : "باز کردن نوار کناری"}
             aria-label={
               isExpanded ? "جمع کردن نوار کناری" : "باز کردن نوار کناری"
@@ -512,8 +467,8 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             <div className="flex items-center gap-2">
             <form className="min-w-0 flex-1" onSubmit={handleFastSearchSubmit}>
               <div className="relative">
-                <Search className="pointer-events-none absolute right-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--liquid-muted)]" />
-                <input
+                <Search className="pointer-events-none absolute start-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-[var(--liquid-muted)]" />
+                <Input
                   key={`${pathname}-${searchValue}`}
                   ref={inputRef}
                   name="q"
@@ -521,14 +476,14 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                   defaultValue={searchValue}
                   aria-label="جستجو در سامانه"
                   placeholder="جستجوی نامه، همکار یا واحد..."
-                  className="liquid-glass-keyline h-11 w-full rounded-[15px] border bg-black/[0.035] pr-11 pl-4 text-sm font-medium text-[var(--liquid-ink)] outline-none transition placeholder:text-[var(--liquid-muted)] focus:bg-white/65 dark:bg-white/[0.045] dark:focus:bg-white/[0.07]"
+                  className="ui-control-with-start-icon font-medium"
                 />
               </div>
             </form>
             <button
               type="button"
               onClick={() => setIsAdvancedSearchOpen((current) => !current)}
-              className={`dropdown-toggle hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+              className={`dropdown-toggle hidden h-10 w-10 shrink-0 place-items-center rounded-control border transition sm:grid ${
                 isAdvancedSearchOpen
                   ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
                   : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045]"
@@ -548,16 +503,17 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                 glassVariant="surface"
                 portal
                 anchorRef={advancedSearchRef}
-                className="w-[min(24rem,calc(100vw-2rem))] rounded-[22px] p-4 text-right"
+                className="w-[min(24rem,calc(100vw-2rem))] rounded-card p-4 text-right"
               >
                 <div className="mb-4 flex items-center justify-between gap-3 border-b border-app-border pb-3 dark:border-gray-800">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setIsAdvancedSearchOpen(false)}
-                    className="rounded-md px-2 py-1 text-sm text-gray-500 transition hover:bg-gray-50 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
+                    variant="ghost"
+                    size="sm"
                   >
                     بستن
-                  </button>
+                  </Button>
                   <h2 className="text-base font-semibold text-gray-900 dark:text-white">
                     جستجوی پیشرفته نامه‌ها
                   </h2>
@@ -567,37 +523,23 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                   className="space-y-4"
                   onSubmit={handleAdvancedSearchSubmit}
                 >
-                  <div>
-                    <label
-                      htmlFor="advanced-letter-title"
-                      className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      عنوان نامه
-                    </label>
-                    <input
+                  <Field label="عنوان نامه" htmlFor="advanced-letter-title">
+                    <Input
                       id="advanced-letter-title"
                       name="title"
                       type="text"
                       defaultValue={advancedTitle}
-                      className="h-11 w-full rounded-lg border border-app-border bg-white/80 px-4 text-sm text-gray-900 outline-none transition focus:border-blue-light-500 focus:ring-4 focus:ring-blue-light-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     />
-                  </div>
+                  </Field>
 
-                  <div>
-                    <label
-                      htmlFor="advanced-letter-content"
-                      className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-                    >
-                      متن نامه
-                    </label>
-                    <input
+                  <Field label="متن نامه" htmlFor="advanced-letter-content">
+                    <Input
                       id="advanced-letter-content"
                       name="content"
                       type="text"
                       defaultValue={advancedContent}
-                      className="h-11 w-full rounded-lg border border-app-border bg-white/80 px-4 text-sm text-gray-900 outline-none transition focus:border-blue-light-500 focus:ring-4 focus:ring-blue-light-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
                     />
-                  </div>
+                  </Field>
 
                   <div>
                     <span className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -624,7 +566,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                   </div>
 
                   <div className="flex items-center justify-end gap-2 pt-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => {
                         setAdvancedSearchDate("");
@@ -632,16 +574,15 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
                         setIsAdvancedSearchOpen(false);
                         router.push("/letter-search");
                       }}
-                      className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+                      variant="secondary"
                     >
                       پاک کردن
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="submit"
-                      className="rounded-lg bg-blue-light-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-light-700"
                     >
                       جستجو
-                    </button>
+                    </Button>
                   </div>
                 </form>
               </Dropdown>
@@ -653,7 +594,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             title="کارتابل ورودی"
             aria-label="کارتابل ورودی"
             aria-current={pathname === "/" || pathname === "/incoming-letters" ? "page" : undefined}
-            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-control border transition sm:grid ${
               pathname === "/" || pathname === "/incoming-letters"
                 ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
                 : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
@@ -666,7 +607,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             title="پیام‌های ورودی"
             aria-label="پیام‌های ورودی"
             aria-current={pathname === "/incoming-messages" ? "page" : undefined}
-            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-control border transition sm:grid ${
               pathname === "/incoming-messages"
                 ? "border-brand-500/25 bg-brand-500/10 text-brand-600 dark:text-brand-300"
                 : "liquid-glass-keyline bg-white/50 text-[var(--liquid-muted)] hover:text-brand-600 dark:bg-white/[0.045] dark:hover:text-brand-300"
@@ -679,7 +620,7 @@ const AppHeader: React.FC<{ user: CurrentUser }> = ({ user }) => {
             onClick={openBrief}
             title={aiButtonLabel}
             aria-label={aiButtonLabel}
-            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-[14px] border transition sm:grid ${AI_HEADER_BUTTON_CLASS}`}
+            className={`hidden h-10 w-10 shrink-0 place-items-center rounded-control border transition sm:grid ${AI_HEADER_BUTTON_CLASS}`}
           >
             {isCreating ? (
               <Loader2 className="h-[18px] w-[18px] animate-spin" />

@@ -9,7 +9,7 @@ import {
   readAiProviderString,
   requestAiChatCompletion,
 } from "@/src/ai/client";
-import { getPlainText } from "@/src/lib/richText";
+import { getPlainText, getPlainTextSnippet } from "@/src/lib/richText";
 
 export type ArchiveFolderNode = {
   id: number;
@@ -253,15 +253,6 @@ function buildArchiveSuggestionPrompt(input: {
     "پوشه‌های مجاز:",
     JSON.stringify(input.folders, null, 2),
   ].join("\n");
-}
-
-function getPlainTextSnippet(value: string | null | undefined) {
-  return (value || "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 140);
 }
 
 function buildFolderTree(

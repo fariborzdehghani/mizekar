@@ -2,6 +2,8 @@
 
 import { useActionState, useMemo, useState } from "react";
 import { updateProfileAction, type ProfileFormState } from "@/src/actions/profileActions";
+import { Alert, Button, Field, Input } from "@/src/components/ui";
+import Image from "next/image";
 
 type ProfileFormProps = {
   profile: {
@@ -33,12 +35,14 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
   return (
     <form action={formAction} className="space-y-6">
       <div className="liquid-glass-inset flex flex-col gap-5 rounded-3xl p-5 sm:flex-row sm:items-center">
-        <div className="h-24 w-24 overflow-hidden rounded-full border border-white/70 bg-white/35 shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-white/70 bg-white/35 shadow-lg dark:border-white/10 dark:bg-white/[0.04]">
+          <Image
             src={photoSrc}
             alt={profile.displayName}
-            className="h-full w-full object-cover"
+            fill
+            sizes="96px"
+            unoptimized
+            className="absolute inset-0 block h-full w-full object-cover object-top"
           />
         </div>
 
@@ -70,37 +74,23 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        <div>
-          <label
-            htmlFor="firstName"
-            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            نام
-          </label>
-          <input
+        <Field label="نام" htmlFor="firstName">
+          <Input
             id="firstName"
             name="firstName"
             type="text"
             defaultValue={profile.firstName}
-            className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
           />
-        </div>
+        </Field>
 
-        <div>
-          <label
-            htmlFor="lastName"
-            className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
-            نام خانوادگی
-          </label>
-          <input
+        <Field label="نام خانوادگی" htmlFor="lastName">
+          <Input
             id="lastName"
             name="lastName"
             type="text"
             defaultValue={profile.lastName}
-            className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
           />
-        </div>
+        </Field>
       </div>
 
       <div className="liquid-glass-inset rounded-3xl p-5">
@@ -109,78 +99,54 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
         </h3>
 
         <div className="mt-5 grid gap-5 md:grid-cols-3">
-          <div>
-            <label
-              htmlFor="currentPassword"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              رمز فعلی
-            </label>
-            <input
+          <Field label="رمز فعلی" htmlFor="currentPassword">
+            <Input
               id="currentPassword"
               name="currentPassword"
               type="password"
               autoComplete="current-password"
-              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label
-              htmlFor="newPassword"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              رمز جدید
-            </label>
-            <input
+          <Field label="رمز جدید" htmlFor="newPassword" hint="حداقل ۸ نویسه">
+            <Input
               id="newPassword"
               name="newPassword"
               type="password"
               autoComplete="new-password"
               minLength={8}
-              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
-          </div>
+          </Field>
 
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
-            >
-              تکرار رمز جدید
-            </label>
-            <input
+          <Field label="تکرار رمز جدید" htmlFor="confirmPassword">
+            <Input
               id="confirmPassword"
               name="confirmPassword"
               type="password"
               autoComplete="new-password"
               minLength={8}
-              className="liquid-glass-control h-11 w-full rounded-2xl border px-4 text-sm text-gray-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
             />
-          </div>
+          </Field>
         </div>
       </div>
 
       {state.error ? (
-        <p className="rounded-lg border border-error-200 bg-error-50 px-4 py-3 text-sm text-error-700 dark:border-error-900 dark:bg-error-950 dark:text-error-200">
-          {state.error}
-        </p>
+        <Alert tone="error">{state.error}</Alert>
       ) : null}
 
       {state.success ? (
-        <p className="rounded-lg border border-success-200 bg-success-50 px-4 py-3 text-sm text-success-700 dark:border-success-900 dark:bg-success-950 dark:text-success-200">
-          {state.success}
-        </p>
+        <Alert tone="success">{state.success}</Alert>
       ) : null}
 
       <div className="flex justify-end">
-        <button
+        <Button
           type="submit"
-          disabled={pending}
-          className="flex h-11 min-w-32 items-center justify-center rounded-2xl bg-brand-500 px-5 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-70"
+          loading={pending}
+          loadingLabel="در حال ذخیره..."
+          className="min-w-32"
         >
-          {pending ? "در حال ذخیره..." : "ذخیره تغییرات"}
-        </button>
+          ذخیره تغییرات
+        </Button>
       </div>
     </form>
   );

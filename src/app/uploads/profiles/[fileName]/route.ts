@@ -22,7 +22,7 @@ function getContentType(fileName: string) {
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ fileName: string }> }
+  { params }: RouteContext<"/uploads/profiles/[fileName]">,
 ) {
   const { fileName } = await params;
 

@@ -15,6 +15,7 @@ import {
   type SampleDataSeedOptions,
   type SampleDataSeedSummary,
 } from "@/src/sample-data/seed";
+import { readFormText } from "@/src/lib/input";
 
 export type SampleDataActionState = {
   error?: string;
@@ -34,7 +35,7 @@ function readNumber(
   key: keyof typeof SAMPLE_DATA_LIMITS,
   fallback: number
 ) {
-  const value = Number(formData.get(key));
+  const value = Number(readFormText(formData, key));
   const limits = SAMPLE_DATA_LIMITS[key];
 
   if (!Number.isFinite(value)) return fallback;
@@ -72,7 +73,7 @@ export async function sendAiPromptAction(
 ): Promise<AiPromptActionState> {
   await requireUser();
 
-  const prompt = String(formData.get("prompt") || "").trim();
+  const prompt = readFormText(formData, "prompt");
 
   if (!prompt) {
     return { error: "Please enter a prompt." };
@@ -99,10 +100,9 @@ export async function createSampleDataAction(
   formData: FormData
 ): Promise<SampleDataActionState> {
   const currentUser = await requireUser();
-  const sampleUserPassword = String(
-    formData.get("sampleUserPassword") ||
-      SAMPLE_DATA_DEFAULTS.sampleUserPassword
-  ).trim();
+  const sampleUserPassword =
+    readFormText(formData, "sampleUserPassword") ||
+    SAMPLE_DATA_DEFAULTS.sampleUserPassword;
 
   if (sampleUserPassword.length < 8) {
     return {

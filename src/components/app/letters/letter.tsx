@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2, Sparkles, X } from "lucide-react";
+import { Alert, Button, PageTitle, buttonStyles } from "@/src/components/ui";
 
 interface Person {
   id: number;
@@ -1216,28 +1217,22 @@ export default function LetterForm({
 
       <div className="liquid-content-frame liquid-glass-page space-y-6 py-4 sm:py-6 lg:py-8">
       <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/"
-              className="liquid-glass-control rounded-xl border px-4 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
+              className={buttonStyles({ variant: "secondary" })}
             >
               بازگشت
             </Link>
             {!isViewMode && (
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className="rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+                loading={loading}
+                loadingLabel={initialLetter ? "در حال بروزرسانی..." : "در حال ایجاد..."}
               >
-                {loading
-                  ? initialLetter
-                    ? "در حال بروزرسانی..."
-                    : "در حال ایجاد..."
-                  : initialLetter
-                    ? "بروزرسانی نامه"
-                    : "ایجاد نامه"}
-              </button>
+                {initialLetter ? "بروزرسانی نامه" : "ایجاد نامه"}
+              </Button>
             )}
             {!isViewMode && !initialLetter && (
               <button
@@ -1278,18 +1273,15 @@ export default function LetterForm({
               </button>
             )}
           </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {pageTitle}
-            </h1>
-          </div>
+          <PageTitle
+            title={pageTitle}
+            description={isViewMode ? "مشاهده نامه و سوابق مرتبط" : "ثبت مشخصات، گیرندگان و محتوای نامه"}
+          />
         </div>
 
         <div className="liquid-glass-header rounded-3xl border p-5 sm:p-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-800 dark:text-red-200 rounded-md text-sm">
-              {error}
-            </div>
+            <Alert tone="error" className="mb-4">{error}</Alert>
           )}
 
           {/* Title Field */}

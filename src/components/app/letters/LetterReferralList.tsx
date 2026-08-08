@@ -11,11 +11,12 @@ import {
   ChevronRight,
   ClipboardList,
   Eye,
-  Filter,
   Mail,
   PenLine,
   Search,
 } from "lucide-react";
+import { Alert, Input, PageTitle, buttonStyles } from "@/src/components/ui";
+import { normalizeSearchValue, toLatinDigits } from "@/src/lib/text";
 
 type ReferralListItem = {
   id: number;
@@ -107,12 +108,6 @@ const persianDatePartsFormatter = new Intl.DateTimeFormat(
   },
 );
 
-function toLatinDigits(value: string) {
-  return value.replace(/[\u06F0-\u06F9\u0660-\u0669]/g, (digit) =>
-    String(digit.charCodeAt(0) & 0xf),
-  );
-}
-
 function getPersianDateParts(date: Date) {
   const parts = persianDatePartsFormatter.formatToParts(date);
   const getPart = (type: string) =>
@@ -172,10 +167,6 @@ function getLetterNumber(referral: ReferralListItem) {
   if (!letter) return referral.letter_id ? `#${referral.letter_id}` : "-";
 
   return letter.internal_number || letter.external_number || `#${letter.id}`;
-}
-
-function normalizeSearchValue(value: unknown) {
-  return String(value ?? "").toLocaleLowerCase("fa-IR");
 }
 
 function referralMatchesSearch(
@@ -340,29 +331,24 @@ export default function LetterReferralList({
     <ArchiveSelectionProvider>
       <div className="liquid-content-frame liquid-glass-page min-h-[calc(100vh-92px)] overflow-x-clip pt-4 pb-4 sm:pb-5 lg:pb-6">
         <section className="flex min-w-0 flex-col gap-4">
-          <div className="liquid-page-header sticky top-[108px] z-40 flex shrink-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div className="liquid-page-header flex shrink-0 flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <Link
               href="/letter"
-              className="flex h-11 items-center justify-center gap-2 rounded-[15px] bg-brand-500 px-5 text-xs font-bold text-white shadow-[0_12px_28px_rgba(98,92,255,.3)] transition hover:bg-brand-600"
+              className={buttonStyles({ size: "lg" })}
             >
               <PenLine className="h-4 w-4" /> ایجاد نامه جدید
             </Link>
-            <div className="text-right">
-              <p className="mb-2 flex items-center gap-2 text-xs font-bold text-brand-500">
-                <Mail className="h-4 w-4" /> مرکز مکاتبات
-              </p>
-              <h1 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white sm:text-[30px]">
-                {title}
-              </h1>
-              <p className="mt-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-                نامه‌ها، ارجاعات و مکاتبات سازمانی شما در یک جا
-              </p>
-            </div>
+            <PageTitle
+              eyebrow="مرکز مکاتبات"
+              icon={<Mail className="h-4 w-4" />}
+              title={title}
+              description="نامه‌ها، ارجاعات و مکاتبات سازمانی شما در یک جا"
+            />
           </div>
           <InboxArchiveLayout folders={archiveFolders}>
-        <main className="liquid-glass-surface flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-[28px] border border-white/70 dark:border-white/10">
+        <main className="liquid-glass-surface flex min-h-[560px] min-w-0 flex-1 flex-col overflow-hidden rounded-panel border border-white/70 dark:border-white/10">
           <div className="flex min-h-[68px] shrink-0 flex-col gap-4 border-b border-black/5 p-4 dark:border-white/5 sm:p-5 lg:flex-row lg:items-center lg:justify-between">
-            <div className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-[15px] bg-black/[0.035] p-1 dark:bg-white/[0.04]">
+            <div className="no-scrollbar flex max-w-full gap-1 overflow-x-auto rounded-control bg-black/[0.035] p-1 dark:bg-white/[0.04]">
               {([
                 ["all", "همه موارد", allItems.length],
                 ["letter", "نامه‌ها", filteredReferrals.length],
@@ -386,43 +372,24 @@ export default function LetterReferralList({
             </div>
             <div className="flex items-center gap-2">
               <form className="relative min-w-0 flex-1 lg:w-56" action={basePath}>
-                <Search className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--liquid-muted)]" />
+                <Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--liquid-muted)]" />
                 {itemType !== "all" && <input type="hidden" name="type" value={itemType} />}
                 {sortOrder !== "desc" && <input type="hidden" name="sort" value={sortOrder} />}
-                <input name="q" defaultValue={searchQuery} className="h-9 w-full rounded-xl border border-black/[0.045] bg-black/[0.025] pr-9 pl-3 text-[11px] text-[var(--liquid-ink)] outline-none placeholder:text-[var(--liquid-muted)] focus:border-brand-500/25 dark:border-white/[0.06] dark:bg-white/[0.035]" placeholder="جستجو در کارتابل..." />
+                <Input name="q" defaultValue={searchQuery} className="ui-control-with-start-icon text-xs" placeholder="جستجو در کارتابل..." />
               </form>
-              <span aria-hidden="true" className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-black/[0.045] bg-white/40 text-[var(--liquid-muted)] dark:border-white/[0.06] dark:bg-white/[0.035]"><Filter className="h-3.5 w-3.5" /></span>
-              <Link href={getListHref(itemType, sortOrder === "desc" ? "asc" : "desc")} aria-label={sortOrder === "desc" ? "مرتب‌سازی از قدیمی‌ترین" : "مرتب‌سازی از جدیدترین"} className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-black/[0.045] bg-white/40 text-[var(--liquid-muted)] transition hover:text-brand-500 dark:border-white/[0.06] dark:bg-white/[0.035]"><ArrowDownUp className={`h-3.5 w-3.5 transition ${sortOrder === "asc" ? "rotate-180" : ""}`} /></Link>
+              <Link
+                href={getListHref(itemType, sortOrder === "desc" ? "asc" : "desc")}
+                aria-label={sortOrder === "desc" ? "مرتب‌سازی از قدیمی‌ترین" : "مرتب‌سازی از جدیدترین"}
+                className={buttonStyles({ variant: "secondary", className: "ui-icon-button" })}
+              >
+                <ArrowDownUp className={`h-4 w-4 transition ${sortOrder === "asc" ? "rotate-180" : ""}`} />
+              </Link>
               <ArchivePanelToggleButton />
-            </div>
-            <div className="hidden">
-              <Link
-                href="/letter"
-                className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
-              >
-                نامه جدید
-              </Link>
-              <Link
-                href="/meeting"
-                className="liquid-glass-control rounded-2xl border border-app-border bg-white/70 px-4 py-2 font-medium text-gray-700 transition hover:bg-brand-50 hover:text-brand-600 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700"
-              >
-                جلسه جدید
-              </Link>
-            </div>
-            <div className="hidden text-right">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-                {title}
-              </h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {items.length} مورد
-              </p>
             </div>
           </div>
 
           {error ? (
-            <div className="m-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900/20 dark:text-gray-200">
-              {error}
-            </div>
+            <Alert tone="error" className="m-4">{error}</Alert>
           ) : items.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center bg-app-panel p-8 text-center dark:bg-gray-800">
               <p className="mb-4 text-gray-600 dark:text-gray-400">
@@ -431,19 +398,19 @@ export default function LetterReferralList({
               <div className="flex flex-wrap items-center justify-center gap-2">
                 <Link
                   href="/letter"
-                  className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white shadow-[0_10px_24px_rgba(98,92,255,0.24)] transition hover:bg-brand-600"
+                  className={buttonStyles()}
                 >
                   ایجاد نامه
                 </Link>
                 <Link
                   href="/new-form"
-                  className="inline-block rounded-lg border border-app-border bg-white/70 px-4 py-2 text-gray-700 transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className={buttonStyles({ variant: "secondary" })}
                 >
                   ایجاد فرم
                 </Link>
                 <Link
                   href="/meeting"
-                  className="inline-block rounded-lg border border-app-border bg-white/70 px-4 py-2 text-gray-700 transition hover:bg-blue-light-50 hover:text-blue-light-700 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700"
+                  className={buttonStyles({ variant: "secondary" })}
                 >
                   ایجاد جلسه
                 </Link>
@@ -477,7 +444,7 @@ export default function LetterReferralList({
                         >
                           {isUnreadIncoming && <span className="absolute inset-y-0 right-0 w-[3px] rounded-l-full bg-brand-500" />}
                           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[15px] bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-sm"><CalendarDays className="h-5 w-5" /></span>
+                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-sm"><CalendarDays className="h-5 w-5" /></span>
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2 text-[10px]"><span className="font-extrabold text-gray-800 dark:text-gray-100">{personName}</span><span className="rounded-md bg-black/[0.04] px-1.5 py-0.5 text-gray-500 dark:bg-white/5 dark:text-gray-400">جلسه #{meeting.id}</span><span className="rounded-md bg-blue-500/10 px-1.5 py-0.5 font-bold text-blue-600 dark:text-blue-300">{getMeetingApprovalLabel(meeting.approval_status)}</span></div>
                               <p className={`mt-1.5 truncate text-sm text-gray-900 dark:text-white ${isUnreadIncoming ? "font-extrabold" : "font-bold"}`}>{meeting.title || "(بدون عنوان)"}</p>
@@ -527,7 +494,7 @@ export default function LetterReferralList({
                         >
                           {isUnreadIncoming && <span className="absolute inset-y-0 right-0 w-[3px] rounded-l-full bg-brand-500" />}
                           <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[15px] bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-sm"><ClipboardList className="h-5 w-5" /></span>
+                            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-sm"><ClipboardList className="h-5 w-5" /></span>
                             <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2 text-[10px]"><span className="font-extrabold text-gray-800 dark:text-gray-100">{personName}</span><span className="rounded-md bg-black/[0.04] px-1.5 py-0.5 text-gray-500 dark:bg-white/5 dark:text-gray-400">فرم #{form.id}</span><span className="rounded-md bg-amber-500/10 px-1.5 py-0.5 font-bold text-amber-600 dark:text-amber-300">{form.statusLabel}{form.activeStepOrder ? ` · مرحله ${form.activeStepOrder}` : ""}</span></div><p className={`mt-1.5 truncate text-sm text-gray-900 dark:text-white ${isUnreadIncoming ? "font-extrabold" : "font-bold"}`}>{form.title || "(بدون عنوان)"}</p><p className="mt-1.5 truncate text-[11px] text-gray-500 dark:text-gray-400">{form.templateTitle}</p></div>
                             <div className="flex shrink-0 flex-col items-end gap-2 self-stretch text-[10px] text-gray-500 dark:text-gray-400"><span>{formatDate(item.date)}</span><div className="mt-auto flex items-center gap-1.5">
                               <Link
@@ -578,7 +545,7 @@ export default function LetterReferralList({
                       >
                         {isUnreadIncoming && <span className="absolute inset-y-0 right-0 w-[3px] rounded-l-full bg-brand-500" />}
                         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
-                          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[15px] bg-gradient-to-br from-violet-500 to-brand-600 text-white shadow-sm"><Mail className="h-5 w-5" /></span>
+                          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-control bg-gradient-to-br from-violet-500 to-brand-600 text-white shadow-sm"><Mail className="h-5 w-5" /></span>
                           <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2 text-[10px]"><span className="font-extrabold text-gray-800 dark:text-gray-100">{personName}</span><span className="rounded-md bg-black/[0.04] px-1.5 py-0.5 text-gray-500 dark:bg-white/5 dark:text-gray-400">{getLetterNumber(referral)}</span><span className={`rounded-md px-1.5 py-0.5 font-bold ${getStatusClass(referral.status)}`}>{getStatusLabel(referral.status)}</span></div><p className={`mt-1.5 truncate text-sm text-gray-900 dark:text-white ${isUnreadIncoming ? "font-extrabold" : "font-bold"}`}>{letter?.title || "(بدون عنوان)"}</p><p className="mt-1.5 truncate text-[11px] text-gray-500 dark:text-gray-400">{referral.contentSnippet || letter?.contentSnippet || "بدون توضیحات"}</p></div>
                           <div className="flex shrink-0 flex-col items-end gap-2 self-stretch text-[10px] text-gray-500 dark:text-gray-400"><span>{formatDate(referral.date_time)}</span>
                           {letter ? (

@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { SendHorizontal, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { Alert, Button, PageTitle, buttonStyles } from "@/src/components/ui";
 
 type Person = {
   id: number;
@@ -158,39 +159,30 @@ export default function MessageForm({
           value={prefill?.forwardedFromMessageId || ""}
         />
 
-        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <Link
               href="/incoming-messages"
-              className="liquid-glass-control inline-flex h-10 leading-none items-center justify-center rounded-xl border px-4 py-0 text-sm font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
+              className={buttonStyles({ variant: "secondary" })}
             >
               بازگشت
             </Link>
-            <button
+            <Button
               type="submit"
-              disabled={isSubmitting}
-              className="inline-flex h-10 leading-none items-center justify-center gap-2 rounded-xl bg-brand-500 px-4 py-0 text-sm font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              loading={isSubmitting}
+              loadingLabel="در حال ارسال..."
+              leadingIcon={<SendHorizontal className="h-4 w-4" />}
             >
-              <SendHorizontal className="h-4 w-4" />
-              {isSubmitting ? "در حال ارسال..." : "ارسال پیام"}
-            </button>
+              ارسال پیام
+            </Button>
           </div>
 
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {pageTitle}
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {getModeText(prefill?.mode)}
-            </p>
-          </div>
+          <PageTitle title={pageTitle} description={getModeText(prefill?.mode)} />
         </div>
 
         <div className="liquid-glass-panel space-y-6 rounded-3xl border p-5 sm:p-6">
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-              {error}
-            </div>
+            <Alert tone="error">{error}</Alert>
           )}
 
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_16rem]">

@@ -15,6 +15,7 @@ import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { CheckCircle2, MapPin, Save, UserPlus, Video, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Alert, Button, PageTitle, buttonStyles } from "@/src/components/ui";
 
 interface Person {
   id: number;
@@ -295,59 +296,48 @@ export default function MeetingForm({
 
       <div className="liquid-content-frame liquid-glass-page space-y-6 py-4 sm:py-6 lg:py-8">
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="liquid-page-header sticky top-[92px] z-30 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href="/incoming-letters"
-              className="liquid-glass-control rounded-xl border px-4 py-2 font-medium text-gray-700 transition hover:border-brand-300 dark:text-gray-300"
+              className={buttonStyles({ variant: "secondary" })}
             >
               بازگشت
             </Link>
             {!isViewMode && (
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
-                className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-4 py-2 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+                loading={loading}
+                loadingLabel="در حال ایجاد..."
+                leadingIcon={<Save className="h-4 w-4" />}
               >
-                <Save className="h-4 w-4" />
-                {loading ? "در حال ایجاد..." : "ایجاد جلسه"}
-              </button>
+                ایجاد جلسه
+              </Button>
             )}
             {isViewMode && initialMeeting?.canApprove && (
-              <button
+              <Button
                 type="button"
                 onClick={handleApprove}
-                disabled={approving}
-                className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+                variant="success"
+                loading={approving}
+                loadingLabel="در حال تایید..."
+                leadingIcon={<CheckCircle2 className="h-4 w-4" />}
               >
-                <CheckCircle2 className="h-4 w-4" />
-                {approving ? "در حال تایید..." : "تایید جلسه"}
-              </button>
+                تایید جلسه
+              </Button>
             )}
           </div>
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              {pageTitle}
-            </h1>
-            {initialMeeting && (
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {getApprovalLabel(initialMeeting.approval_status)}
-              </p>
-            )}
-          </div>
+          <PageTitle
+            title={pageTitle}
+            description={initialMeeting ? getApprovalLabel(initialMeeting.approval_status) : undefined}
+          />
         </div>
 
         <div className="liquid-glass-header rounded-3xl border p-5 sm:p-6">
           {(error || success) && (
-            <div
-              className={`mb-4 rounded-lg border px-4 py-3 text-sm ${
-                error
-                  ? "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
-                  : "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200"
-              }`}
-            >
+            <Alert tone={error ? "error" : "success"} className="mb-4">
               {error || success}
-            </div>
+            </Alert>
           )}
 
           <div className="mb-6 grid grid-cols-1 gap-5 xl:grid-cols-3">

@@ -10,6 +10,8 @@ import ListPagination, {
   DEFAULT_PAGE_SIZE,
 } from "@/src/components/common/ListPagination";
 import InboxListToolbar from "@/src/components/common/InboxListToolbar";
+import { Alert, EmptyState, PageTitle, buttonStyles } from "@/src/components/ui";
+import { normalizeSearchValue } from "@/src/lib/text";
 
 interface ArchivedLettersListProps {
   folders: ArchiveFolderNode[];
@@ -67,10 +69,6 @@ function getItemSubtitle(item: ArchivedItemListItem) {
   return item.letter.contentSnippet;
 }
 
-function normalizeSearchValue(value: unknown) {
-  return String(value ?? "").toLocaleLowerCase("fa-IR");
-}
-
 function archivedItemMatchesSearch(
   item: ArchivedItemListItem,
   searchQuery: string
@@ -119,37 +117,31 @@ export default function ArchivedLettersList({
   return (
     <div className="liquid-content-frame liquid-glass-page grid min-h-[calc(100vh-92px)] grid-cols-1 content-start items-start gap-4 py-4 sm:py-6 xl:grid-cols-[minmax(0,1fr)_280px]">
       <main className="contents">
-        <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between xl:col-span-2">
+        <div className="liquid-page-header flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between xl:col-span-2">
           <Link
             href="/letter"
-            className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
+            className={buttonStyles()}
           >
             نامه جدید
           </Link>
-          <div className="text-right">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              بایگانی نامه‌ها، فرم‌ها و جلسات
-            </h1>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              {selectedFolderTitle || "یک پوشه انتخاب کنید"}
-            </p>
-          </div>
+          <PageTitle
+            title="بایگانی نامه‌ها، فرم‌ها و جلسات"
+            description={selectedFolderTitle || "یک پوشه انتخاب کنید"}
+          />
         </div>
 
         {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-            {error}
-          </div>
+          <Alert tone="error">{error}</Alert>
         ) : !selectedFolderId ? (
-          <div className="liquid-glass-panel flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
-            برای مشاهده موارد بایگانی‌شده، یک پوشه را از سمت چپ انتخاب کنید
-          </div>
+          <EmptyState
+            className="flex-1"
+            title="یک پوشه انتخاب کنید"
+            description="برای مشاهده موارد بایگانی‌شده، یک پوشه را از نوار کناری انتخاب کنید."
+          />
         ) : filteredItems.length === 0 ? (
-          <div className="liquid-glass-panel flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
-            این پوشه هنوز موردی ندارد
-          </div>
+          <EmptyState className="flex-1" title="این پوشه هنوز موردی ندارد" />
         ) : (
-          <div className="liquid-glass-surface flex-1 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+          <div className="liquid-glass-surface flex-1 overflow-hidden rounded-panel border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
             <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در بایگانی..." />
             <div className="overflow-x-auto">
             <table className="inbox-card-table inbox-card-table--archive w-full">

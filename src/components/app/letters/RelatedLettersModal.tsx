@@ -3,6 +3,7 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Plus, X } from "lucide-react";
 import { searchLetters } from "@/src/actions/letterActions";
+import { Button, Dialog, IconButton, Input } from "@/src/components/ui";
 
 export interface RelatedLetter {
   id: number;
@@ -97,34 +98,28 @@ export default function RelatedLettersModal({
   if (!isOpen) return null;
 
   return (
-    <div className="liquid-modal-backdrop fixed inset-0 z-[1000001] flex items-center justify-center p-4">
-      <div className="liquid-modal liquid-modal-dialog flex h-[82vh] max-h-180 w-full max-w-3xl flex-col overflow-hidden rounded-[28px]">
-        <div className="liquid-modal-header flex shrink-0 items-center justify-between px-6 py-4">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-            نامه های مرتبط
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="liquid-glass-control inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition hover:text-brand-600 dark:text-gray-300 dark:hover:text-brand-300"
-            aria-label="بستن"
-          >
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-hidden p-6">
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
+      title="نامه‌های مرتبط"
+      className="h-[82vh]"
+      contentClassName="flex flex-col gap-6 overflow-hidden"
+      footer={
+        <Button type="button" onClick={onClose}>
+          بستن
+        </Button>
+      }
+    >
           <div className="shrink-0">
             <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
               جستجو بر اساس شماره، عنوان یا محتوا
             </label>
             <div className="relative">
-              <input
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={handleSearchChange}
                 placeholder="شماره، عنوان یا بخشی از متن نامه را وارد کنید..."
-                className="liquid-glass-control w-full rounded-2xl border px-4 py-2.5 text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10 dark:text-white"
               />
 
               {searchQuery && (
@@ -191,13 +186,16 @@ export default function RelatedLettersModal({
                         </p>
                       )}
                     </div>
-                    <button
+                    <IconButton
                       type="button"
                       onClick={() => onRemoveLetter(letter.id)}
-                      className="shrink-0 text-red-500 transition hover:text-red-700 dark:hover:text-red-400"
+                      variant="ghost"
+                      size="sm"
+                      className="shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                      aria-label={`حذف ${letter.title || `نامه ${letter.id}`}`}
                     >
                       <X className="h-5 w-5" />
-                    </button>
+                    </IconButton>
                   </div>
                 ))}
               </div>
@@ -207,18 +205,6 @@ export default function RelatedLettersModal({
               </div>
             )}
           </div>
-        </div>
-
-        <div className="liquid-modal-footer flex shrink-0 justify-end gap-3 px-6 py-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-2xl bg-brand-500 px-6 py-2.5 font-medium text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600"
-          >
-            بستن
-          </button>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

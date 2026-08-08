@@ -1,6 +1,7 @@
 import { getMeeting } from "@/src/actions/meetingActions";
 import MeetingForm from "@/src/components/app/meetings/MeetingForm";
 import MeetingReadMarker from "@/src/components/app/meetings/MeetingReadMarker";
+import { parsePositiveInteger } from "@/src/lib/input";
 
 interface MeetingPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -8,7 +9,9 @@ interface MeetingPageProps {
 
 export default async function MeetingPage({ searchParams }: MeetingPageProps) {
   const params = await searchParams;
-  const meetingId = params.id ? parseInt(params.id as string) : null;
+  const meetingId = parsePositiveInteger(
+    Array.isArray(params.id) ? params.id[0] : params.id,
+  );
   const isViewMode = params.viewOnly === "true" || Boolean(meetingId);
 
   let meetingData = null;

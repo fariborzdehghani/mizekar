@@ -6,16 +6,13 @@ import {
   parseLetterResponseDraft,
   prepareNewLetterDraft,
 } from "@/src/ai/features/letterRelationSummary";
-import { requireUser } from "@/src/lib/auth";
+import { getCurrentUser } from "@/src/lib/auth";
+import { reportError } from "@/src/lib/errors";
+import { readJsonObject } from "@/src/lib/input";
+import { createNdjsonStreamResponse } from "@/src/lib/ndjson";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type DraftRequestBody = {
-  prompt?: unknown;
-  title?: unknown;
-  content?: unknown;
-};
 
 type StreamEvent =
   | {
@@ -32,51 +29,13 @@ type StreamEvent =
       error: string;
     };
 
-function createStreamResponse(
-  handler: (write: (event: StreamEvent) => void) => Promise<void>
-) {
-  const encoder = new TextEncoder();
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const write = (event: StreamEvent) => {
-        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-      };
-
-      try {
-        await handler(write);
-      } catch (error) {
-        write({
-          type: "error",
-          error: error instanceof Error ? error.message : "AI stream failed.",
-        });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Cache-Control": "no-cache, no-transform",
-      "Content-Type": "application/x-ndjson; charset=utf-8",
-      "X-Accel-Buffering": "no",
-    },
-  });
-}
-
 export async function POST(request: Request) {
-  try {
-    await requireUser();
-  } catch {
+  if (!(await getCurrentUser())) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: DraftRequestBody;
-
-  try {
-    body = (await request.json()) as DraftRequestBody;
-  } catch {
+  const body = await readJsonObject(request);
+  if (!body) {
     return Response.json({ error: "Invalid request body." }, { status: 400 });
   }
 
@@ -84,8 +43,9 @@ export async function POST(request: Request) {
   const title = typeof body.title === "string" ? body.title : "";
   const content = typeof body.content === "string" ? body.content : "";
 
-  return createStreamResponse(async (write) => {
-    const preparedDraft = await prepareNewLetterDraft(prompt, title, content);
+  return createNdjsonStreamResponse<StreamEvent>(
+    async (write) => {
+      const preparedDraft = await prepareNewLetterDraft(prompt, title, content);
 
     if (!preparedDraft.success) {
       write({ type: "error", error: preparedDraft.error });
@@ -138,10 +98,15 @@ export async function POST(request: Request) {
       return;
     }
 
-    write({
-      type: "draft",
-      title: draft.title,
-      content: draft.content,
-    });
-  });
+      write({
+        type: "draft",
+        title: draft.title,
+        content: draft.content,
+      });
+    },
+    (error) => {
+      reportError("api.ai.letter-draft", error);
+      return { type: "error", error: "سرویس هوشمند پاسخ نداد. دوباره تلاش کنید." };
+    },
+  );
 }

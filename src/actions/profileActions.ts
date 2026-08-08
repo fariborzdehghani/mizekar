@@ -1,7 +1,7 @@
 "use server";
 
 import fs from "fs/promises";
-import path from "path";
+import crypto from "crypto";
 import { revalidatePath } from "next/cache";
 import { requireUserId } from "@/src/lib/auth";
 import { hashPassword, verifyPassword } from "@/src/lib/password";
@@ -11,6 +11,8 @@ import {
   getProfilePhotoStorageDir,
 } from "@/src/lib/profilePhotos";
 import { prisma } from "@/src/lib/prisma";
+import { getPublicErrorMessage, PublicError, reportError } from "@/src/lib/errors";
+import { readFormText } from "@/src/lib/input";
 
 export type ProfileFormState = {
   error?: string;
@@ -24,36 +26,50 @@ const ALLOWED_PROFILE_PHOTO_TYPES = new Set([
   "image/webp",
 ]);
 
-function readText(formData: FormData, key: string) {
-  return String(formData.get(key) || "").trim();
-}
+const PROFILE_PHOTO_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+};
 
-function getFileExtension(file: File) {
-  const extension = path.extname(file.name).toLowerCase();
-
-  if ([".jpg", ".jpeg", ".png", ".webp"].includes(extension)) {
-    return extension;
+function hasExpectedImageSignature(bytes: Uint8Array, mimeType: string) {
+  if (mimeType === "image/jpeg") {
+    return bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
   }
 
-  if (file.type === "image/png") return ".png";
-  if (file.type === "image/webp") return ".webp";
+  if (mimeType === "image/png") {
+    return [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every(
+      (byte, index) => bytes[index] === byte,
+    );
+  }
 
-  return ".jpg";
+  if (mimeType === "image/webp") {
+    return (
+      new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
+      new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP"
+    );
+  }
+
+  return false;
 }
 
 async function saveProfilePhoto(file: File, userId: number) {
   if (file.size > MAX_PROFILE_PHOTO_SIZE) {
-    throw new Error("حجم تصویر پروفایل نباید بیشتر از ۲ مگابایت باشد.");
+    throw new PublicError("حجم تصویر پروفایل نباید بیشتر از ۲ مگابایت باشد.");
   }
 
   if (!ALLOWED_PROFILE_PHOTO_TYPES.has(file.type)) {
-    throw new Error("فرمت تصویر پروفایل باید JPG، PNG یا WebP باشد.");
+    throw new PublicError("فرمت تصویر پروفایل باید JPG، PNG یا WebP باشد.");
+  }
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  if (!hasExpectedImageSignature(bytes, file.type)) {
+    throw new PublicError("محتوای فایل با فرمت تصویر انتخاب‌شده مطابقت ندارد.");
   }
 
   await fs.mkdir(getProfilePhotoStorageDir(), { recursive: true });
 
-  const fileName = `${userId}_${Date.now()}${getFileExtension(file)}`;
-  const bytes = new Uint8Array(await file.arrayBuffer());
+  const fileName = `${userId}_${crypto.randomUUID()}${PROFILE_PHOTO_EXTENSIONS[file.type]}`;
 
   await fs.writeFile(getProfilePhotoFilePath(fileName), bytes);
 
@@ -65,11 +81,11 @@ export async function updateProfileAction(
   formData: FormData
 ): Promise<ProfileFormState> {
   const currentUserId = await requireUserId();
-  const firstName = readText(formData, "firstName");
-  const lastName = readText(formData, "lastName");
-  const currentPassword = String(formData.get("currentPassword") || "");
-  const newPassword = String(formData.get("newPassword") || "");
-  const confirmPassword = String(formData.get("confirmPassword") || "");
+  const firstName = readFormText(formData, "firstName");
+  const lastName = readFormText(formData, "lastName");
+  const currentPassword = readFormText(formData, "currentPassword", { trim: false });
+  const newPassword = readFormText(formData, "newPassword", { trim: false });
+  const confirmPassword = readFormText(formData, "confirmPassword", { trim: false });
   const photo = formData.get("photo");
 
   if (!firstName && !lastName) {
@@ -154,11 +170,12 @@ export async function updateProfileAction(
 
     return { success: "پروفایل با موفقیت ذخیره شد." };
   } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message };
-    }
-
-    console.error("Error updating profile:", error);
-    return { error: "خطا در ذخیره پروفایل. دوباره تلاش کنید." };
+    reportError("profile.update", error);
+    return {
+      error: getPublicErrorMessage(
+        error,
+        "خطا در ذخیره پروفایل. دوباره تلاش کنید.",
+      ),
+    };
   }
 }

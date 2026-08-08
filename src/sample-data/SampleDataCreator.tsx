@@ -114,7 +114,7 @@ export default function SampleDataCreator({
 
   return (
     <div className="liquid-glass-page mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <header className="liquid-glass-header flex flex-col gap-4 rounded-[28px] border border-white/70 p-5 dark:border-white/10 lg:flex-row lg:items-end lg:justify-between">
+      <header className="liquid-glass-header flex flex-col gap-4 rounded-panel border border-white/70 p-5 dark:border-white/10 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 rounded-md border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700 dark:border-brand-800 dark:bg-brand-950 dark:text-brand-200">
             <Database className="h-4 w-4" />
@@ -139,7 +139,7 @@ export default function SampleDataCreator({
         {statLabels.map((stat) => (
           <div
             key={stat.key}
-            className="liquid-glass-panel rounded-[24px] border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900"
+            className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-4 shadow-theme-xs dark:border-gray-800 dark:bg-gray-900"
           >
             <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
               {stat.label}
@@ -151,7 +151,7 @@ export default function SampleDataCreator({
         ))}
       </section>
 
-      <section className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
+      <section className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
         <div className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-brand-600 dark:text-brand-300" />
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -205,7 +205,7 @@ export default function SampleDataCreator({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
         <form
           action={createFormAction}
-          className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900"
+          className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900"
         >
           <h2 className="text-base font-semibold text-gray-900 dark:text-white">
             تنظیمات ایجاد داده
@@ -292,7 +292,7 @@ export default function SampleDataCreator({
         </form>
 
         <aside className="flex flex-col gap-4">
-          <section className="liquid-glass-panel rounded-[26px] border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
+          <section className="liquid-glass-panel rounded-card border border-gray-200 bg-white p-5 shadow-theme-sm dark:border-gray-800 dark:bg-gray-900">
             <h2 className="text-base font-semibold text-gray-900 dark:text-white">
               نتیجه عملیات
             </h2>

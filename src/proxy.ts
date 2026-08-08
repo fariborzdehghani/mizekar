@@ -6,7 +6,10 @@ export function proxy(request: NextRequest) {
 
   if (!session) {
     const signInUrl = new URL("/signin", request.url);
-    signInUrl.searchParams.set("next", request.nextUrl.pathname);
+    signInUrl.searchParams.set(
+      "next",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
     return NextResponse.redirect(signInUrl);
   }
 
@@ -15,6 +18,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!signin|_next/static|_next/image|favicon.ico|images|fonts|uploads).*)",
+    "/((?!api|signin|_next/static|_next/image|favicon.ico|images|fonts|uploads).*)",
   ],
 };

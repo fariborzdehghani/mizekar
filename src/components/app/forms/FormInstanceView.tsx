@@ -12,6 +12,7 @@ import {
 import RecipientsModal from "@/src/components/app/letters/RecipientsModal";
 import Editor from "@/src/components/common/editor/editor";
 import OnlyOfficeEditor from "./OnlyOfficeEditor";
+import { Alert, Button, PageTitle } from "@/src/components/ui";
 
 type Person = {
   id: number;
@@ -169,15 +170,12 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
         requireUser
       />
 
-      <div className="liquid-page-header sticky top-[92px] z-40 flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="liquid-page-header flex flex-col items-stretch gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {form.title}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {form.templateTitle} / {form.statusLabel} / ایجادکننده:{" "}
-            {form.creatorName}
-          </p>
+          <PageTitle
+            title={form.title}
+            description={`${form.templateTitle} / ${form.statusLabel} / ایجادکننده: ${form.creatorName}`}
+          />
           {form.activeStep && (
             <p className="mt-1 text-sm text-brand-600 dark:text-brand-300">
               مرحله فعال {form.activeStep.order}: {form.activeStep.approverName}
@@ -192,36 +190,36 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
 
         <div className="flex flex-wrap gap-2">
           {form.canSubmit && (
-            <button
+            <Button
               type="button"
-              disabled={isSubmitting}
               onClick={() => runAction(submitFormInstance)}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+              loading={isSubmitting}
+              loadingLabel="در حال ارسال..."
+              leadingIcon={<SendHorizontal className="h-4 w-4" />}
             >
-              <SendHorizontal className="h-4 w-4" />
               ارسال
-            </button>
+            </Button>
           )}
           {form.canApprove && (
             <>
-              <button
+              <Button
                 type="button"
-                disabled={isSubmitting}
                 onClick={() => runAction(approveFormInstance)}
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-green-600 px-4 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                تایید
-              </button>
-              <button
-                type="button"
+                variant="success"
                 disabled={isSubmitting}
-                onClick={() => runAction(rejectFormInstance)}
-                className="inline-flex h-10 items-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                leadingIcon={<CheckCircle2 className="h-4 w-4" />}
               >
-                <XCircle className="h-4 w-4" />
+                تایید
+              </Button>
+              <Button
+                type="button"
+                onClick={() => runAction(rejectFormInstance)}
+                variant="danger"
+                disabled={isSubmitting}
+                leadingIcon={<XCircle className="h-4 w-4" />}
+              >
                 رد
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -229,15 +227,7 @@ export default function FormInstanceView({ form }: { form: FormInstance }) {
 
       <div className="flex flex-col gap-5">
       {(error || message) && (
-        <div
-          className={`rounded-lg border px-4 py-3 text-sm ${
-            error
-              ? "border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200"
-              : "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-900/20 dark:text-green-200"
-          }`}
-        >
-          {error || message}
-        </div>
+        <Alert tone={error ? "error" : "success"}>{error || message}</Alert>
       )}
 
       {form.canApprove && (

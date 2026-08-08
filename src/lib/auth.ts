@@ -7,6 +7,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { SESSION_COOKIE_NAME } from "@/src/lib/auth-constants";
 import type { CalculatedPermission, CurrentUser } from "@/src/lib/auth-types";
+import { readFirstEnv, readOptionalEnv, readSecret } from "@/src/lib/env";
+import { isRecord } from "@/src/lib/input";
 import {
   getProfilePhotoFilePath,
   isSafeProfilePhotoFileName,
@@ -17,16 +19,13 @@ const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
 type SessionPayload = {
   userId: number;
-  roleId: number | null;
   expiresAt: number;
-  permissions?: CalculatedPermission[];
 };
 
 function getSessionSecret() {
-  return (
-    process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    "mizekar-development-session-secret-change-me"
+  return readSecret(
+    ["AUTH_SECRET", "NEXTAUTH_SECRET"],
+    "mizekar-development-session-secret-change-me",
   );
 }
 
@@ -41,13 +40,11 @@ function parseBooleanFlag(value: string | undefined) {
 }
 
 function shouldUseSecureSessionCookie() {
-  const explicitValue = parseBooleanFlag(process.env.AUTH_COOKIE_SECURE);
+  const explicitValue = parseBooleanFlag(readOptionalEnv("AUTH_COOKIE_SECURE") || undefined);
   if (explicitValue !== null) return explicitValue;
 
   const publicUrl =
-    process.env.APP_PUBLIC_URL ||
-    process.env.NEXTAUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL;
+    readFirstEnv(["APP_PUBLIC_URL", "NEXTAUTH_URL", "NEXT_PUBLIC_APP_URL"]);
 
   if (!publicUrl) return false;
 
@@ -106,17 +103,22 @@ function decodeSession(value: string | undefined): SessionPayload | null {
   try {
     const payload = JSON.parse(
       Buffer.from(encodedPayload, "base64url").toString("utf8")
-    ) as SessionPayload;
+    ) as unknown;
 
     if (
-      !Number.isInteger(payload.userId) ||
-      payload.userId <= 0 ||
-      payload.expiresAt <= Date.now()
+      !isRecord(payload) ||
+      !Number.isSafeInteger(payload.userId) ||
+      Number(payload.userId) <= 0 ||
+      !Number.isFinite(payload.expiresAt) ||
+      Number(payload.expiresAt) <= Date.now()
     ) {
       return null;
     }
 
-    return payload;
+    return {
+      userId: Number(payload.userId),
+      expiresAt: Number(payload.expiresAt),
+    };
   } catch {
     return null;
   }
@@ -185,14 +187,9 @@ export async function getCalculatedUserPermissions(
   return Array.from(finalPermissions.values());
 }
 
-export async function createSession(
-  user: { id: number; role_id: number | null },
-  permissions: CalculatedPermission[] = []
-) {
+export async function createSession(user: { id: number }) {
   const session = encodeSession({
     userId: user.id,
-    roleId: user.role_id,
-    permissions,
     expiresAt: Date.now() + SESSION_MAX_AGE_SECONDS * 1000,
   });
 
@@ -268,13 +265,15 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
 
   if (!user) return null;
 
+  const permissions = await getCalculatedUserPermissions(user.id, user.role_id);
+
   return {
     id: user.id,
     userId: user.user_id || String(user.id),
     roleId: user.role_id,
     photo: await getExistingProfilePhoto(user.photo),
     displayName: getDisplayName(user),
-    permissions: session.permissions || [],
+    permissions,
   };
 });
 

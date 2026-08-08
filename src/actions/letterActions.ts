@@ -6,6 +6,7 @@ import { requireUser, requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
+import crypto from "crypto";
 import {
   generateLetterResponseDraftWithAi,
   summarizeRelatedLetterTreeWithAi,
@@ -27,22 +28,22 @@ import {
   uniqueLetterTagNames,
   type LetterKeywordTag,
 } from "@/src/lib/letterTags";
+import { toLatinDigits } from "@/src/lib/text";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
+import {
+  isNonNullable,
+  parseJsonArray,
+  readFormText,
+  readPositiveInteger,
+} from "@/src/lib/input";
+import {
+  getUniqueUserIds,
+  isIdSelection,
+  parsePersonSelections,
+  type PersonSelection,
+} from "@/src/lib/selection";
 
-interface PersonRecipient {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-  job: string | null;
-  user_id: number | null;
-}
-
-interface RelatedLetterInput {
-  id: number;
-}
-
-interface ReferralReceiverInput {
-  user_id: number | null;
-}
+type PersonRecipient = PersonSelection;
 
 const REFERRAL_STATUS_IN_PROGRESS = 0;
 const REFERRAL_STATUS_DONE = 1;
@@ -216,33 +217,6 @@ async function saveLetterTags(letterId: number, tagNames: string[]) {
   return savedTags;
 }
 
-function toLatinDigits(value: string) {
-  const digitMap: Record<string, string> = {
-    "۰": "0",
-    "۱": "1",
-    "۲": "2",
-    "۳": "3",
-    "۴": "4",
-    "۵": "5",
-    "۶": "6",
-    "۷": "7",
-    "۸": "8",
-    "۹": "9",
-    "٠": "0",
-    "١": "1",
-    "٢": "2",
-    "٣": "3",
-    "٤": "4",
-    "٥": "5",
-    "٦": "6",
-    "٧": "7",
-    "٨": "8",
-    "٩": "9",
-  };
-
-  return value.replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
-}
-
 function getCurrentShamsiYear() {
   const year = new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
     year: "numeric",
@@ -277,11 +251,11 @@ async function buildInternalLetterNumber(letterId: number) {
 export async function createLetter(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const title = formData.get("title") as string;
-    const content = formData.get("content") as string;
-    const recipientsJson = formData.get("recipients") as string;
-    const relatedLettersJson = formData.get("relatedLetters") as string | null;
-    const tagNames = parseLetterTagsJson(formData.get("tags") as string | null);
+    const title = readFormText(formData, "title");
+    const content = readFormText(formData, "content", { trim: false });
+    const recipientsJson = readFormText(formData, "recipients");
+    const relatedLettersJson = readFormText(formData, "relatedLetters");
+    const tagNames = parseLetterTagsJson(readFormText(formData, "tags"));
 
     // Validate required fields
     if (!title || !content || !recipientsJson) {
@@ -291,11 +265,8 @@ export async function createLetter(formData: FormData) {
       };
     }
 
-    // Parse recipients
-    let recipients: PersonRecipient[] = [];
-    try {
-      recipients = JSON.parse(recipientsJson);
-    } catch {
+    const recipients = parsePersonSelections(recipientsJson);
+    if (!recipients) {
       return {
         success: false,
         error: "داده های گیرندگان نامعتبر است",
@@ -309,22 +280,14 @@ export async function createLetter(formData: FormData) {
       };
     }
 
-    const recipientUserIds = recipients.map((recipient) => {
-      const userId = Number(recipient.user_id);
-      return Number.isInteger(userId) && userId > 0 ? userId : null;
-    });
+    const uniqueRecipientUserIds = getUniqueUserIds(recipients);
 
-    if (recipientUserIds.some((userId) => userId === null)) {
+    if (uniqueRecipientUserIds.length !== recipients.length) {
       return {
         success: false,
-        error: "Ú¯ÛŒØ±Ù†Ø¯Ù‡ Ø§Ø±Ø¬Ø§Ø¹ Ø¨Ø§ÛŒØ¯ Ú©Ø§Ø±Ø¨Ø± Ø³ÛŒØ³ØªÙ… Ø¨Ø§Ø´Ø¯",
+        error: "گیرنده ارجاع باید کاربر سیستم باشد",
       };
     }
-
-    const validRecipientUserIds = recipientUserIds.filter(
-      (userId): userId is number => userId !== null
-    );
-    const uniqueRecipientUserIds = [...new Set(validRecipientUserIds)];
     const existingRecipientUsers = await prisma.users.findMany({
       where: {
         id: {
@@ -339,16 +302,14 @@ export async function createLetter(formData: FormData) {
     if (existingRecipientUsers.length !== uniqueRecipientUserIds.length) {
       return {
         success: false,
-        error: "Ø¯Ø§Ø¯Ù‡ Ù‡Ø§ÛŒ Ú¯ÛŒØ±Ù†Ø¯Ú¯Ø§Ù† Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª",
+        error: "داده‌های گیرندگان نامعتبر است",
       };
     }
 
     let relatedLetterIds: number[] = [];
     if (relatedLettersJson) {
-      try {
-        const relatedLetters = JSON.parse(
-          relatedLettersJson
-        ) as RelatedLetterInput[];
+      const relatedLetters = parseJsonArray(relatedLettersJson, isIdSelection);
+      if (relatedLetters) {
         relatedLetterIds = [
           ...new Set(
             relatedLetters
@@ -356,10 +317,10 @@ export async function createLetter(formData: FormData) {
               .filter((id) => Number.isInteger(id) && id > 0)
           ),
         ];
-      } catch {
+      } else {
         return {
           success: false,
-          error: "Ø¯Ø§Ø¯Ù‡ Ù‡Ø§ÛŒ Ù†Ø§Ù…Ù‡â€ŒÙ‡Ø§ÛŒ Ù…Ø±ØªØ¨Ø· Ù†Ø§Ù…Ø¹ØªØ¨Ø± Ø§Ø³Øª",
+          error: "داده‌های نامه‌های مرتبط نامعتبر است",
         };
       }
     }
@@ -374,11 +335,7 @@ export async function createLetter(formData: FormData) {
 
     // Create uploads directory if it doesn't exist
     const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    try {
-      await fs.mkdir(uploadsDir, { recursive: true });
-    } catch {
-      console.log("Uploads directory already exists");
-    }
+    await fs.mkdir(uploadsDir, { recursive: true });
 
     // Handle file uploads and get file IDs
     const fileIds: number[] = [];
@@ -388,9 +345,7 @@ export async function createLetter(formData: FormData) {
         const bytes = new Uint8Array(buffer);
 
         // Create unique filename with timestamp and random suffix
-        const timestamp = Date.now();
-        const randomSuffix = Math.random().toString(36).substring(2, 9);
-        const filename = `${timestamp}_${randomSuffix}`;
+        const filename = crypto.randomUUID();
 
         // Save file to public/uploads
         const filepath = path.join(uploadsDir, filename);
@@ -443,7 +398,7 @@ export async function createLetter(formData: FormData) {
 
     // Create letter recipients entries
     // Store the actual user_id from the persons table
-    for (const userId of validRecipientUserIds) {
+    for (const userId of uniqueRecipientUserIds) {
       await prisma.letter_recipients.create({
         data: {
           letter_id: letter.id,
@@ -454,7 +409,7 @@ export async function createLetter(formData: FormData) {
 
     const now = new Date();
     await prisma.letter_referrals.createMany({
-      data: validRecipientUserIds.map((receiverId) => ({
+      data: uniqueRecipientUserIds.map((receiverId) => ({
         letter_id: letter.id,
         sender_id: currentUserId,
         receiver_id: receiverId,
@@ -676,36 +631,6 @@ export async function generateLetterKeywordTags(
   }
 }
 
-function getUserDisplayName(
-  user:
-    | {
-        id: number;
-        user_id: string | null;
-        persons_persons_user_idTousers?: Array<{
-          first_name: string | null;
-          last_name: string | null;
-          job: string | null;
-        }>;
-      }
-    | null
-    | undefined
-) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-
-  if (fullName) {
-    return job ? `${fullName} - ${job}` : fullName;
-  }
-
-  const fallbackName = user?.user_id || (user?.id ? `User #${user.id}` : "-");
-
-  return job && fallbackName !== "-" ? `${fallbackName} - ${job}` : fallbackName;
-}
-
 function parseDateOnly(value: string | null | undefined) {
   if (!value) return null;
 
@@ -808,7 +733,7 @@ export async function searchLetters(query: string, excludeLetterId?: number) {
     console.error("Error searching letters:", error);
     return {
       success: false,
-      error: "Ø®Ø·Ø§ Ø¯Ø± Ø¬Ø³ØªØ¬ÙˆÛŒ Ù†Ø§Ù…Ù‡â€ŒÙ‡Ø§",
+      error: "خطا در جستجوی نامه‌ها",
       letters: [],
     };
   }
@@ -972,12 +897,12 @@ export async function searchAccessibleLetters(input: AdvancedLetterSearchInput) 
 export async function createLetterReferral(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const letterId = Number(formData.get("letterId"));
-    const content = formData.get("content") as string | null;
-    const receiversJson = formData.get("receivers") as string | null;
-    const dueDate = parseDateOnly(formData.get("dueDate") as string | null);
+    const letterId = readPositiveInteger(formData, "letterId");
+    const content = readFormText(formData, "content", { trim: false });
+    const receiversJson = readFormText(formData, "receivers");
+    const dueDate = parseDateOnly(readFormText(formData, "dueDate"));
 
-    if (!Number.isInteger(letterId) || letterId <= 0) {
+    if (!letterId) {
       return {
         success: false,
         error: "نامه معتبر نیست",
@@ -998,23 +923,15 @@ export async function createLetterReferral(formData: FormData) {
       };
     }
 
-    let receivers: ReferralReceiverInput[] = [];
-    try {
-      receivers = JSON.parse(receiversJson);
-    } catch {
+    const receivers = parsePersonSelections(receiversJson);
+    if (!receivers) {
       return {
         success: false,
         error: "داده گیرندگان ارجاع نامعتبر است",
       };
     }
 
-    const receiverIds = [
-      ...new Set(
-        receivers
-          .map((receiver) => Number(receiver.user_id))
-          .filter((id) => Number.isInteger(id) && id > 0)
-      ),
-    ];
+    const receiverIds = getUniqueUserIds(receivers);
 
     if (receiverIds.length === 0) {
       return {
@@ -1625,16 +1542,17 @@ export async function getLetter(letterId: number) {
     const relatedLettersData = [
       ...new Map(
         relatedLetters
-          .filter((relatedLetter) => relatedLetter && relatedLetter.id !== letter.id)
+          .filter(isNonNullable)
+          .filter((relatedLetter) => relatedLetter.id !== letter.id)
           .map((relatedLetter) => [
-            relatedLetter!.id,
+            relatedLetter.id,
             {
-              id: relatedLetter!.id,
-              title: relatedLetter!.title,
-              internal_number: relatedLetter!.internal_number,
-              external_number: relatedLetter!.external_number,
-              contentSnippet: getPlainTextSnippet(relatedLetter!.contents),
-              create_date: relatedLetter!.create_date,
+              id: relatedLetter.id,
+              title: relatedLetter.title,
+              internal_number: relatedLetter.internal_number,
+              external_number: relatedLetter.external_number,
+              contentSnippet: getPlainTextSnippet(relatedLetter.contents),
+              create_date: relatedLetter.create_date,
             },
           ])
       ).values(),

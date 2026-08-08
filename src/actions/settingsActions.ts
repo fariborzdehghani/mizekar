@@ -4,6 +4,10 @@ import { prisma } from "@/src/lib/prisma";
 import { requireUser } from "@/src/lib/auth";
 import { hashPassword } from "@/src/lib/password";
 import { revalidatePath } from "next/cache";
+import {
+  readFormText,
+  readPositiveInteger,
+} from "@/src/lib/input";
 
 export type UserFormState = {
   error?: string;
@@ -15,24 +19,11 @@ export type RoleFormState = {
   success?: string;
 };
 
-function readText(formData: FormData, key: string) {
-  return String(formData.get(key) || "").trim();
-}
-
-function readOptionalNumber(formData: FormData, key: string) {
-  const value = readText(formData, key);
-
-  if (!value) return null;
-
-  const numberValue = Number(value);
-  return Number.isInteger(numberValue) && numberValue > 0 ? numberValue : null;
-}
-
 function getUserNameParts(formData: FormData) {
   return {
-    firstName: readText(formData, "firstName"),
-    lastName: readText(formData, "lastName"),
-    job: readText(formData, "job"),
+    firstName: readFormText(formData, "firstName"),
+    lastName: readFormText(formData, "lastName"),
+    job: readFormText(formData, "job"),
   };
 }
 
@@ -96,9 +87,9 @@ export async function createUserAction(
   formData: FormData
 ): Promise<UserFormState> {
   const currentUser = await requireUser();
-  const username = readText(formData, "userId");
-  const password = String(formData.get("password") || "");
-  const roleId = readOptionalNumber(formData, "roleId");
+  const username = readFormText(formData, "userId");
+  const password = readFormText(formData, "password", { trim: false });
+  const roleId = readPositiveInteger(formData, "roleId");
   const permissionIds = await getExistingPermissionIds(
     readPermissionIds(formData)
   );
@@ -170,16 +161,16 @@ export async function updateUserAction(
   formData: FormData
 ): Promise<UserFormState> {
   const currentUser = await requireUser();
-  const id = Number(formData.get("id"));
-  const username = readText(formData, "userId");
-  const password = String(formData.get("password") || "");
-  const roleId = readOptionalNumber(formData, "roleId");
+  const id = readPositiveInteger(formData, "id");
+  const username = readFormText(formData, "userId");
+  const password = readFormText(formData, "password", { trim: false });
+  const roleId = readPositiveInteger(formData, "roleId");
   const permissionIds = await getExistingPermissionIds(
     readPermissionIds(formData)
   );
   const { firstName, lastName, job } = getUserNameParts(formData);
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     return { error: "شناسه کاربر معتبر نیست." };
   }
 
@@ -286,7 +277,7 @@ export async function createRoleAction(
 ): Promise<RoleFormState> {
   await requireUser();
 
-  const title = readText(formData, "title");
+  const title = readFormText(formData, "title");
   const permissionIds = await getExistingPermissionIds(
     readPermissionIds(formData)
   );
@@ -335,13 +326,13 @@ export async function updateRoleAction(
 ): Promise<RoleFormState> {
   await requireUser();
 
-  const id = Number(formData.get("id"));
-  const title = readText(formData, "title");
+  const id = readPositiveInteger(formData, "id");
+  const title = readFormText(formData, "title");
   const permissionIds = await getExistingPermissionIds(
     readPermissionIds(formData)
   );
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     return { error: "شناسه نقش معتبر نیست." };
   }
 
@@ -407,9 +398,9 @@ export async function updateRoleAction(
 export async function deleteRoleAction(formData: FormData) {
   await requireUser();
 
-  const id = Number(formData.get("id"));
+  const id = readPositiveInteger(formData, "id");
 
-  if (!Number.isInteger(id) || id <= 0) {
+  if (!id) {
     return;
   }
 
@@ -440,9 +431,9 @@ export async function deleteRoleAction(formData: FormData) {
 
 export async function deleteUserAction(formData: FormData) {
   const currentUser = await requireUser();
-  const id = Number(formData.get("id"));
+  const id = readPositiveInteger(formData, "id");
 
-  if (!Number.isInteger(id) || id <= 0 || id === currentUser.id) {
+  if (!id || id === currentUser.id) {
     return;
   }
 

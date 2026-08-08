@@ -6,7 +6,10 @@ import {
   AI_SUMMARY_MAX_TOKENS,
   prepareLetterRelationSummary,
 } from "@/src/ai/features/letterRelationSummary";
-import { requireUser } from "@/src/lib/auth";
+import { getCurrentUser } from "@/src/lib/auth";
+import { reportError } from "@/src/lib/errors";
+import { parsePositiveInteger } from "@/src/lib/input";
+import { createNdjsonStreamResponse } from "@/src/lib/ndjson";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,54 +31,23 @@ type StreamEvent =
       error: string;
     };
 
-function createStreamResponse(
-  handler: (write: (event: StreamEvent) => void) => Promise<void>
-) {
-  const encoder = new TextEncoder();
-
-  const stream = new ReadableStream({
-    async start(controller) {
-      const write = (event: StreamEvent) => {
-        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
-      };
-
-      try {
-        await handler(write);
-      } catch (error) {
-        write({
-          type: "error",
-          error: error instanceof Error ? error.message : "AI stream failed.",
-        });
-      } finally {
-        controller.close();
-      }
-    },
-  });
-
-  return new Response(stream, {
-    headers: {
-      "Cache-Control": "no-cache, no-transform",
-      "Content-Type": "application/x-ndjson; charset=utf-8",
-      "X-Accel-Buffering": "no",
-    },
-  });
-}
-
 export async function POST(
   _request: Request,
-  context: { params: Promise<{ letterId: string }> }
+  context: RouteContext<"/api/ai/letters/[letterId]/summary">,
 ) {
-  try {
-    await requireUser();
-  } catch {
+  if (!(await getCurrentUser())) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { letterId } = await context.params;
-  const parsedLetterId = Number(letterId);
+  const parsedLetterId = parsePositiveInteger(letterId);
+  if (!parsedLetterId) {
+    return Response.json({ error: "Invalid letter id." }, { status: 400 });
+  }
 
-  return createStreamResponse(async (write) => {
-    const preparedSummary = await prepareLetterRelationSummary(parsedLetterId);
+  return createNdjsonStreamResponse<StreamEvent>(
+    async (write) => {
+      const preparedSummary = await prepareLetterRelationSummary(parsedLetterId);
 
     if (!preparedSummary.success) {
       write({ type: "error", error: preparedSummary.error });
@@ -103,28 +75,33 @@ export async function POST(
       return;
     }
 
-    for await (const delta of streamAiChatCompletion(
-      preparedSummary.systemPrompt,
-      preparedSummary.userPrompt,
-      {
-        timeoutMs: readAiProviderNumber(
-          ["AI_LETTER_SUMMARY_TIMEOUT_MS"],
-          ["LM_STUDIO_AI_LETTER_SUMMARY_TIMEOUT_MS"],
-          180000
-        ),
-        maxTokens: readAiProviderNumber(
-          ["AI_LETTER_SUMMARY_MAX_TOKENS"],
-          ["LM_STUDIO_AI_LETTER_SUMMARY_MAX_TOKENS"],
-          AI_SUMMARY_MAX_TOKENS
-        ),
-        temperature: readAiProviderNumber(
-          ["AI_LETTER_SUMMARY_TEMPERATURE"],
-          ["LM_STUDIO_AI_LETTER_SUMMARY_TEMPERATURE"],
-          0.3
-        ),
+      for await (const delta of streamAiChatCompletion(
+        preparedSummary.systemPrompt,
+        preparedSummary.userPrompt,
+        {
+          timeoutMs: readAiProviderNumber(
+            ["AI_LETTER_SUMMARY_TIMEOUT_MS"],
+            ["LM_STUDIO_AI_LETTER_SUMMARY_TIMEOUT_MS"],
+            180000,
+          ),
+          maxTokens: readAiProviderNumber(
+            ["AI_LETTER_SUMMARY_MAX_TOKENS"],
+            ["LM_STUDIO_AI_LETTER_SUMMARY_MAX_TOKENS"],
+            AI_SUMMARY_MAX_TOKENS,
+          ),
+          temperature: readAiProviderNumber(
+            ["AI_LETTER_SUMMARY_TEMPERATURE"],
+            ["LM_STUDIO_AI_LETTER_SUMMARY_TEMPERATURE"],
+            0.3,
+          ),
+        },
+      )) {
+        write({ type: "delta", text: delta });
       }
-    )) {
-      write({ type: "delta", text: delta });
-    }
-  });
+    },
+    (error) => {
+      reportError("api.ai.letter-summary", error);
+      return { type: "error", error: "سرویس هوشمند پاسخ نداد. دوباره تلاش کنید." };
+    },
+  );
 }

@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DEFAULT_PAGE_SIZE } from "./ListPagination";
+import { Button } from "@/src/components/ui";
 
 interface ClientListPaginationProps {
   currentPage: number;
@@ -34,27 +35,29 @@ export default function ClientListPagination({
       </span>
       {totalPages > 1 && (
         <nav aria-label="صفحه‌بندی فهرست" className="flex items-center gap-2">
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant="secondary"
             disabled={activePage === 1}
             onClick={() => moveTo(activePage - 1)}
-            className="liquid-glass-control inline-flex h-9 items-center gap-1 rounded-xl border px-3 transition hover:text-brand-600 disabled:opacity-40"
+            leadingIcon={<ChevronRight className="h-4 w-4" />}
           >
-            <ChevronRight className="h-4 w-4" />
             قبلی
-          </button>
+          </Button>
           <span className="min-w-24 text-center font-bold text-gray-700 dark:text-gray-200">
             صفحه {activePage.toLocaleString("fa-IR")} از {totalPages.toLocaleString("fa-IR")}
           </span>
-          <button
+          <Button
             type="button"
+            size="sm"
+            variant="secondary"
             disabled={activePage === totalPages}
             onClick={() => moveTo(activePage + 1)}
-            className="liquid-glass-control inline-flex h-9 items-center gap-1 rounded-xl border px-3 transition hover:text-brand-600 disabled:opacity-40"
+            trailingIcon={<ChevronLeft className="h-4 w-4" />}
           >
             بعدی
-            <ChevronLeft className="h-4 w-4" />
-          </button>
+          </Button>
         </nav>
       )}
     </div>

@@ -1,5 +1,3 @@
-import "server-only";
-
 function decodeNumericHtmlEntity(value: string, radix: 10 | 16) {
   const codePoint = Number.parseInt(value, radix);
 

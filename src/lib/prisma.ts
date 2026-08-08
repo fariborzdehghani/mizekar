@@ -1,21 +1,28 @@
 import "dotenv/config";
+import "server-only";
+
 import { PrismaMssql } from "@prisma/adapter-mssql";
 import { PrismaClient } from "@/generated/prisma/client";
+import {
+  readBooleanEnv,
+  readPositiveIntegerEnv,
+  readRequiredEnv,
+} from "@/src/lib/env";
 
 const sqlConfig = {
-  user: process.env.DB_USER!,
-  password: process.env.DB_PASSWORD!,
-  database: process.env.DB_NAME!,
-  server: process.env.HOST!,
-    port: parseInt(process.env.DB_PORT!),
+  user: readRequiredEnv("DB_USER"),
+  password: readRequiredEnv("DB_PASSWORD"),
+  database: readRequiredEnv("DB_NAME"),
+  server: readRequiredEnv("HOST"),
+  port: readPositiveIntegerEnv("DB_PORT"),
   pool: {
     max: 10,
     min: 0,
     idleTimeoutMillis: 30000,
   },
   options: {
-    encrypt: true, // for azure
-    trustServerCertificate: true, // change to true for local dev / self-signed certs
+    encrypt: readBooleanEnv("DB_ENCRYPT", true),
+    trustServerCertificate: readBooleanEnv("DB_TRUST_SERVER_CERTIFICATE", true),
   },
 };
 

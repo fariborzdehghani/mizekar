@@ -4,6 +4,7 @@ import ListPagination, {
   DEFAULT_PAGE_SIZE,
 } from "@/src/components/common/ListPagination";
 import InboxListToolbar from "@/src/components/common/InboxListToolbar";
+import { Alert, EmptyState, PageTitle, buttonStyles } from "@/src/components/ui";
 
 type MessageListItem = {
   id: number;
@@ -93,39 +94,33 @@ export default function MessageList({
 
   return (
     <main className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
-      <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/new-message"
-          className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
+          className={buttonStyles()}
         >
           پیام جدید
         </Link>
-        <div className="text-right">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            {title}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {messages.length} پیام
-          </p>
-        </div>
+        <PageTitle title={title} description={`${messages.length} پیام`} />
       </div>
 
       {error ? (
-        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-          {error}
-        </div>
+        <Alert tone="error" className="mt-4">{error}</Alert>
       ) : messages.length === 0 ? (
-        <div className="liquid-glass-panel mt-4 flex flex-1 flex-col items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center dark:border-white/10 dark:bg-gray-900">
-          <p className="mb-4 text-gray-600 dark:text-gray-400">{emptyText}</p>
+        <EmptyState
+          className="mt-4 flex-1"
+          title={emptyText}
+          action={
           <Link
             href="/new-message"
-            className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white transition hover:bg-brand-600"
+            className={buttonStyles()}
           >
             ایجاد پیام
           </Link>
-        </div>
+          }
+        />
       ) : (
-        <div className="liquid-glass-surface mt-4 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+        <div className="liquid-glass-surface mt-4 overflow-hidden rounded-panel border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
           <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در پیام‌ها..." />
           <div className="overflow-x-auto">
           <table className="inbox-card-table inbox-card-table--messages w-full">

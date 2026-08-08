@@ -3,6 +3,7 @@
 import { ArrowDownUp, Filter, Search } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { IconButton, Input } from "@/src/components/ui";
 
 interface InboxListToolbarProps {
   searchQuery?: string;
@@ -38,8 +39,8 @@ export default function InboxListToolbar({
     <div className="flex min-h-[68px] flex-col gap-3 border-b border-black/5 p-4 dark:border-white/5 sm:flex-row sm:items-center sm:justify-end sm:p-5">
       <div className="flex min-w-0 items-center gap-2 sm:w-auto">
         <div className="relative min-w-0 flex-1 sm:w-64">
-          <Search className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--liquid-muted)]" />
-          <input
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--liquid-muted)]" />
+          <Input
             type="search"
             value={query}
             onChange={(event) => {
@@ -52,25 +53,27 @@ export default function InboxListToolbar({
                 updateParams({ [queryParam]: query.trim() || null });
               }
             }}
-            className="liquid-glass-keyline h-9 w-full rounded-xl border bg-black/[0.025] pr-9 pl-3 text-[11px] text-[var(--liquid-ink)] outline-none placeholder:text-[var(--liquid-muted)] dark:bg-white/[0.035]"
+            className="ui-control-with-start-icon text-xs"
             placeholder={searchPlaceholder}
           />
         </div>
-        <button
+        <IconButton
           type="button"
           aria-label="فیلتر فهرست"
-          className="liquid-glass-keyline grid h-9 w-9 shrink-0 place-items-center rounded-xl border bg-white/40 text-[var(--liquid-muted)] transition hover:text-brand-500 dark:bg-white/[0.035]"
+          size="md"
+          variant="secondary"
         >
-          <Filter className="h-3.5 w-3.5" />
-        </button>
-        <button
+          <Filter className="h-4 w-4" />
+        </IconButton>
+        <IconButton
           type="button"
           onClick={() => updateParams({ sort: sortOrder === "desc" ? "asc" : null })}
           aria-label={sortOrder === "desc" ? "مرتب‌سازی از قدیمی‌ترین" : "مرتب‌سازی از جدیدترین"}
-          className="liquid-glass-keyline grid h-9 w-9 shrink-0 place-items-center rounded-xl border bg-white/40 text-[var(--liquid-muted)] transition hover:text-brand-500 dark:bg-white/[0.035]"
+          size="md"
+          variant="secondary"
         >
-          <ArrowDownUp className={`h-3.5 w-3.5 transition ${sortOrder === "asc" ? "rotate-180" : ""}`} />
-        </button>
+          <ArrowDownUp className={`h-4 w-4 transition ${sortOrder === "asc" ? "rotate-180" : ""}`} />
+        </IconButton>
       </div>
     </div>
   );

@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingExcludes: {
+    "/*": ["./public/uploads/**/*"],
+  },
 
   webpack(config) {
     config.module.rules.push({

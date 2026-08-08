@@ -5,6 +5,7 @@ import {
 } from "@/src/actions/formActions";
 import FormInstanceView from "@/src/components/app/forms/FormInstanceView";
 import FormReadMarker from "@/src/components/app/forms/FormReadMarker";
+import { EmptyState, buttonStyles } from "@/src/components/ui";
 
 interface FormPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -17,17 +18,11 @@ export default async function FormPage({ searchParams }: FormPageProps) {
 
   if (!formId || !Number.isInteger(formId)) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          شناسه فرم نامعتبر است.
-        </p>
-        <Link
-          href="/incoming-letters"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-        >
-          بازگشت به فرم‌ها
-        </Link>
-      </div>
+      <EmptyState
+        className="m-4 min-h-[60vh]"
+        title="شناسه فرم نامعتبر است"
+        action={<Link href="/incoming-forms" className={buttonStyles()}>بازگشت به فرم‌ها</Link>}
+      />
     );
   }
 
@@ -36,17 +31,11 @@ export default async function FormPage({ searchParams }: FormPageProps) {
 
   if (!result.success || !result.form) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 p-6 text-center">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {result.error || "فرم یافت نشد."}
-        </p>
-        <Link
-          href="/incoming-letters"
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-        >
-          بازگشت به فرم‌ها
-        </Link>
-      </div>
+      <EmptyState
+        className="m-4 min-h-[60vh]"
+        title={result.error || "فرم یافت نشد"}
+        action={<Link href="/incoming-forms" className={buttonStyles()}>بازگشت به فرم‌ها</Link>}
+      />
     );
   }
 

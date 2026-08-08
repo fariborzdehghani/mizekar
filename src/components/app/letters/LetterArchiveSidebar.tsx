@@ -464,7 +464,7 @@ export default function LetterArchiveSidebar({
   }
 
   return (
-    <aside className={`liquid-glass-surface flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-[28px] border border-white/70 bg-app-archive-panel p-4 dark:border-white/10 dark:bg-gray-900 lg:sticky lg:z-30 lg:w-[280px] ${compactStickyOffset ? "lg:top-[214px] lg:max-h-[calc(100dvh-230px)]" : "lg:top-[246px] lg:max-h-[calc(100dvh-262px)]"}`}>
+    <aside className={`liquid-glass-surface flex max-h-full w-full shrink-0 flex-col overflow-hidden rounded-panel border border-white/70 bg-app-archive-panel p-4 dark:border-white/10 dark:bg-gray-900 lg:sticky lg:z-30 lg:w-[280px] ${compactStickyOffset ? "lg:top-[214px] lg:max-h-[calc(100dvh-230px)]" : "lg:top-[246px] lg:max-h-[calc(100dvh-262px)]"}`}>
       <div className="mb-4 flex shrink-0 items-center gap-3">
         <h2 className="min-w-0 flex-1 text-base font-semibold text-gray-900 dark:text-white">
           بایگانی
@@ -487,7 +487,7 @@ export default function LetterArchiveSidebar({
         <Link
           href={getInboxHref()}
           aria-current={pathname === "/incoming-letters" ? "page" : undefined}
-          className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-semibold transition ${
+          className={`flex items-center gap-3 rounded-control px-3 py-2.5 text-sm font-semibold transition ${
             pathname === "/incoming-letters"
               ? "bg-brand-500/10 text-brand-600 dark:text-brand-300"
               : "text-gray-600 hover:bg-white/60 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/5"
@@ -499,7 +499,7 @@ export default function LetterArchiveSidebar({
         <Link
           href={getOutgoingHref()}
           aria-current={pathname === "/outgoing-letters" ? "page" : undefined}
-          className={`flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-sm font-semibold transition ${
+          className={`flex items-center gap-3 rounded-control px-3 py-2.5 text-sm font-semibold transition ${
             pathname === "/outgoing-letters"
               ? "bg-brand-500/10 text-brand-600 dark:text-brand-300"
               : "text-gray-600 hover:bg-white/60 hover:text-brand-600 dark:text-gray-300 dark:hover:bg-white/5"
@@ -641,7 +641,7 @@ export default function LetterArchiveSidebar({
           <form
             onSubmit={submitFolderDialog}
             onMouseDown={(event) => event.stopPropagation()}
-            className="liquid-modal liquid-modal-dialog w-full max-w-sm rounded-[24px] p-4 text-right"
+            className="liquid-modal liquid-modal-dialog w-full max-w-sm rounded-card p-4 text-right"
           >
             <div className="mb-4">
               <h3 className="text-base font-semibold text-gray-900 dark:text-white">

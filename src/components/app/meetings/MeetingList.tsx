@@ -11,6 +11,7 @@ import ListPagination, {
   DEFAULT_PAGE_SIZE,
 } from "@/src/components/common/ListPagination";
 import InboxListToolbar from "@/src/components/common/InboxListToolbar";
+import { Alert, EmptyState, PageTitle, buttonStyles } from "@/src/components/ui";
 
 type CreatedMeetingListItem = {
   id: number;
@@ -86,44 +87,38 @@ export default function MeetingList({
     <ArchiveSelectionProvider>
       <div className="liquid-content-frame liquid-glass-page grid min-h-[calc(100vh-92px)] grid-cols-1 content-start items-start gap-4 py-4 sm:py-6 xl:grid-cols-[minmax(0,1fr)_280px]">
         <main className="contents">
-          <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between xl:col-span-2">
+          <div className="liquid-page-header flex shrink-0 flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between xl:col-span-2">
             <Link
               href="/meeting"
-              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
+              className={buttonStyles()}
             >
               <Plus className="h-4 w-4" />
               جلسه جدید
             </Link>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                جلسات ایجاد شده
-              </h1>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {meetings.length} جلسه
-                {searchQuery ? ` برای «${searchQuery}»` : ""}
-              </p>
-            </div>
+            <PageTitle
+              title="جلسات ایجاد شده"
+              description={`${meetings.length} جلسه${searchQuery ? ` برای «${searchQuery}»` : ""}`}
+            />
           </div>
 
           {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-900/20 dark:text-red-200">
-              {error}
-            </div>
+            <Alert tone="error">{error}</Alert>
           ) : meetings.length === 0 ? (
-            <div className="liquid-glass-panel flex flex-1 flex-col items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center dark:border-white/10 dark:bg-gray-900">
-              <CalendarCheck className="mb-4 h-10 w-10 text-gray-400" />
-              <p className="mb-4 text-gray-600 dark:text-gray-400">
-                هنوز جلسه‌ای ایجاد نکرده‌اید
-              </p>
+            <EmptyState
+              className="flex-1"
+              icon={<CalendarCheck className="h-6 w-6" />}
+              title="هنوز جلسه‌ای ایجاد نکرده‌اید"
+              action={
               <Link
                 href="/meeting"
-                className="inline-block rounded-2xl bg-brand-500 px-4 py-2 text-white transition hover:bg-brand-600"
+                className={buttonStyles()}
               >
                 ایجاد جلسه
               </Link>
-            </div>
+              }
+            />
           ) : (
-            <div className="liquid-glass-surface flex-1 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+            <div className="liquid-glass-surface flex-1 overflow-hidden rounded-panel border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
               <InboxListToolbar searchQuery={searchQuery} searchPlaceholder="جستجو در جلسات..." />
               <div className="overflow-x-auto">
               <table className="inbox-card-table inbox-card-table--meetings w-full">

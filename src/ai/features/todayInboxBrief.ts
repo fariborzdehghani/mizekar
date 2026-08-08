@@ -9,6 +9,7 @@ import {
   requestAiChatCompletion,
 } from "@/src/ai/client";
 import { getPlainText, getPlainTextSnippet } from "@/src/lib/richText";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
 
 const MAX_BRIEF_TASKS = 5;
 const AI_ITEM_CONTENT_CHAR_LIMIT = 1800;
@@ -26,19 +27,6 @@ const AI_TIMEOUT_MS = 180_000;
 const AI_MAX_TOKENS = 1400;
 
 type InboxSourceType = "letter" | "form" | "meeting" | "message";
-type UserForDisplay =
-  | {
-      id: number;
-      user_id: string | null;
-      persons_persons_user_idTousers?: Array<{
-        first_name: string | null;
-        last_name: string | null;
-        job?: string | null;
-      }>;
-    }
-  | null
-  | undefined;
-
 type InboxCandidate = {
   key: string;
   sourceType: InboxSourceType;
@@ -90,20 +78,6 @@ type ParsedAiBriefItem = {
   text?: unknown;
   actionLabel?: unknown;
 };
-
-function getUserDisplayName(user: UserForDisplay) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-
-  if (fullName) return job ? `${fullName} - ${job}` : fullName;
-
-  const fallbackName = user?.user_id || (user?.id ? `User #${user.id}` : "-");
-  return job && fallbackName !== "-" ? `${fallbackName} - ${job}` : fallbackName;
-}
 
 function startOfToday() {
   const now = new Date();
@@ -376,10 +350,9 @@ async function collectLetterCandidates(userId: number): Promise<InboxCandidate[]
     take: 40,
   });
 
-  return referrals
-    .filter((referral) => referral.letters)
-    .map((referral) => {
-      const letter = referral.letters!;
+  return referrals.flatMap((referral) => {
+      const letter = referral.letters;
+      if (!letter) return [];
       const key = `letter:${referral.id}`;
       const number = letter.internal_number || letter.external_number || `#${letter.id}`;
       const hasDueToday = isBeforeTomorrow(referral.due_date);
@@ -393,7 +366,7 @@ async function collectLetterCandidates(userId: number): Promise<InboxCandidate[]
         { label: "ارسال پیام", href: "/new-message" },
       ];
 
-      return {
+      return [{
         key,
         sourceType: "letter",
         sourceId: letter.id,
@@ -423,7 +396,7 @@ async function collectLetterCandidates(userId: number): Promise<InboxCandidate[]
           "پاسخ، ارجاع یا بایگانی را در صفحه نامه ثبت کنید.",
         ],
         score,
-      } satisfies InboxCandidate;
+      } satisfies InboxCandidate];
     });
 }
 

@@ -313,13 +313,13 @@ export function InboxBriefProvider({
             aria-labelledby="ai-brief-dialog-title"
             aria-busy={isCreating}
             tabIndex={-1}
-            className="liquid-modal liquid-modal-dialog flex max-h-[88dvh] w-full max-w-[860px] flex-col overflow-hidden rounded-[30px] outline-none"
+            className="liquid-modal liquid-modal-dialog flex max-h-[88dvh] w-full max-w-[860px] flex-col overflow-hidden rounded-panel outline-none"
             dir="rtl"
           >
             <header className="liquid-modal-header flex shrink-0 items-start justify-between gap-4 px-4 py-4 sm:px-6 sm:py-5">
               <div className="flex min-w-0 items-start gap-3.5">
                 <span
-                  className={`grid h-12 w-12 shrink-0 place-items-center rounded-[16px] ${AI_ICON_CLASS}`}
+                  className={`grid h-12 w-12 shrink-0 place-items-center rounded-control-lg ${AI_ICON_CLASS}`}
                 >
                   <Sparkles className="h-5 w-5" strokeWidth={2.2} />
                 </span>
@@ -353,7 +353,7 @@ export function InboxBriefProvider({
               <button
                 type="button"
                 onClick={closeBrief}
-                className="liquid-glass-control inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] border text-gray-500 transition hover:text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 dark:text-gray-400 dark:hover:text-white"
+                className="liquid-glass-control inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control border text-gray-500 transition hover:text-gray-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 dark:text-gray-400 dark:hover:text-white"
                 aria-label="بستن اقدامات پیشنهادی هوش مصنوعی"
               >
                 <X className="h-[18px] w-[18px]" />
@@ -367,7 +367,7 @@ export function InboxBriefProvider({
                   role="status"
                   aria-live="polite"
                 >
-                  <span className={`grid h-14 w-14 place-items-center rounded-[18px] ${AI_ICON_CLASS}`}>
+                  <span className={`grid h-14 w-14 place-items-center rounded-control-lg ${AI_ICON_CLASS}`}>
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </span>
                   <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">
@@ -380,7 +380,7 @@ export function InboxBriefProvider({
                     {[0, 1, 2].map((item) => (
                       <span
                         key={item}
-                        className="h-[72px] animate-pulse rounded-[18px] border border-black/[0.045] bg-white/35 dark:border-white/[0.06] dark:bg-white/[0.035]"
+                        className="h-[72px] animate-pulse rounded-control-lg border border-black/[0.045] bg-white/35 dark:border-white/[0.06] dark:bg-white/[0.035]"
                       />
                     ))}
                   </div>
@@ -388,11 +388,11 @@ export function InboxBriefProvider({
               ) : error ? (
                 <div className="mx-auto flex min-h-64 max-w-xl flex-col items-center justify-center text-center">
                   <div
-                    className="w-full rounded-[22px] border border-red-500/15 bg-red-500/[0.07] p-5 text-right dark:bg-red-400/[0.07]"
+                    className="w-full rounded-card border border-red-500/15 bg-red-500/[0.07] p-5 text-right dark:bg-red-400/[0.07]"
                     role="alert"
                   >
                     <div className="flex items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[13px] bg-red-500/10 text-red-600 dark:text-red-300">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-red-500/10 text-red-600 dark:text-red-300">
                         <AlertCircle className="h-5 w-5" />
                       </span>
                       <div>
@@ -408,7 +408,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className={`${AI_SOLID_BUTTON_CLASS} mt-4 h-10 rounded-[13px] px-4 text-sm font-bold`}
+                    className={`${AI_SOLID_BUTTON_CLASS} mt-4 h-10 rounded-control px-4 text-sm font-bold`}
                   >
                     <RefreshCw className="h-4 w-4" />
                     تلاش دوباره
@@ -416,9 +416,9 @@ export function InboxBriefProvider({
                 </div>
               ) : brief?.summary ? (
                 <div className="space-y-5 text-right font-iransans" dir="rtl">
-                  <section className="liquid-glass-inset rounded-[22px] border border-black/[0.045] p-4 sm:p-5 dark:border-white/[0.07]">
+                  <section className="liquid-glass-inset rounded-card border border-black/[0.045] p-4 sm:p-5 dark:border-white/[0.07]">
                     <div className="flex items-start gap-3">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[13px] bg-brand-500/10 text-brand-700 dark:text-brand-300">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-control bg-brand-500/10 text-brand-700 dark:text-brand-300">
                         <ListChecks className="h-5 w-5" />
                       </span>
                       <div className="min-w-0">
@@ -450,11 +450,11 @@ export function InboxBriefProvider({
                           return (
                             <article
                               key={item.id}
-                              className="group rounded-[20px] border border-black/[0.055] bg-white/42 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.62)] transition duration-200 hover:border-brand-500/20 hover:bg-white/58 dark:border-white/[0.075] dark:bg-white/[0.035] dark:shadow-none dark:hover:bg-white/[0.055]"
+                              className="group rounded-card border border-black/[0.055] bg-white/42 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,.62)] transition duration-200 hover:border-brand-500/20 hover:bg-white/58 dark:border-white/[0.075] dark:bg-white/[0.035] dark:shadow-none dark:hover:bg-white/[0.055]"
                             >
                               <div className="flex items-start gap-3">
                                 <span
-                                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-[13px] ${sourceMeta.className}`}
+                                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-control ${sourceMeta.className}`}
                                 >
                                   <SourceIcon className="h-[18px] w-[18px]" />
                                 </span>
@@ -479,7 +479,7 @@ export function InboxBriefProvider({
                                 <Link
                                   href={item.actionHref}
                                   onClick={closeBrief}
-                                  className="liquid-glass-keyline inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-[12px] border bg-brand-500/[0.08] px-3 text-xs font-extrabold text-brand-700 transition hover:border-brand-500/25 hover:bg-brand-500/[0.13] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 dark:text-brand-300 sm:w-auto"
+                                  className="liquid-glass-keyline inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-control border bg-brand-500/[0.08] px-3 text-xs font-extrabold text-brand-700 transition hover:border-brand-500/25 hover:bg-brand-500/[0.13] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-500/15 dark:text-brand-300 sm:w-auto"
                                 >
                                   {item.actionLabel}
                                   <ChevronLeft className="h-4 w-4" />
@@ -494,7 +494,7 @@ export function InboxBriefProvider({
                 </div>
               ) : (
                 <div className="mx-auto flex min-h-64 max-w-lg flex-col items-center justify-center text-center">
-                  <span className="grid h-14 w-14 place-items-center rounded-[18px] bg-brand-500/10 text-brand-700 dark:text-brand-300">
+                  <span className="grid h-14 w-14 place-items-center rounded-control-lg bg-brand-500/10 text-brand-700 dark:text-brand-300">
                     <Sparkles className="h-6 w-6" />
                   </span>
                   <h3 className="mt-4 text-base font-bold text-gray-900 dark:text-white">
@@ -506,7 +506,7 @@ export function InboxBriefProvider({
                   <button
                     type="button"
                     onClick={() => void createBrief()}
-                    className={`${AI_SOLID_BUTTON_CLASS} mt-4 h-10 rounded-[13px] px-4 text-sm font-bold`}
+                    className={`${AI_SOLID_BUTTON_CLASS} mt-4 h-10 rounded-control px-4 text-sm font-bold`}
                   >
                     <Sparkles className="h-4 w-4" />
                     ایجاد اقدامات پیشنهادی
@@ -523,7 +523,7 @@ export function InboxBriefProvider({
                 <button
                   type="button"
                   onClick={() => void createBrief()}
-                  className={`${AI_SOFT_BUTTON_CLASS} h-10 w-full rounded-[13px] px-4 text-sm font-bold sm:w-auto`}
+                  className={`${AI_SOFT_BUTTON_CLASS} h-10 w-full rounded-control px-4 text-sm font-bold sm:w-auto`}
                 >
                   <RefreshCw className="h-4 w-4" />
                   ایجاد پیشنهادهای جدید

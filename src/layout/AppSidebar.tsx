@@ -341,8 +341,8 @@ const AppSidebar: React.FC = () => {
               : "gap-0 justify-center"
           }`}
         >
-          <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-[16px] bg-gradient-to-br from-[#7168ff] via-[#625cff] to-[#45b9c9] text-white">
-            <span className="absolute inset-px rounded-[15px] border border-white/25" />
+          <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-control-lg bg-gradient-to-br from-[#7168ff] via-[#625cff] to-[#45b9c9] text-white">
+            <span className="absolute inset-px rounded-control border border-white/25" />
             <Feather className="relative h-5 w-5" strokeWidth={2.2} />
           </span>
           <span

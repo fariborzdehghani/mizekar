@@ -1,6 +1,7 @@
 import "server-only";
 
 import crypto from "crypto";
+import { readFirstEnv, readOptionalEnv, readSecret } from "@/src/lib/env";
 
 type SignedTokenPayload = {
   purpose: string;
@@ -9,16 +10,14 @@ type SignedTokenPayload = {
 };
 
 function getSigningSecret() {
-  return (
-    process.env.ONLYOFFICE_APP_SECRET ||
-    process.env.AUTH_SECRET ||
-    process.env.NEXTAUTH_SECRET ||
-    "mizekar-development-session-secret-change-me"
+  return readSecret(
+    ["ONLYOFFICE_APP_SECRET", "AUTH_SECRET", "NEXTAUTH_SECRET"],
+    "mizekar-development-session-secret-change-me",
   );
 }
 
 function getOnlyOfficeJwtSecret() {
-  return process.env.ONLYOFFICE_JWT_SECRET || "";
+  return readOptionalEnv("ONLYOFFICE_JWT_SECRET") || "";
 }
 
 function base64UrlEncode(value: string | Buffer) {
@@ -113,5 +112,8 @@ export function verifyOnlyOfficeJwt(token: string | null | undefined) {
 }
 
 export function getOnlyOfficeDocumentServerUrl() {
-  return (process.env.ONLYOFFICE_DOCUMENT_SERVER_URL || "").replace(/\/$/, "");
+  return (readFirstEnv(["ONLYOFFICE_DOCUMENT_SERVER_URL"]) || "").replace(
+    /\/$/,
+    "",
+  );
 }

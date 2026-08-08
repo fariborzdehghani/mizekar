@@ -11,15 +11,30 @@ export function hashPassword(password: string) {
 
 function verifyScryptPassword(password: string, storedPassword: string) {
   const [, salt, key] = storedPassword.split("$");
-  if (!salt || !key) return false;
+  if (!salt || !/^[a-f0-9]+$/i.test(key) || key.length % 2 !== 0) return false;
 
   const keyBuffer = Buffer.from(key, "hex");
+  if (keyBuffer.length === 0) return false;
   const derivedKey = crypto.scryptSync(password, salt, keyBuffer.length);
 
   return (
     keyBuffer.length === derivedKey.length &&
     crypto.timingSafeEqual(keyBuffer, derivedKey)
   );
+}
+
+function timingSafeStringEqual(first: string, second: string) {
+  const firstBuffer = Buffer.from(first);
+  const secondBuffer = Buffer.from(second);
+
+  return (
+    firstBuffer.length === secondBuffer.length &&
+    crypto.timingSafeEqual(firstBuffer, secondBuffer)
+  );
+}
+
+export function needsPasswordRehash(storedPassword: string | null | undefined) {
+  return Boolean(storedPassword && !storedPassword.startsWith("scrypt$"));
 }
 
 function verifySha256Password(password: string, storedPassword: string) {
@@ -47,5 +62,5 @@ export function verifyPassword(
     return verifySha256Password(password, storedPassword);
   }
 
-  return password === storedPassword;
+  return timingSafeStringEqual(password, storedPassword);
 }

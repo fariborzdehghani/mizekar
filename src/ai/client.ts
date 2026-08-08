@@ -1,5 +1,7 @@
 import "server-only";
 
+import { readOptionalEnv } from "@/src/lib/env";
+
 export type AiChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
@@ -50,7 +52,7 @@ export function readAiString(
   for (const name of names) {
     if (!name) continue;
 
-    const value = process.env[name]?.trim();
+    const value = readOptionalEnv(name);
 
     if (value) return value;
   }
@@ -62,7 +64,7 @@ export function readAiNumber(names: Array<string | undefined>, fallback: number)
   for (const name of names) {
     if (!name) continue;
 
-    const rawValue = process.env[name]?.trim();
+    const rawValue = readOptionalEnv(name);
     if (!rawValue) continue;
 
     const value = Number(rawValue);

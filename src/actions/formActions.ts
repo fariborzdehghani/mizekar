@@ -2,6 +2,7 @@
 
 import fs from "fs/promises";
 import path from "path";
+import crypto from "crypto";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/src/lib/prisma";
@@ -11,6 +12,13 @@ import {
   getOnlyOfficeDocumentServerUrl,
   signOnlyOfficePayload,
 } from "@/src/lib/onlyoffice";
+import {
+  getUniqueUserIds,
+  parsePersonSelections,
+} from "@/src/lib/selection";
+import { readFormText, readPositiveInteger } from "@/src/lib/input";
+import { readFirstEnv } from "@/src/lib/env";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
 
 const FORM_STATUS_DRAFT = 0;
 const FORM_STATUS_IN_PROGRESS = 1;
@@ -24,14 +32,6 @@ const FORM_STEP_REJECTED = 3;
 
 const FORM_REFERRAL_OPEN = 0;
 const FORM_REFERRAL_DONE = 1;
-
-type PersonInput = {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-  job: string | null;
-  user_id: number | null;
-};
 
 export type FormTemplateFormState = {
   error?: string;
@@ -59,9 +59,7 @@ function isWordDocument(fileName: string | null | undefined) {
 async function saveUploadedFile(file: File, creatorId: number) {
   await fs.mkdir(getUploadsDir(), { recursive: true });
 
-  const timestamp = Date.now();
-  const randomSuffix = Math.random().toString(36).slice(2, 9);
-  const storedFileName = `${timestamp}_${randomSuffix}`;
+  const storedFileName = crypto.randomUUID();
   const filePath = path.join(getUploadsDir(), storedFileName);
   const bytes = new Uint8Array(await file.arrayBuffer());
 
@@ -81,9 +79,7 @@ async function copyStoredFile(sourceName: string, title: string, creatorId: numb
   await fs.mkdir(getUploadsDir(), { recursive: true });
 
   const sourcePath = path.join(getUploadsDir(), sourceName);
-  const timestamp = Date.now();
-  const randomSuffix = Math.random().toString(36).slice(2, 9);
-  const storedFileName = `${timestamp}_${randomSuffix}`;
+  const storedFileName = crypto.randomUUID();
   const targetPath = path.join(getUploadsDir(), storedFileName);
 
   await fs.copyFile(sourcePath, targetPath);
@@ -96,31 +92,6 @@ async function copyStoredFile(sourceName: string, title: string, creatorId: numb
       creator_id: creatorId,
     },
   });
-}
-
-function getUserDisplayName(
-  user:
-    | {
-        id: number;
-        user_id: string | null;
-        persons_persons_user_idTousers?: Array<{
-          first_name: string | null;
-          last_name: string | null;
-          job?: string | null;
-        }>;
-      }
-    | null
-    | undefined
-) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-  const baseName = fullName || user?.user_id || (user?.id ? `کاربر #${user.id}` : "-");
-
-  return job && baseName !== "-" ? `${baseName} - ${job}` : baseName;
 }
 
 function getStatusLabel(status: number) {
@@ -142,10 +113,11 @@ function normalizeBaseUrl(value: string) {
 }
 
 export async function getRequestBaseUrl() {
-  const configuredUrl =
-    process.env.APP_PUBLIC_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXTAUTH_URL;
+  const configuredUrl = readFirstEnv([
+    "APP_PUBLIC_URL",
+    "NEXT_PUBLIC_APP_URL",
+    "NEXTAUTH_URL",
+  ]);
 
   if (configuredUrl) return normalizeBaseUrl(configuredUrl);
 
@@ -159,9 +131,9 @@ export async function getRequestBaseUrl() {
 export async function createFormTemplate(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const title = String(formData.get("title") || "").trim();
-    const description = String(formData.get("description") || "").trim();
-    const stepsJson = String(formData.get("steps") || "");
+    const title = readFormText(formData, "title");
+    const description = readFormText(formData, "description");
+    const stepsJson = readFormText(formData, "steps");
     const file = formData.get("templateFile");
 
     if (!title) {
@@ -176,16 +148,12 @@ export async function createFormTemplate(formData: FormData) {
       return { success: false, error: "فقط فایل‌های .docx و .doc پشتیبانی می‌شوند." };
     }
 
-    let steps: PersonInput[] = [];
-    try {
-      steps = JSON.parse(stepsJson) as PersonInput[];
-    } catch {
+    const steps = parsePersonSelections(stepsJson);
+    if (!steps) {
       return { success: false, error: "مراحل تایید نامعتبر است." };
     }
 
-    const approverIds = steps
-      .map((step) => Number(step.user_id))
-      .filter((userId) => Number.isInteger(userId) && userId > 0);
+    const approverIds = getUniqueUserIds(steps);
 
     if (approverIds.length === 0) {
       return { success: false, error: "حداقل یک مرحله تایید الزامی است." };
@@ -251,14 +219,14 @@ export async function updateFormTemplateAction(
 ): Promise<FormTemplateFormState> {
   try {
     const currentUserId = await requireUserId();
-    const templateId = Number(formData.get("id"));
-    const title = String(formData.get("title") || "").trim();
-    const description = String(formData.get("description") || "").trim();
+    const templateId = readPositiveInteger(formData, "id");
+    const title = readFormText(formData, "title");
+    const description = readFormText(formData, "description");
     const isActive = formData.get("isActive") === "on";
-    const stepsJson = String(formData.get("steps") || "");
+    const stepsJson = readFormText(formData, "steps");
     const file = formData.get("templateFile");
 
-    if (!Number.isInteger(templateId) || templateId <= 0) {
+    if (!templateId) {
       return { error: "قالب فرم نامعتبر است." };
     }
 
@@ -266,16 +234,12 @@ export async function updateFormTemplateAction(
       return { error: "عنوان قالب الزامی است." };
     }
 
-    let steps: PersonInput[] = [];
-    try {
-      steps = JSON.parse(stepsJson) as PersonInput[];
-    } catch {
+    const steps = parsePersonSelections(stepsJson);
+    if (!steps) {
       return { error: "مراحل تایید نامعتبر است." };
     }
 
-    const approverIds = steps
-      .map((step) => Number(step.user_id))
-      .filter((userId) => Number.isInteger(userId) && userId > 0);
+    const approverIds = getUniqueUserIds(steps);
 
     if (approverIds.length === 0) {
       return { error: "حداقل یک مرحله تایید الزامی است." };
@@ -348,9 +312,9 @@ export async function updateFormTemplateAction(
 export async function deleteFormTemplateAction(formData: FormData) {
   try {
     await requireUserId();
-    const templateId = Number(formData.get("id"));
+    const templateId = readPositiveInteger(formData, "id");
 
-    if (!Number.isInteger(templateId) || templateId <= 0) {
+    if (!templateId) {
       return;
     }
 
@@ -419,10 +383,10 @@ export async function getFormTemplates() {
 export async function createFormInstance(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const templateId = Number(formData.get("templateId"));
-    const customTitle = String(formData.get("title") || "").trim();
+    const templateId = readPositiveInteger(formData, "templateId");
+    const customTitle = readFormText(formData, "title");
 
-    if (!Number.isInteger(templateId) || templateId <= 0) {
+    if (!templateId) {
       return { success: false, error: "قالب فرم نامعتبر است." };
     }
 
@@ -496,7 +460,11 @@ export async function createFormInstance(formData: FormData) {
 export async function submitFormInstance(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const instanceId = Number(formData.get("instanceId"));
+    const instanceId = readPositiveInteger(formData, "instanceId");
+
+    if (!instanceId) {
+      return { success: false, error: "فرم نامعتبر است." };
+    }
 
     const instance = await prisma.form_instances.findUnique({
       where: { id: instanceId },
@@ -572,8 +540,12 @@ async function getActiveStepForCurrentUser(instanceId: number, currentUserId: nu
 export async function approveFormInstance(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const instanceId = Number(formData.get("instanceId"));
-    const comments = String(formData.get("comments") || "").trim();
+    const instanceId = readPositiveInteger(formData, "instanceId");
+    const comments = readFormText(formData, "comments");
+
+    if (!instanceId) {
+      return { success: false, error: "فرم نامعتبر است." };
+    }
     const activeStep = await getActiveStepForCurrentUser(instanceId, currentUserId);
 
     if (!activeStep) {
@@ -655,8 +627,12 @@ export async function approveFormInstance(formData: FormData) {
 export async function rejectFormInstance(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const instanceId = Number(formData.get("instanceId"));
-    const comments = String(formData.get("comments") || "").trim();
+    const instanceId = readPositiveInteger(formData, "instanceId");
+    const comments = readFormText(formData, "comments");
+
+    if (!instanceId) {
+      return { success: false, error: "فرم نامعتبر است." };
+    }
     const activeStep = await getActiveStepForCurrentUser(instanceId, currentUserId);
 
     if (!activeStep) {
@@ -717,9 +693,13 @@ export async function rejectFormInstance(formData: FormData) {
 export async function createFormReferral(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const instanceId = Number(formData.get("instanceId"));
-    const contents = String(formData.get("contents") || "").trim();
-    const receiversJson = String(formData.get("receivers") || "");
+    const instanceId = readPositiveInteger(formData, "instanceId");
+    const contents = readFormText(formData, "contents");
+    const receiversJson = readFormText(formData, "receivers");
+
+    if (!instanceId) {
+      return { success: false, error: "فرم نامعتبر است." };
+    }
 
     const hasAccess = await prisma.form_instances.findFirst({
       where: {
@@ -743,20 +723,12 @@ export async function createFormReferral(formData: FormData) {
       return { success: false, error: "شما مجاز به ارجاع این فرم نیستید." };
     }
 
-    let receivers: PersonInput[] = [];
-    try {
-      receivers = JSON.parse(receiversJson) as PersonInput[];
-    } catch {
+    const receivers = parsePersonSelections(receiversJson);
+    if (!receivers) {
       return { success: false, error: "گیرندگان ارجاع نامعتبر هستند." };
     }
 
-    const receiverIds = [
-      ...new Set(
-        receivers
-          .map((receiver) => Number(receiver.user_id))
-          .filter((id) => Number.isInteger(id) && id > 0)
-      ),
-    ];
+    const receiverIds = getUniqueUserIds(receivers);
 
     if (receiverIds.length === 0) {
       return { success: false, error: "حداقل یک گیرنده انتخاب کنید." };

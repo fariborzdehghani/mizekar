@@ -3,6 +3,16 @@
 import { prisma } from "@/src/lib/prisma";
 import { requireUser, requireUserId } from "@/src/lib/auth";
 import { revalidatePath } from "next/cache";
+import { parsePositiveInteger, readFormText } from "@/src/lib/input";
+import { getPlainTextSnippet, hasRichTextContent } from "@/src/lib/richText";
+import { normalizeSearchValue } from "@/src/lib/text";
+import { getUserDisplayName } from "@/src/lib/userDisplay";
+import type { DisplayUser as UserForDisplay } from "@/src/lib/userDisplay";
+import {
+  getUniqueUserIds,
+  parsePersonSelections,
+  type PersonSelection,
+} from "@/src/lib/selection";
 
 const MESSAGE_IMPORTANCE_NORMAL = 1;
 const MESSAGE_IMPORTANCE_IMPORTANT = 2;
@@ -13,64 +23,7 @@ const VALID_IMPORTANCE_VALUES = new Set([
   MESSAGE_IMPORTANCE_URGENT,
 ]);
 
-type PersonRecipient = {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-  job: string | null;
-  user_id: number | null;
-};
-
-type UserForDisplay =
-  | {
-      id: number;
-      user_id: string | null;
-      persons_persons_user_idTousers?: Array<{
-        id?: number;
-        first_name: string | null;
-        last_name: string | null;
-        job?: string | null;
-      }>;
-    }
-  | null
-  | undefined;
-
-function getPlainTextSnippet(value: string | null | undefined) {
-  return (value || "")
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 160);
-}
-
-function hasRichTextContent(value: string | null | undefined) {
-  const content = value || "";
-  const plainText = content
-    .replace(/<[^>]*>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
-  return plainText.length > 0 || /<(img|table|ul|ol)\b/i.test(content);
-}
-
-function getUserDisplayName(user: UserForDisplay) {
-  const person = user?.persons_persons_user_idTousers?.[0];
-  const fullName = [person?.first_name, person?.last_name]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-  const job = person?.job?.trim();
-
-  if (fullName) {
-    return job ? `${fullName} - ${job}` : fullName;
-  }
-
-  const fallbackName = user?.user_id || (user?.id ? `User #${user.id}` : "-");
-
-  return job && fallbackName !== "-" ? `${fallbackName} - ${job}` : fallbackName;
-}
+type PersonRecipient = PersonSelection;
 
 function getImportanceLabel(importance: number | null | undefined) {
   if (importance === MESSAGE_IMPORTANCE_URGENT) return "فوری";
@@ -79,8 +32,7 @@ function getImportanceLabel(importance: number | null | undefined) {
 }
 
 function parsePositiveInt(value: FormDataEntryValue | null) {
-  const parsedValue = Number(value);
-  return Number.isInteger(parsedValue) && parsedValue > 0 ? parsedValue : null;
+  return parsePositiveInteger(value);
 }
 
 function normalizeImportance(value: FormDataEntryValue | null) {
@@ -164,10 +116,8 @@ function parseRecipients(recipientsJson: string | null) {
     };
   }
 
-  let recipients: PersonRecipient[] = [];
-  try {
-    recipients = JSON.parse(recipientsJson) as PersonRecipient[];
-  } catch {
+  const recipients = parsePersonSelections(recipientsJson);
+  if (!recipients) {
     return {
       success: false as const,
       error: "داده گیرندگان نامعتبر است",
@@ -175,13 +125,7 @@ function parseRecipients(recipientsJson: string | null) {
     };
   }
 
-  const userIds = [
-    ...new Set(
-      recipients
-        .map((recipient) => Number(recipient.user_id))
-        .filter((userId) => Number.isInteger(userId) && userId > 0)
-    ),
-  ];
+  const userIds = getUniqueUserIds(recipients);
 
   if (userIds.length === 0) {
     return {
@@ -220,11 +164,9 @@ function revalidateMessagePaths() {
 export async function createMessage(formData: FormData) {
   try {
     const currentUserId = await requireUserId();
-    const title = String(formData.get("title") || "").trim();
-    const content = String(formData.get("content") || "");
-    const recipientsResult = parseRecipients(
-      formData.get("recipients") as string | null
-    );
+    const title = readFormText(formData, "title");
+    const content = readFormText(formData, "content", { trim: false });
+    const recipientsResult = parseRecipients(readFormText(formData, "recipients"));
     const importance = normalizeImportance(formData.get("importance"));
     const parentMessageId = parsePositiveInt(formData.get("parentMessageId"));
     const forwardedFromMessageId = parsePositiveInt(
@@ -401,10 +343,6 @@ function mapMessageListItem(
 }
 
 type MessageListItem = ReturnType<typeof mapMessageListItem>;
-
-function normalizeSearchValue(value: unknown) {
-  return String(value ?? "").toLocaleLowerCase("fa-IR");
-}
 
 function formatSearchDate(value: Date | string | null) {
   if (!value) return "";

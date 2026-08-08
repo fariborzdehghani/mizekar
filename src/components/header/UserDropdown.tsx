@@ -5,6 +5,7 @@ import { Dropdown } from "@/src/components/ui/dropdown/Dropdown";
 import { DropdownItem } from "@/src/components/ui/dropdown/DropdownItem";
 import type { CurrentUser } from "@/src/lib/auth-types";
 import { ChevronLeft, LogOut, UserPen, UserRound } from "lucide-react";
+import Image from "next/image";
 import React, { useMemo, useRef, useState } from "react";
 
 export default function UserDropdown({ user }: { user: CurrentUser }) {
@@ -38,14 +39,16 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
         onClick={toggleDropdown}
         aria-label="منوی پروفایل"
         aria-expanded={isOpen}
-        className="dropdown-toggle liquid-glass-keyline flex shrink-0 items-center gap-2 rounded-[16px] border bg-white/55 p-1.5 pl-2.5 text-right text-[var(--liquid-ink)] transition hover:bg-white/80 dark:bg-white/[0.045] dark:hover:bg-white/[0.08]"
+        className="dropdown-toggle liquid-glass-keyline flex shrink-0 items-center gap-2 rounded-control-lg border bg-white/55 p-1.5 pl-2.5 text-right text-[var(--liquid-ink)] transition hover:bg-white/80 dark:bg-white/[0.045] dark:hover:bg-white/[0.08]"
       >
         <span className="relative isolate block h-[34px] w-[34px] shrink-0 overflow-hidden rounded-xl">
           {avatarSrc ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Image
               src={avatarSrc}
               alt={user.displayName}
+              fill
+              sizes="34px"
+              unoptimized
               className="absolute inset-0 block h-full w-full object-cover object-top"
               onError={handleAvatarError}
             />
@@ -91,15 +94,17 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
         glassVariant="surface"
         portal
         anchorRef={dropdownAnchorRef}
-        className="flex w-[280px] flex-col rounded-[20px] p-2.5"
+        className="flex w-[280px] flex-col rounded-card p-2.5"
       >
-        <div className="flex items-center gap-3 rounded-[15px] border border-white/70 bg-white/45 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.7)] dark:border-white/10 dark:bg-white/[0.055] dark:shadow-none">
-          <span className="relative isolate block h-11 w-11 shrink-0 overflow-hidden rounded-[13px] shadow-sm">
+        <div className="flex items-center gap-3 rounded-control border border-white/70 bg-white/45 p-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,.7)] dark:border-white/10 dark:bg-white/[0.055] dark:shadow-none">
+          <span className="relative isolate block h-11 w-11 shrink-0 overflow-hidden rounded-control shadow-sm">
             {avatarSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={avatarSrc}
                 alt={user.displayName}
+                fill
+                sizes="44px"
+                unoptimized
                 className="absolute inset-0 block h-full w-full object-cover object-top"
                 onError={handleAvatarError}
               />
@@ -129,7 +134,7 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
               baseClassName=""
               className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-2 py-2 text-right text-sm font-semibold text-gray-700 transition hover:border-white/70 hover:bg-white/55 hover:text-brand-600 dark:text-gray-300 dark:hover:border-white/10 dark:hover:bg-white/[0.07] dark:hover:text-brand-300"
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-brand-500/10 text-brand-600 transition group-hover:bg-brand-500/15 dark:text-brand-300">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-brand-500/10 text-brand-600 transition group-hover:bg-brand-500/15 dark:text-brand-300">
                 <UserPen className="h-[17px] w-[17px]" aria-hidden="true" />
               </span>
               <span>ویرایش پروفایل</span>
@@ -149,7 +154,7 @@ export default function UserDropdown({ user }: { user: CurrentUser }) {
             type="submit"
             className="group flex w-full items-center gap-3 rounded-xl border border-transparent px-2 py-2 text-right text-sm font-semibold text-gray-600 transition hover:border-red-500/10 hover:bg-red-500/[0.08] hover:text-red-600 dark:text-gray-300 dark:hover:border-red-400/10 dark:hover:bg-red-400/[0.08] dark:hover:text-red-300"
           >
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-red-500/[0.08] text-red-500 transition group-hover:bg-red-500/[0.12]">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-control bg-red-500/[0.08] text-red-500 transition group-hover:bg-red-500/[0.12]">
               <LogOut className="h-[17px] w-[17px]" aria-hidden="true" />
             </span>
             <span>خروج</span>

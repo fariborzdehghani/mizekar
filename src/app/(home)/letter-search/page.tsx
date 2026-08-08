@@ -85,7 +85,7 @@ export default async function LetterSearchPage({
 
   return (
     <div className="liquid-content-frame liquid-glass-page flex min-h-[calc(100vh-92px)] flex-col py-4 sm:py-6 lg:py-8">
-      <div className="liquid-page-header liquid-page-header-inset sticky top-[108px] z-40 flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="liquid-page-header flex flex-col-reverse items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Link
           href="/letter"
           className="rounded-2xl bg-brand-500 px-4 py-2 font-medium text-white shadow-[0_10px_24px_rgba(98,92,255,0.26)] transition hover:bg-brand-600"
@@ -107,15 +107,15 @@ export default async function LetterSearchPage({
           {result.error}
         </div>
       ) : !result.hasSearchCriteria ? (
-        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
+        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-panel border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
           از دکمه جستجوی پیشرفته در سربرگ، عنوان، متن یا تاریخ ایجاد نامه را وارد کنید.
         </div>
       ) : result.letters.length === 0 ? (
-        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-[28px] border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
+        <div className="liquid-glass-panel mt-4 flex flex-1 items-center justify-center rounded-panel border border-white/70 bg-app-panel p-8 text-center text-gray-500 dark:border-white/10 dark:bg-gray-900 dark:text-gray-400">
           نامه‌ای با این معیارها پیدا نشد.
         </div>
       ) : (
-        <div className="liquid-glass-surface mt-4 overflow-hidden rounded-[28px] border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
+        <div className="liquid-glass-surface mt-4 overflow-hidden rounded-panel border border-white/70 bg-app-panel dark:border-white/10 dark:bg-gray-900">
           <InboxListToolbar searchQuery={title} searchPlaceholder="جستجو در نامه‌ها..." queryParam="title" />
           <div className="overflow-x-auto">
           <table className="inbox-card-table inbox-card-table--letters w-full">
