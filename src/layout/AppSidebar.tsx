@@ -353,7 +353,7 @@ const AppSidebar: React.FC = () => {
                 : "pointer-events-none max-w-0 translate-x-2 opacity-0 delay-0"
             }`}
           >
-            <span className="block whitespace-nowrap text-xl font-extrabold tracking-tight">میزکار</span>
+            <span className="block whitespace-nowrap text-xl font-bold">میزکار</span>
             <span className="block whitespace-nowrap text-[10px] font-medium text-gray-500 dark:text-gray-400">اتوماسیون هوشمند سازمانی</span>
           </span>
         </Link>

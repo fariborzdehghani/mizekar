@@ -1996,12 +1996,22 @@ html:not(.dark) .liquid-glass-app tbody tr:hover {
   background: transparent !important;
 }
 
-.liquid-auth-side {
-  border-color: var(--liquid-edge) !important;
-  background: var(--liquid-glass-strong) !important;
-  box-shadow: var(--liquid-shadow);
-  -webkit-backdrop-filter: blur(34px) saturate(185%);
-  backdrop-filter: blur(34px) saturate(185%);
+.liquid-auth-page button:focus-visible {
+  outline: 3px solid rgba(98, 92, 255, 0.2);
+  outline-offset: 2px;
+}
+
+.liquid-auth-page .ui-control[aria-invalid="true"] {
+  border-color: rgba(217, 45, 32, 0.72) !important;
+}
+
+.dark .liquid-auth-page button:focus-visible {
+  outline-color: rgba(143, 137, 255, 0.34);
+}
+
+.auth-password-input::-ms-reveal,
+.auth-password-input::-ms-clear {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2113,7 +2123,7 @@ html:not(.dark) .liquid-glass-app tbody tr:hover {
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
 }
 
 .dark .ui-page-title {
@@ -2490,6 +2500,11 @@ html:not(.dark) .liquid-glass-app tbody tr:hover {
   .liquid-glass-control:is(button, a),
   .liquid-glass-keyline:is(button, a) {
     min-height: var(--ui-control-lg);
+  }
+
+  .ui-icon-button:not(.ui-button-sm) {
+    width: var(--ui-control-lg);
+    min-width: var(--ui-control-lg);
   }
 
   .ui-surface-padded {
