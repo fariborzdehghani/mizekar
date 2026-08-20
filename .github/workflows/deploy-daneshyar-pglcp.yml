@@ -47,8 +47,7 @@ jobs:
         run: |
           set -euo pipefail
           TARGET_SHA="$(git rev-parse HEAD)"
-          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
-          DEPLOYED_SHA="$("${SSH[@]}" 'cat /opt/apps/daneshyar/deployed-sha 2>/dev/null || true')"
+          DEPLOYED_SHA="$(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'cat /opt/apps/daneshyar/deployed-sha 2>/dev/null || true')"
           echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
           if [ "$TARGET_SHA" = "$DEPLOYED_SHA" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
             echo "DEPLOY_NEEDED=false" >> "$GITHUB_ENV"
@@ -89,11 +88,9 @@ jobs:
         run: |
           set -euo pipefail
           IMAGE_REF="pglcp/daneshyar:$TARGET_SHA"
-          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
-          SCP=(scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT")
-          docker save "$IMAGE_REF" | gzip -1 | "${SSH[@]}" 'gunzip | docker load >/dev/null'
-          "${SCP[@]}" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/daneshyar/compose.yml"
-          "${SSH[@]}" "if systemctl is-active --quiet daneshyar.service; then systemctl stop daneshyar.service; fi; cd /opt/apps/daneshyar && DANESHYAR_IMAGE='$IMAGE_REF' docker compose -p daneshyar -f compose.yml up -d --force-recreate --remove-orphans"
-          "${SSH[@]}" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3201/api/health >/dev/null && exit 0; sleep 3; done; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml logs --tail=120; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml down; if [ -f /etc/systemd/system/daneshyar.service ]; then systemctl start daneshyar.service; fi; exit 1'
-          "${SSH[@]}" "printf '%s\n' '$TARGET_SHA' > /opt/apps/daneshyar/deployed-sha"
-          "${SSH[@]}" 'docker image prune -f >/dev/null'
+          docker save "$IMAGE_REF" | gzip -1 | ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'gunzip | docker load >/dev/null'
+          scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/daneshyar/compose.yml"
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "if systemctl is-active --quiet daneshyar.service; then systemctl stop daneshyar.service; fi; cd /opt/apps/daneshyar && DANESHYAR_IMAGE='$IMAGE_REF' docker compose -p daneshyar -f compose.yml up -d --force-recreate --remove-orphans"
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3201/api/health >/dev/null && exit 0; sleep 3; done; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml logs --tail=120; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml down; if [ -f /etc/systemd/system/daneshyar.service ]; then systemctl start daneshyar.service; fi; exit 1'
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "printf '%s\n' '$TARGET_SHA' > /opt/apps/daneshyar/deployed-sha"
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'docker image prune -f >/dev/null'

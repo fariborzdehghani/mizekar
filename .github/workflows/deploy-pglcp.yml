@@ -61,10 +61,8 @@ jobs:
       - name: Transfer image and deploy
         run: |
           set -euo pipefail
-          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
-          SCP=(scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT")
-          docker save "$IMAGE_REF" | gzip -1 | "${SSH[@]}" 'gunzip | docker load >/dev/null'
-          "${SCP[@]}" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/mizekar/compose.yml"
-          "${SSH[@]}" "if command -v pm2 >/dev/null 2>&1 && pm2 describe mizekar >/dev/null 2>&1; then pm2 delete mizekar; pm2 save; fi; cd /opt/apps/mizekar && MIZEKAR_IMAGE='$IMAGE_REF' docker compose -p mizekar -f compose.yml up -d --force-recreate --remove-orphans"
-          "${SSH[@]}" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/signin >/dev/null && exit 0; sleep 3; done; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml logs --tail=120; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml down; if [ -d /root/projects/mizekar ] && command -v pm2 >/dev/null 2>&1; then cd /root/projects/mizekar && pm2 start npm --name mizekar -- start && pm2 save; fi; exit 1'
-          "${SSH[@]}" 'docker image prune -f >/dev/null'
+          docker save "$IMAGE_REF" | gzip -1 | ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'gunzip | docker load >/dev/null'
+          scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/mizekar/compose.yml"
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "if command -v pm2 >/dev/null 2>&1 && pm2 describe mizekar >/dev/null 2>&1; then pm2 delete mizekar; pm2 save; fi; cd /opt/apps/mizekar && MIZEKAR_IMAGE='$IMAGE_REF' docker compose -p mizekar -f compose.yml up -d --force-recreate --remove-orphans"
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/signin >/dev/null && exit 0; sleep 3; done; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml logs --tail=120; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml down; if [ -d /root/projects/mizekar ] && command -v pm2 >/dev/null 2>&1; then cd /root/projects/mizekar && pm2 start npm --name mizekar -- start && pm2 save; fi; exit 1'
+          ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'docker image prune -f >/dev/null'
