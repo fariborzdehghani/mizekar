@@ -1,5 +1,9 @@
 # Mizekar
 
+## Daneshyar knowledge invitations
+
+`POST /api/integrations/knowledge-invitations` accepts authenticated project-completion notifications and creates a real message for the specified Mizekar username. Configure `KNOWLEDGE_INVITATION_API_KEY` to the same value as Daneshyar's `MIZEKAR_INTEGRATION_API_KEY`; `KNOWLEDGE_INVITATION_SENDER_USERNAME` selects the internal sender account (defaults to `admin`).
+
 Mizekar is a Persian RTL office-workflow application built with Next.js 16, React 19, Prisma, and Microsoft SQL Server. It covers letters, forms, referrals, meetings, messages, archives, notifications, and AI-assisted workflows.
 
 ## Requirements

@@ -1,0 +1,74 @@
+name: Deploy Mizekar to PGLCP
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-pglcp-mizekar
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify-build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      IMAGE_REF: pglcp/mizekar:${{ github.sha }}
+      DEPLOY_HOST: ${{ secrets.PGLCP_DEPLOY_HOST }}
+      DEPLOY_PORT: ${{ secrets.PGLCP_DEPLOY_PORT }}
+      DEPLOY_USER: ${{ secrets.PGLCP_DEPLOY_USER }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify application
+        run: |
+          npm test
+          npm run typecheck
+          npm run lint
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build deployment image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: ${{ env.IMAGE_REF }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Configure deployment SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.PGLCP_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PGLCP_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Transfer image and deploy
+        run: |
+          set -euo pipefail
+          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
+          SCP=(scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT")
+          docker save "$IMAGE_REF" | gzip -1 | "${SSH[@]}" 'gunzip | docker load >/dev/null'
+          "${SCP[@]}" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/mizekar/compose.yml"
+          "${SSH[@]}" "if command -v pm2 >/dev/null 2>&1 && pm2 describe mizekar >/dev/null 2>&1; then pm2 delete mizekar; pm2 save; fi; cd /opt/apps/mizekar && MIZEKAR_IMAGE='$IMAGE_REF' docker compose -p mizekar -f compose.yml up -d --force-recreate --remove-orphans"
+          "${SSH[@]}" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/signin >/dev/null && exit 0; sleep 3; done; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml logs --tail=120; docker compose -p mizekar -f /opt/apps/mizekar/compose.yml down; if [ -d /root/projects/mizekar ] && command -v pm2 >/dev/null 2>&1; then cd /root/projects/mizekar && pm2 start npm --name mizekar -- start && pm2 save; fi; exit 1'
+          "${SSH[@]}" 'docker image prune -f >/dev/null'
