@@ -75,6 +75,7 @@ jobs:
       - name: Verify application
         if: env.DEPLOY_NEEDED == 'true'
         run: |
+          pnpm exec next typegen
           pnpm test
           pnpm typecheck
           pnpm lint

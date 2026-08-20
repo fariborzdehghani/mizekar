@@ -39,6 +39,7 @@ jobs:
 
       - name: Verify application
         run: |
+          npm exec next typegen
           npm test
           npm run typecheck
           npm run lint
