@@ -7,7 +7,7 @@ on:
 
 concurrency:
   group: deploy-pglcp-daneshyar-bridge
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -91,6 +91,6 @@ jobs:
           docker save "$IMAGE_REF" | gzip -1 | ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'gunzip | docker load >/dev/null'
           scp -i ~/.ssh/pglcp_deploy_key -P "$DEPLOY_PORT" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/daneshyar/compose.yml"
           ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "if systemctl is-active --quiet daneshyar.service; then systemctl stop daneshyar.service; fi; cd /opt/apps/daneshyar && DANESHYAR_IMAGE='$IMAGE_REF' docker compose -p daneshyar -f compose.yml up -d --force-recreate --remove-orphans"
-          ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3201/api/health >/dev/null && exit 0; sleep 3; done; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml logs --tail=120; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml down; if [ -f /etc/systemd/system/daneshyar.service ]; then systemctl start daneshyar.service; fi; exit 1'
+          ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "export DANESHYAR_IMAGE='$IMAGE_REF'; for attempt in \$(seq 1 30); do curl -fsS http://127.0.0.1:3201/api/health >/dev/null && exit 0; sleep 3; done; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml logs --tail=120; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml down; if [ -f /etc/systemd/system/daneshyar.service ]; then systemctl start daneshyar.service; fi; exit 1"
           ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" "printf '%s\n' '$TARGET_SHA' > /opt/apps/daneshyar/deployed-sha"
           ssh -i ~/.ssh/pglcp_deploy_key -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST" 'docker image prune -f >/dev/null'
