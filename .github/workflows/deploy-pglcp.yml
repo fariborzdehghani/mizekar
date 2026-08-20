@@ -44,17 +44,8 @@ jobs:
           npm run typecheck
           npm run lint
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build deployment image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          load: true
-          tags: ${{ env.IMAGE_REF }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: docker build --tag "$IMAGE_REF" .
 
       - name: Configure deployment SSH
         env:

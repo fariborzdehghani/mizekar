@@ -80,19 +80,9 @@ jobs:
           pnpm typecheck
           pnpm lint
 
-      - name: Set up Docker Buildx
-        if: env.DEPLOY_NEEDED == 'true'
-        uses: docker/setup-buildx-action@v3
-
       - name: Build deployment image
         if: env.DEPLOY_NEEDED == 'true'
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          load: true
-          tags: pglcp/daneshyar:${{ env.TARGET_SHA }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: docker build --tag "pglcp/daneshyar:$TARGET_SHA" .
 
       - name: Transfer image and deploy
         if: env.DEPLOY_NEEDED == 'true'
