@@ -1,0 +1,107 @@
+name: Deploy Daneshyar to PGLCP
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-pglcp-daneshyar-bridge
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify-build-deploy:
+    runs-on: [self-hosted, Windows, X64, pglcp-deploy]
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      DEPLOY_HOST: ${{ secrets.PGLCP_DEPLOY_HOST }}
+      DEPLOY_PORT: ${{ secrets.PGLCP_DEPLOY_PORT }}
+      DEPLOY_USER: ${{ secrets.PGLCP_DEPLOY_USER }}
+    steps:
+      - name: Check out Daneshyar
+        uses: actions/checkout@v4
+        with:
+          repository: fariborzdehghani/enterprise-forms-knowledge-platform
+          ref: main
+          ssh-key: ${{ secrets.DANESHYAR_CHECKOUT_SSH_KEY }}
+          persist-credentials: false
+
+      - name: Configure deployment SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.PGLCP_DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PGLCP_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Check deployed revision
+        run: |
+          set -euo pipefail
+          TARGET_SHA="$(git rev-parse HEAD)"
+          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
+          DEPLOYED_SHA="$("${SSH[@]}" 'cat /opt/apps/daneshyar/deployed-sha 2>/dev/null || true')"
+          echo "TARGET_SHA=$TARGET_SHA" >> "$GITHUB_ENV"
+          if [ "$TARGET_SHA" = "$DEPLOYED_SHA" ] && [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+            echo "DEPLOY_NEEDED=false" >> "$GITHUB_ENV"
+            echo "Daneshyar revision $TARGET_SHA is already deployed."
+          else
+            echo "DEPLOY_NEEDED=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Set up pnpm
+        if: env.DEPLOY_NEEDED == 'true'
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        if: env.DEPLOY_NEEDED == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        if: env.DEPLOY_NEEDED == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify application
+        if: env.DEPLOY_NEEDED == 'true'
+        run: |
+          pnpm test
+          pnpm typecheck
+          pnpm lint
+
+      - name: Set up Docker Buildx
+        if: env.DEPLOY_NEEDED == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build deployment image
+        if: env.DEPLOY_NEEDED == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: pglcp/daneshyar:${{ env.TARGET_SHA }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Transfer image and deploy
+        if: env.DEPLOY_NEEDED == 'true'
+        run: |
+          set -euo pipefail
+          IMAGE_REF="pglcp/daneshyar:$TARGET_SHA"
+          SSH=(ssh -i ~/.ssh/id_ed25519 -p "$DEPLOY_PORT" "$DEPLOY_USER@$DEPLOY_HOST")
+          SCP=(scp -i ~/.ssh/id_ed25519 -P "$DEPLOY_PORT")
+          docker save "$IMAGE_REF" | gzip -1 | "${SSH[@]}" 'gunzip | docker load >/dev/null'
+          "${SCP[@]}" deploy/compose.production.yml "$DEPLOY_USER@$DEPLOY_HOST:/opt/apps/daneshyar/compose.yml"
+          "${SSH[@]}" "if systemctl is-active --quiet daneshyar.service; then systemctl stop daneshyar.service; fi; cd /opt/apps/daneshyar && DANESHYAR_IMAGE='$IMAGE_REF' docker compose -p daneshyar -f compose.yml up -d --force-recreate --remove-orphans"
+          "${SSH[@]}" 'for attempt in $(seq 1 30); do curl -fsS http://127.0.0.1:3201/api/health >/dev/null && exit 0; sleep 3; done; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml logs --tail=120; docker compose -p daneshyar -f /opt/apps/daneshyar/compose.yml down; if [ -f /etc/systemd/system/daneshyar.service ]; then systemctl start daneshyar.service; fi; exit 1'
+          "${SSH[@]}" "printf '%s\n' '$TARGET_SHA' > /opt/apps/daneshyar/deployed-sha"
+          "${SSH[@]}" 'docker image prune -f >/dev/null'
